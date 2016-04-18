@@ -14,7 +14,8 @@ var app = express();
 var con = mysql.createConnection({
   host: "localhost",
   user: "root",
-  password: "root"
+  password: "root",
+  database: "orpheus"
 });
 
 con.connect(function(err){
@@ -24,6 +25,23 @@ con.connect(function(err){
   }
   console.log('Connection established');
 });
+
+//Example of database acces
+con.query('SELECT * FROM user',function(err,rows){
+  if(err) throw err;
+
+  console.log('Data received from Db:\n');
+  //may be useful for testing:
+  console.log(JSON.stringify(rows));
+
+  //accessing columns from the rows:
+  for (var i = 0; i < rows.length; i++) {
+  console.log(rows[i].firstname);
+};
+
+});
+
+
 
 con.end(function(err) {
   // The connection is terminated gracefully
