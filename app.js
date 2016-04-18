@@ -1,4 +1,9 @@
 var express = require('express');
+var session = require('express-session');
+var passport = require('passport');
+var util = require('util');
+var TwitterStrategy = require('passport-twitter').Strategy;
+var config = require('./configuration/config');
 var mysql = require("mysql");
 var path = require('path');
 var favicon = require('serve-favicon');
@@ -18,6 +23,7 @@ var con = mysql.createConnection({
   database: "orpheus"
 });
 
+
 con.connect(function(err){
   if(err){
     console.log('Error connecting to Db');
@@ -36,18 +42,40 @@ con.query('SELECT * FROM user',function(err,rows){
 
   //accessing columns from the rows:
   for (var i = 0; i < rows.length; i++) {
-  console.log(rows[i].firstname);
-};
+    console.log(rows[i].firstname);
+  };
 
 });
-
-
 
 con.end(function(err) {
   // The connection is terminated gracefully
   // Ensures all previously enqueued queries are still
   // before sending a COM_QUIT packet to the MySQL server.
 });
+
+
+// Use the TwitterStrategy within Passport.
+
+passport.use(new TwitterStrategy({
+    consumerKey: "tKI7h5rY6mthejpht3FyvmvEo",
+    consumerSecret: "TAT0HUmdgvS9ZCleB89MbU3FLQ92sHI0wmB6KM1OPDjJUsGpzj",
+    callbackURL: "http://localhost:3000/auth/twitter/callback"
+  },
+  function(token, tokenSecret, profile, cb) {
+    User.findOrCreate({ twitterId: profile.id }, function (err, user) {
+      return cb(err, user);
+    });
+  }
+));
+
+passport.serializeUser(function(user, cb) {
+  cb(null, user);
+});
+
+passport.deserializeUser(function(obj, cb) {
+  cb(null, obj);
+});
+
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
@@ -60,6 +88,9 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
+app.use(session({ secret: 'keyboard cat', key: 'sid'}));
+app.use(passport.initialize());
+app.use(passport.session());
 
 app.use('/', routes);
 app.use('/users', users);
@@ -94,6 +125,33 @@ app.use(function(err, req, res, next) {
     error: {}
   });
 });
+
+
+app.get('/', function(req, res){
+  res.render('index', { user: req.user });
+});
+
+app.get('/account', ensureAuthenticated, function(req, res){
+  res.render('account', { user: req.user });
+});
+
+app.get('/auth/twitter', passport.authenticate('twitter'));
+
+app.get('/auth/twitter/callback',
+passport.authenticate('twitter', { successRedirect : '/', failureRedirect: '/login' }),
+function(req, res) {
+  res.redirect('/');
+});
+
+app.get('/logout', function(req, res){
+  req.logout();
+  res.redirect('/');
+});
+
+function ensureAuthenticated(req, res, next) {
+  if (req.isAuthenticated()) { return next(); }
+  res.redirect('/login')
+}
 
 
 module.exports = app;
