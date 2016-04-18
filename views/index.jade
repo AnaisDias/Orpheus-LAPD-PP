@@ -129,7 +129,25 @@ html
       .row
         .col-lg-12
           h1.page-header Dashboard
-      // /.row
+    
+          .panel-heading Log in
+            .panel-body
+              form(role='form')
+                fieldset
+                  .form-group
+                    input.form-control(placeholder='E-mail', name='email', type='email', autofocus='')
+                  .form-group
+                    input.form-control(placeholder='Password', name='password', type='password', value='')
+                  .checkbox
+                    label
+                      input(name='remember', type='checkbox', value='Remember Me')
+                      | Remember Me
+                  a(href='index.html') Login
+                
+                  
+    
+    
+    
       .row
         .col-xs-12.col-md-6.col-lg-3
           .panel.panel-blue.panel-widget

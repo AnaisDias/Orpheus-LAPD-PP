@@ -1,4 +1,5 @@
 var express = require('express');
+var mysql = require("mysql");
 var path = require('path');
 var favicon = require('serve-favicon');
 var logger = require('morgan');
@@ -9,6 +10,26 @@ var routes = require('./routes/index');
 var users = require('./routes/users');
 
 var app = express();
+
+var con = mysql.createConnection({
+  host: "localhost",
+  user: "root",
+  password: "root"
+});
+
+con.connect(function(err){
+  if(err){
+    console.log('Error connecting to Db');
+    return;
+  }
+  console.log('Connection established');
+});
+
+con.end(function(err) {
+  // The connection is terminated gracefully
+  // Ensures all previously enqueued queries are still
+  // before sending a COM_QUIT packet to the MySQL server.
+});
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
