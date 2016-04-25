@@ -10,7 +10,7 @@ angular
         });
 
         $breadcrumbProvider.setOptions({
-            prefixStateName: 'app.main',
+            prefixStateName: 'appSimple.login',
             includeAbstract: true,
             template: '<li ng-repeat="step in steps" ng-class="{active: $last}" ng-switch="$last || !!step.abstract"><a ng-switch-when="false" href="{{step.ncyBreadcrumbLink}}">{{step.ncyBreadcrumbLabel}}</a><span ng-switch-when="true">{{step.ncyBreadcrumbLabel}}</span></li>'
         });

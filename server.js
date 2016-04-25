@@ -1,6 +1,7 @@
 var express = require('express');
 var session = require('express-session');
 var passport = require('passport');
+var OAuth = require('oauth');
 var util = require('util');
 var TwitterStrategy = require('passport-twitter').Strategy;
 var config = require('./configuration/config');
@@ -15,6 +16,70 @@ var routes = require('./routes/index');
 var users = require('./routes/users');
 
 var app = express();
+
+// Initialize controllers
+var IndexController = require('./controllers/index'),
+	FitbitAuthController = require('./controllers/fitbit-auth'),
+	FitbitApiController = require('./controllers/fitbit-api');
+
+// uncomment after placing your favicon in /public
+//app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
+app.use(logger('dev'));
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: false }));
+app.use(cookieParser());
+app.use(express.static(path.join(__dirname, 'public')));
+app.use(session({ secret: 'keyboard cat', key: 'sid'}));
+app.use(passport.initialize());
+app.use(passport.session());
+
+app.use('/', routes);
+app.use('/users', users);
+
+// catch 404 and forward to error handler
+app.use(function(req, res, next) {
+  var err = new Error('Not Found');
+  err.status = 404;
+  next(err);
+});
+
+// error handlers
+
+// development error handler
+// will print stacktrace
+if (app.get('env') === 'development') {
+  app.use(function(err, req, res, next) {
+    res.status(err.status || 500);
+    res.render('error', {
+      message: err.message,
+      error: err
+    });
+  });
+}
+
+// production error handler
+// no stacktraces leaked to user
+app.use(function(err, req, res, next) {
+  res.status(err.status || 500);
+  res.render('error', {
+    message: err.message,
+    error: {}
+  });
+});
+
+app.get('*', function(req, res) {
+        res.sendfile('./public/index.html'); // load the single view file (angular will handle the page changes on the front-end)
+    });
+
+// OAuth routes
+app.get('/auth/fitbit', passport.authenticate('fitbit'));
+app.get('/auth/fitbit/callback', passport.authenticate('fitbit', { failureRedirect: '/?error=auth_failed' }),
+	function(req, res) {
+		// Successful authentication, redirect home.
+		res.redirect('/phone');
+	}
+);
+
 
 var con = mysql.createConnection({
   host: "localhost",
@@ -77,59 +142,9 @@ passport.deserializeUser(function(obj, cb) {
 });
 
 
-// view engine setup
-app.set('views', path.join(__dirname, 'views'));
-app.set('view engine', 'jade');
-
-// uncomment after placing your favicon in /public
-//app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
-app.use(logger('dev'));
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: false }));
-app.use(cookieParser());
-app.use(express.static(path.join(__dirname, 'public')));
-app.use(session({ secret: 'keyboard cat', key: 'sid'}));
-app.use(passport.initialize());
-app.use(passport.session());
-
-app.use('/', routes);
-app.use('/users', users);
-
-// catch 404 and forward to error handler
-app.use(function(req, res, next) {
-  var err = new Error('Not Found');
-  err.status = 404;
-  next(err);
-});
-
-// error handlers
-
-// development error handler
-// will print stacktrace
-if (app.get('env') === 'development') {
-  app.use(function(err, req, res, next) {
-    res.status(err.status || 500);
-    res.render('error', {
-      message: err.message,
-      error: err
-    });
-  });
-}
-
-// production error handler
-// no stacktraces leaked to user
-app.use(function(err, req, res, next) {
-  res.status(err.status || 500);
-  res.render('error', {
-    message: err.message,
-    error: {}
-  });
-});
 
 
-app.get('/', function(req, res){
-  res.render('index', { user: req.user });
-});
+/* Twitter code that ill get back to on the next iteration
 
 app.get('/account', ensureAuthenticated, function(req, res){
   res.render('account', { user: req.user });
@@ -148,14 +163,18 @@ app.get('/logout', function(req, res){
   res.redirect('/');
 });
 
-app.get('*', function(req, res) {
-        res.sendfile('./public/index.html'); // load the single view file (angular will handle the page changes on the front-end)
-    });
+
 
 function ensureAuthenticated(req, res, next) {
   if (req.isAuthenticated()) { return next(); }
   res.redirect('/login')
 }
 
+*/
+
+
 
 module.exports = app;
+
+app.listen(8000);
+console.log("App listening on port 8000");

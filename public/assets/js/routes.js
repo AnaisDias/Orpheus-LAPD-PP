@@ -2,7 +2,7 @@ angular
     .module('app')
     .config(['$stateProvider', '$urlRouterProvider', '$ocLazyLoadProvider', '$breadcrumbProvider', function($stateProvider, $urlRouterProvider, $ocLazyLoadProvider, $breadcrumbProvider) {
 
-        $urlRouterProvider.otherwise('/dashboard');
+        $urlRouterProvider.otherwise('/login');
 
         $ocLazyLoadProvider.config({
             // Set to true if you want to see what and when is dynamically loaded
@@ -85,6 +85,8 @@ angular
                     }]
                 }
             })
+
+
             .state('app.main2', {
                 url: '/dashboard2',
                 templateUrl: 'views/main2.html',
@@ -135,11 +137,11 @@ angular
             // Additional Pages
             .state('appSimple.login', {
                 url: '/login',
-                templateUrl: 'views/pages/login.html'
+                templateUrl: 'views/login.html'
             })
             .state('appSimple.register', {
                 url: '/register',
-                templateUrl: 'views/pages/register.html'
+                templateUrl: 'views/register.html'
             })
             .state('appSimple.404', {
                 url: '/404',
