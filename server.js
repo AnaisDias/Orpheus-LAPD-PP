@@ -1,40 +1,75 @@
-var express = require('express');
+
+// set up ========================
+var express  = require('express');
+var app      = express();                               // create our app w/ express
+
+var bodyParser = require('body-parser');    // pull information from HTML POST (express4)
+var methodOverride = require('method-override'); // simulate DELETE and PUT (express4)
+var cookieParser = require('cookie-parser');
 var session = require('express-session');
 var passport = require('passport');
 var OAuth = require('oauth');
-var util = require('util');
 var TwitterStrategy = require('passport-twitter').Strategy;
+var FitbitStrategy = require('passport-fitbit-oauth2').FitbitOAuth2Strategy;
 var config = require('./configuration/config');
 var mysql = require("mysql");
 var path = require('path');
 var favicon = require('serve-favicon');
 var logger = require('morgan');
-var cookieParser = require('cookie-parser');
-var bodyParser = require('body-parser');
 
 var routes = require('./routes/index');
 var users = require('./routes/users');
-
-var app = express();
 
 // Initialize controllers
 var IndexController = require('./controllers/index'),
 	FitbitAuthController = require('./controllers/fitbit-auth'),
 	FitbitApiController = require('./controllers/fitbit-api');
 
-// uncomment after placing your favicon in /public
-//app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
+// configuration =================
 app.use(logger('dev'));
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: false }));
+app.use(express.static(__dirname + '/public'));                 // set the static files location /public/img will be /img for users
+app.use(bodyParser.urlencoded({'extended':'true'}));            // parse application/x-www-form-urlencoded
+app.use(bodyParser.json());                                     // parse application/json
+app.use(bodyParser.json({ type: 'application/vnd.api+json' })); // parse application/vnd.api+json as json
+app.use(methodOverride());
 app.use(cookieParser());
-app.use(express.static(path.join(__dirname, 'public')));
-app.use(session({ secret: 'keyboard cat', key: 'sid'}));
 app.use(passport.initialize());
 app.use(passport.session());
 
 app.use('/', routes);
 app.use('/users', users);
+
+
+passport.use(new FitbitStrategy({
+        clientID:     "227L7D",
+        clientSecret: "7723212530771cafa5f2514b9aee8a54",
+        callbackURL: "http://127.0.0.1:8000/auth/fitbit/callback"
+    },
+    function(accessToken, refreshToken, profile, done) {
+        done(null, {token: accessToken});
+    }
+));
+
+app.get('/api/todos', function(req, res) {
+	var json_data = {"name":"amita","pass":"12345"};
+	res.json(json_data);
+
+});
+
+// OAuth routes
+app.get('/auth/fitbit', passport.authenticate('fitbit', {scope: ['weight', 'profile']}));
+app.get('/auth/fitbit/callback',
+    passport.authenticate('fitbit', { failureRedirect: '/login' }),
+    function(req, res) {
+        console.log(req.user);
+        res.redirect('/#/dashboard');
+    }
+);
+
+
+app.get('*', function(req, res) {
+	res.sendfile('./public/index.html'); // load the single view file (angular will handle the page changes on the front-end)
+});
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
@@ -66,20 +101,6 @@ app.use(function(err, req, res, next) {
     error: {}
   });
 });
-
-app.get('*', function(req, res) {
-        res.sendfile('./public/index.html'); // load the single view file (angular will handle the page changes on the front-end)
-    });
-
-// OAuth routes
-app.get('/auth/fitbit', passport.authenticate('fitbit'));
-app.get('/auth/fitbit/callback', passport.authenticate('fitbit', { failureRedirect: '/?error=auth_failed' }),
-	function(req, res) {
-		// Successful authentication, redirect home.
-		res.redirect('/phone');
-	}
-);
-
 
 var con = mysql.createConnection({
   host: "localhost",
@@ -117,62 +138,6 @@ con.end(function(err) {
   // Ensures all previously enqueued queries are still
   // before sending a COM_QUIT packet to the MySQL server.
 });
-
-
-// Use the TwitterStrategy within Passport.
-
-passport.use(new TwitterStrategy({
-    consumerKey: "tKI7h5rY6mthejpht3FyvmvEo",
-    consumerSecret: "TAT0HUmdgvS9ZCleB89MbU3FLQ92sHI0wmB6KM1OPDjJUsGpzj",
-    callbackURL: "http://localhost:3000/auth/twitter/callback"
-  },
-  function(token, tokenSecret, profile, cb) {
-    User.findOrCreate({ twitterId: profile.id }, function (err, user) {
-      return cb(err, user);
-    });
-  }
-));
-
-passport.serializeUser(function(user, cb) {
-  cb(null, user);
-});
-
-passport.deserializeUser(function(obj, cb) {
-  cb(null, obj);
-});
-
-
-
-
-/* Twitter code that ill get back to on the next iteration
-
-app.get('/account', ensureAuthenticated, function(req, res){
-  res.render('account', { user: req.user });
-});
-
-app.get('/auth/twitter', passport.authenticate('twitter'));
-
-app.get('/auth/twitter/callback',
-passport.authenticate('twitter', { successRedirect : '/', failureRedirect: '/login' }),
-function(req, res) {
-  res.redirect('/');
-});
-
-app.get('/logout', function(req, res){
-  req.logout();
-  res.redirect('/');
-});
-
-
-
-function ensureAuthenticated(req, res, next) {
-  if (req.isAuthenticated()) { return next(); }
-  res.redirect('/login')
-}
-
-*/
-
-
 
 module.exports = app;
 

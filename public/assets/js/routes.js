@@ -129,10 +129,24 @@ angular
                     }]
                 }
             })
+            .state('auth.fitbit', {
+              url: 'auth/fitbit'
+
+            })
             .state('appSimple', {
                 abstract: true,
-                templateUrl: 'views/common/layouts/simple.html'
+                templateUrl: 'views/common/layouts/simple.html',
+                resolve: {
+
+                    loadMyCtrl: ['$ocLazyLoad', function($ocLazyLoad) {
+                        // you can lazy load controllers
+                        return $ocLazyLoad.load({
+                            files: ['assets/js/controllers/login.js']
+                        });
+                    }]
+                }
             })
+
 
             // Additional Pages
             .state('appSimple.login', {
