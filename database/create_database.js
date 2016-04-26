@@ -28,7 +28,7 @@ CREATE TABLE `roles` ( \
 
 connection.query('\
 CREATE TABLE `users` ( \
-    `iduser` int(11) NOT NULL, \
+    `iduser` int(11) NOT NULL AUTO_INCREMENT, \
     `role` int(11) NOT NULL, \
     `averageDailySteps` int(11) DEFAULT NULL, \
     `dateOfBirth` date DEFAULT NULL, \
