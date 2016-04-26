@@ -16,6 +16,7 @@ var mysql = require("mysql");
 var path = require('path');
 var favicon = require('serve-favicon');
 var logger = require('morgan');
+var request = require("request");
 
 var routes = require('./routes/index');
 var users = require('./routes/users');
@@ -40,15 +41,7 @@ app.use('/', routes);
 app.use('/users', users);
 
 
-passport.use(new FitbitStrategy({
-        clientID:     "227L7D",
-        clientSecret: "7723212530771cafa5f2514b9aee8a54",
-        callbackURL: "http://127.0.0.1:8000/auth/fitbit/callback"
-    },
-    function(accessToken, refreshToken, profile, done) {
-        done(null, {token: accessToken});
-    }
-));
+
 
 app.get('/api/todos', function(req, res) {
 	var json_data = {"name":"amita","pass":"12345"};
@@ -57,14 +50,13 @@ app.get('/api/todos', function(req, res) {
 });
 
 // OAuth routes
-app.get('/auth/fitbit', passport.authenticate('fitbit', {scope: ['weight', 'profile']}));
-app.get('/auth/fitbit/callback',
-    passport.authenticate('fitbit', { failureRedirect: '/login' }),
-    function(req, res) {
-        console.log(req.user);
-        res.redirect('/#/dashboard');
-    }
-);
+app.get('/auth/fitbit', passport.authenticate('fitbit', {scope: ['weight', 'profile', 'activity','heartrate']}));
+app.get( '/auth/fitbit/callback', passport.authenticate( 'fitbit', {
+        successRedirect: '/#/dashboard',
+        failureRedirect: '/#/login'
+}));
+
+
 
 
 app.get('*', function(req, res) {
@@ -102,6 +94,7 @@ app.use(function(err, req, res, next) {
   });
 });
 
+/*
 var con = mysql.createConnection({
   host: "localhost",
   user: "root",
@@ -138,6 +131,8 @@ con.end(function(err) {
   // Ensures all previously enqueued queries are still
   // before sending a COM_QUIT packet to the MySQL server.
 });
+
+*/
 
 module.exports = app;
 

@@ -33,6 +33,7 @@ function titleDirective() {
     return directive;
 }
 
+
 //Breadcrumb Prefix
 function breadcrumbPrefixDirective() {
     var directive = {

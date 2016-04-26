@@ -129,10 +129,7 @@ angular
                     }]
                 }
             })
-            .state('auth.fitbit', {
-              url: 'auth/fitbit'
 
-            })
             .state('appSimple', {
                 abstract: true,
                 templateUrl: 'views/common/layouts/simple.html',
@@ -146,6 +143,7 @@ angular
                     }]
                 }
             })
+
 
 
             // Additional Pages
