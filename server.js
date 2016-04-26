@@ -21,6 +21,13 @@ var request = require("request");
 var routes = require('./routes/index');
 var users = require('./routes/users');
 
+var dbconfig = require('./configuration/database');
+
+//creating db connection
+var connection = mysql.createConnection(dbconfig.connection);
+
+console.log("connection to" + dbconfig.connection.database);
+
 // Initialize controllers
 var IndexController = require('./controllers/index'),
 	FitbitAuthController = require('./controllers/fitbit-auth'),
