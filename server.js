@@ -64,16 +64,13 @@ app.get('/api/todos', function(req, res) {
 });
 
 
-app.get('/api/fitbit/user/create', function(req, res) {
+app.post('/api/fitbit/user/create', function(req, res) {
 
-	User.findOrCreate({where: {fullname: req.fullname, avatar: req.avatar, displayName: req.displayName, gender: req.gender, age: req.age, avatar: req.avatar, auth_id: req.auth_id}})
-	.success(function(user, created){
-  console.log(user.values);
-    res.send(200);
-		})
-	.error(function(err){
-	   console.log('Error occured' + err);
-	})
+	models.User.findOrCreate({
+		where: { auth_id: '4JJ92F'}, // we search for this user
+		defaults: {fullname: req.body.fullname, avatar: req.body.avatar, displayName: req.body.displayName, gender: req.body.gender, age: req.body.age}});
+
+	console.log(req.body.fullname);
 });
 
 
