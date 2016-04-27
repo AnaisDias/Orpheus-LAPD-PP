@@ -2,5 +2,21 @@
     <div class="container-fluid">
         <button class="navbar-toggler hidden-lg-up" type="button">&#9776;</button>
         <a class="navbar-brand" ui-sref="app.main"></a>
+        <ul class="nav navbar-nav pull-right hidden-md-down">
+        	<li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false" ng-controller="showUsername">
+                    <img src="{{avatar}}" class="img-avatar" alt="assets/img/avatars/6.jpg">   
+                    	<span class="hidden-md-down">{{username}}</span>
+                    </div>
+                </a>
+                <div class="dropdown-menu dropdown-menu-right">
+                    <div class="dropdown-header text-xs-center">
+                        <strong>{{ 'ACCOUNT' | translate }}</strong>
+                    </div>
+                    <a class="dropdown-item" href="#"><i class="fa fa-user"></i> {{ 'PROFILE' | translate }}</a>
+                    <a class="dropdown-item" href="#"><i class="fa fa-lock"></i> {{ 'LOGOUT' | translate }}</a>
+                </div>
+            </li>
+        </ul>
     </div>
 </header>

@@ -6,6 +6,7 @@ var CircularJSON = require('circular-json');
 var bodyParser = require('body-parser');    // pull information from HTML POST (express4)
 var methodOverride = require('method-override'); // simulate DELETE and PUT (express4)
 var cookieParser = require('cookie-parser');
+var cookieSession = require('cookie-session');
 var session = require('express-session');
 var passport = require('passport');
 var OAuth = require('oauth');
@@ -39,6 +40,7 @@ app.use(bodyParser.json());                                     // parse applica
 app.use(bodyParser.json({ type: 'application/vnd.api+json' })); // parse application/vnd.api+json as json
 app.use(methodOverride());
 app.use(cookieParser());
+app.use(cookieSession({ name: 'session', keys: ['key1', 'key2']}));
 app.use(passport.initialize());
 app.use(passport.session());
 
@@ -78,6 +80,31 @@ app.get('/api/user/:user_id', function(req, res) {
 	var json_data = {"name":"amita","pass":"12345", "id":req.params.user_id};
 	res.json(json_data);
 
+});
+
+app.get('/api/username', function (req, res) {
+  var json_data = {username:req.user.profile.displayName , avatar:req.user.profile._json.user.avatar};
+  res.json(json_data);
+});
+
+app.get('/api/weight/:date', function(req, res){
+  console.log("Sending request!");
+  console.log(req.params);
+  console.log(req.user.accessToken);
+  var url1 = "https://api.fitbit.com/1/user/" + req.user.profile.id +"/body/log/weight/date/" + req.params.date + ".json";
+  var fitAuth = "Bearer " + req.user.accessToken;
+  var options = {
+    url:url1,
+    headers:{
+      'Authorization' : fitAuth
+    }
+  };
+  console.log(options.url);
+  console.log(options.headers.Authorization);
+  request(options, function(error, response, body){
+    console.log(body); // Show the HTML for the Google homepage.
+  
+  });
 });
 
 // OAuth routes
