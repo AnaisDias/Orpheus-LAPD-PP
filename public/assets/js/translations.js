@@ -6,6 +6,7 @@ angular
         .translations('en', {
             CHOOSE_LANGUAGE:'Choose language',
             HOME:           'Home',
+            TITLE:          'Hello',
             DASHBOARD:      'Dashboard',
             ICONS:          'Icons',
             FORMS:          'Forms',

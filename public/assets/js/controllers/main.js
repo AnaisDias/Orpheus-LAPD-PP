@@ -1,7 +1,7 @@
 //main.js
 angular
     .module('app')
-    .controller('showUsername', showUsername)
+    .controller('navbarCtrl', navbarCtrl)
     .controller('fitbitWeight', fitbitWeight)
     .controller('toastrWelcome', toastrWelcome)
     .controller('trafficDemoCtrl', trafficDemoCtrl)
@@ -21,8 +21,8 @@ angular
     .controller('cardChartCtrl4', cardChartCtrl4);
 
 
-showUsername.$inject = ['$scope', '$http'];
-function showUsername($scope,$http){
+navbarCtrl.$inject = ['$scope', '$http'];
+function navbarCtrl($scope,$http){
     $http.get('/api/username').success(function (data) {
         $scope.username = data.username;
         $scope.avatar = data.avatar;

@@ -25,7 +25,7 @@ angular
                     skip: true
                 },
                 resolve: {
-                    loadPlugin: ['$ocLazyLoad', function ($ocLazyLoad) {
+                    loadPlugin: ['$ocLazyLoad', function($ocLazyLoad) {
                         // you can lazy load files for an existing module
                         return $ocLazyLoad.load([{
                             serie: true,
@@ -46,80 +46,32 @@ angular
                 templateUrl: 'views/main.html',
                 //page title goes here
                 ncyBreadcrumb: {
-                    label: '{{ "HOME" | translate }}',
+                    label: '{{ "TITLE" | translate }}',
                 },
                 //page subtitle goes here
-                params: { subtitle: 'Welcome to ROOT powerfull Bootstrap & AngularJS UI Kit' },
-                resolve: {
-                    loadPlugin: ['$ocLazyLoad', function ($ocLazyLoad) {
-                        // you can lazy load files for an existing module
-                        return $ocLazyLoad.load([
-                            {
-                                serie: true,
-                                files: ['assets/js/libs/moment.min.js']
-                            },
-                            {
-                                serie: true,
-                                files: ['assets/js/libs/daterangepicker.min.js', 'assets/js/libs/angular-daterangepicker.min.js']
-                            },
-                            {
-                                serie: true,
-                                name: 'chart.js',
-                                files: ['assets/js/libs/Chart.min.js', 'assets/js/libs/angular-chart.min.js']
-                            },
-                            {
-                                serie: true,
-                                files: ['assets/js/libs/gauge.min.js']
-                            },
-                            {
-                                serie: true,
-                                files: ['assets/js/libs/angular-toastr.tpls.min.js']
-                            }
-                        ]);
-                    }],
-                    loadMyCtrl: ['$ocLazyLoad', function($ocLazyLoad) {
-                        // you can lazy load controllers
-                        return $ocLazyLoad.load({
-                            files: ['assets/js/controllers/main.js']
-                        });
-                    }]
-                }
-            })
-
-
-            .state('app.main2', {
-                url: '/dashboard2',
-                templateUrl: 'views/main2.html',
-                ncyBreadcrumb: {
-                    label: 'Alternative',
+                params: {
+                    subtitle: 'Welcome to e-Health'
                 },
-                params: { subtitle: 'Subtitle goes here!' },
                 resolve: {
-                    loadPlugin: ['$ocLazyLoad', function ($ocLazyLoad) {
+                    loadPlugin: ['$ocLazyLoad', function($ocLazyLoad) {
                         // you can lazy load files for an existing module
-                        return $ocLazyLoad.load([
-                            {
-                                serie: true,
-                                files: ['assets/js/libs/moment.min.js']
-                            },
-                            {
-                                serie: true,
-                                files: ['assets/js/libs/daterangepicker.min.js', 'assets/js/libs/angular-daterangepicker.min.js']
-                            },
-                            {
-                                serie: true,
-                                name: 'chart.js',
-                                files: ['assets/js/libs/Chart.min.js', 'assets/js/libs/angular-chart.min.js']
-                            },
-                            {
-                                serie: true,
-                                files: ['assets/js/libs/gauge.min.js']
-                            },
-                            {
-                                serie: true,
-                                files: ['assets/js/libs/angular-toastr.tpls.min.js']
-                            }
-                        ]);
+                        return $ocLazyLoad.load([{
+                            serie: true,
+                            files: ['assets/js/libs/moment.min.js']
+                        }, {
+                            serie: true,
+                            files: ['assets/js/libs/daterangepicker.min.js', 'assets/js/libs/angular-daterangepicker.min.js']
+                        }, {
+                            serie: true,
+                            name: 'chart.js',
+                            files: ['assets/js/libs/Chart.min.js', 'assets/js/libs/angular-chart.min.js']
+                        }, {
+                            serie: true,
+                            files: ['assets/js/libs/gauge.min.js']
+                        }, {
+                            serie: true,
+                            files: ['assets/js/libs/angular-toastr.tpls.min.js']
+                        }]);
                     }],
                     loadMyCtrl: ['$ocLazyLoad', function($ocLazyLoad) {
                         // you can lazy load controllers
@@ -130,24 +82,64 @@ angular
                 }
             })
 
-            .state('appSimple', {
-                abstract: true,
-                templateUrl: 'views/common/layouts/simple.html',
-                resolve: {
 
-                    loadMyCtrl: ['$ocLazyLoad', function($ocLazyLoad) {
-                        // you can lazy load controllers
-                        return $ocLazyLoad.load({
-                            files: ['assets/js/controllers/login.js']
-                        });
-                    }]
-                }
-            })
+        .state('app.main2', {
+            url: '/dashboard2',
+            templateUrl: 'views/main2.html',
+            ncyBreadcrumb: {
+                label: 'Alternative',
+            },
+            params: {
+                subtitle: 'Subtitle goes here!'
+            },
+            resolve: {
+                loadPlugin: ['$ocLazyLoad', function($ocLazyLoad) {
+                    // you can lazy load files for an existing module
+                    return $ocLazyLoad.load([{
+                        serie: true,
+                        files: ['assets/js/libs/moment.min.js']
+                    }, {
+                        serie: true,
+                        files: ['assets/js/libs/daterangepicker.min.js', 'assets/js/libs/angular-daterangepicker.min.js']
+                    }, {
+                        serie: true,
+                        name: 'chart.js',
+                        files: ['assets/js/libs/Chart.min.js', 'assets/js/libs/angular-chart.min.js']
+                    }, {
+                        serie: true,
+                        files: ['assets/js/libs/gauge.min.js']
+                    }, {
+                        serie: true,
+                        files: ['assets/js/libs/angular-toastr.tpls.min.js']
+                    }]);
+                }],
+                loadMyCtrl: ['$ocLazyLoad', function($ocLazyLoad) {
+                    // you can lazy load controllers
+                    return $ocLazyLoad.load({
+                        files: ['assets/js/controllers/main.js']
+                    });
+                }]
+            }
+        })
+
+        .state('appSimple', {
+            abstract: true,
+            templateUrl: 'views/common/layouts/simple.html',
+            resolve: {
+
+                loadMyCtrl: ['$ocLazyLoad', function($ocLazyLoad) {
+                    // you can lazy load controllers
+                    return $ocLazyLoad.load({
+                        files: ['assets/js/controllers/login.js']
+                    });
+                }]
+            }
+        })
 
 
 
-            // Additional Pages
-            .state('appSimple.login', {
+        // Additional Pages
+        .state('appSimple.login', {
                 url: '/login',
                 templateUrl: 'views/login.html'
             })
@@ -164,17 +156,17 @@ angular
                 templateUrl: 'views/pages/500.html'
             })
 
-            //UI Kits
-            .state('app.uikits', {
-                abstract: true,
-                template: '<ui-view></ui-view>',
-                ncyBreadcrumb: {
-                    label: 'UI Kits'
-                }
-            })
+        //UI Kits
+        .state('app.uikits', {
+            abstract: true,
+            template: '<ui-view></ui-view>',
+            ncyBreadcrumb: {
+                label: 'UI Kits'
+            }
+        })
 
-            //UI Kits - Invoicing App
-            .state('app.uikits.invoicing', {
+        //UI Kits - Invoicing App
+        .state('app.uikits.invoicing', {
                 abstract: true,
                 template: '<ui-view></ui-view>',
                 ncyBreadcrumb: {
@@ -189,8 +181,8 @@ angular
                 }
             })
 
-            //UI Kits - Email App
-            .state('app.uikits.email', {
+        //UI Kits - Email App
+        .state('app.uikits.email', {
                 abstract: true,
                 template: '<ui-view></ui-view>',
                 ncyBreadcrumb: {
@@ -218,13 +210,11 @@ angular
                     label: '{{ "INBOX" | translate }}'
                 },
                 resolve: {
-                    loadPlugin: ['$ocLazyLoad', function ($ocLazyLoad) {
+                    loadPlugin: ['$ocLazyLoad', function($ocLazyLoad) {
                         // you can lazy load files for an existing module
-                        return $ocLazyLoad.load([
-                            {
-                                files: ['assets/js/libs/select.min.js']
-                            }
-                        ]);
+                        return $ocLazyLoad.load([{
+                            files: ['assets/js/libs/select.min.js']
+                        }]);
                     }],
                     loadMyCtrl: ['$ocLazyLoad', function($ocLazyLoad) {
                         // you can lazy load controllers

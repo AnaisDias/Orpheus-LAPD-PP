@@ -1,4 +1,69 @@
 <div class="animated fadeIn">
-    <h1>Hello World</h1>
+    <h1> </h1>
 </div>
 <div ng-controller="toastrWelcome"></div>
+<div class="col-sm-6 col-lg-3">
+    <div class="card card-inverse card-primary" ng-controller="cardChartCtrl1">
+        <div class="card-block p-b-0">
+            <div class="btn-group pull-right">
+                <button type="button" class="btn btn-primary-outline active dropdown-toggle p-a-0" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    <i class="icon-settings"></i>
+                </button>
+                <div class="dropdown-menu">
+                    <a class="dropdown-item" href="#">Action</a>
+                    <a class="dropdown-item" href="#">Another action</a>
+                    <a class="dropdown-item" href="#">Something else here</a>
+                    <div class="dropdown-divider"></div>
+                    <a class="dropdown-item" href="#">Separated link</a>
+                </div>
+            </div>
+            <h4 class="m-b-0">9.823</h4>
+            <p>Moods from the last few days</p>
+        </div>
+        <div class="chart-wrapper p-x-1">
+            <canvas class="chart chart-line" chart-data="data" chart-labels="labels" chart-legend="false" chart-series="series" chart-options="options" chart-colours="colours" height="70"></canvas>
+        </div>
+    </div>
+    <div class="card card-inverse card-warning" ng-controller="cardChartCtrl3">
+        <div class="card-block p-b-0">
+            <div class="btn-group pull-right">
+                <button type="button" class="btn btn-warning-outline active dropdown-toggle p-a-0" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    <i class="icon-settings"></i>
+                </button>
+                <div class="dropdown-menu">
+                    <a class="dropdown-item" href="#">Action</a>
+                    <a class="dropdown-item" href="#">Another action</a>
+                    <a class="dropdown-item" href="#">Something else here</a>
+                    <div class="dropdown-divider"></div>
+                    <a class="dropdown-item" href="#">Separated link</a>
+                </div>
+            </div>
+            <h4 class="m-b-0">Sleep</h4>
+            <p> </p>
+
+        </div>
+        <div class="chart-wrapper">
+            <canvas class="chart chart-line" chart-data="data" chart-labels="labels" chart-legend="false" chart-series="series" chart-options="options" chart-colours="colours" height="63"></canvas>
+        </div>
+    </div>
+</div>
+
+<!--/.col-->
+<div class="col-sm-6 col-lg-3">
+    <div class="social-box twitter">
+        <i class="fa fa-twitter"></i>
+        <div class="chart-wrapper">
+            <canvas class="chart chart-line" chart-data="data2" chart-labels="labels" chart-legend="false" chart-series="series" chart-options="options" chart-colours="colours" height="90"></canvas>
+        </div>
+        <ul>
+            <li>
+                <strong>1</strong>
+                <span>Positive tweet</span>
+            </li>
+            <li>
+                <strong>5</strong>
+                <span>Negative tweets</span>
+            </li>
+        </ul>
+    </div>
+    <!--/.social-box-->
