@@ -2,16 +2,14 @@
 // set up ========================
 var express  = require('express');
 var app      = express();                               // create our app w/ express
-
+var CircularJSON = require('circular-json');
 var bodyParser = require('body-parser');    // pull information from HTML POST (express4)
 var methodOverride = require('method-override'); // simulate DELETE and PUT (express4)
 var cookieParser = require('cookie-parser');
 var session = require('express-session');
 var passport = require('passport');
 var OAuth = require('oauth');
-var TwitterStrategy = require('passport-twitter').Strategy;
 var FitbitStrategy = require('passport-fitbit-oauth2').FitbitOAuth2Strategy;
-var config = require('./configuration/config');
 var mysql = require("mysql");
 var path = require('path');
 var favicon = require('serve-favicon');
@@ -21,17 +19,17 @@ var request = require("request");
 var routes = require('./routes/index');
 var users = require('./routes/users');
 
-var dbconfig = require('./configuration/database');
+/*
+var db = require('./db'),
+  sequelize = db.sequelize,
+  Sequelize = db.Sequelize;
+	*/
 
-//creating db connection
-var connection = mysql.createConnection(dbconfig.connection);
-
-console.log("connection to" + dbconfig.connection.database);
+var models = require('./models');
+// console.log(JSON.stringify(models.UserTest));
 
 // Initialize controllers
-var IndexController = require('./controllers/index'),
-	FitbitAuthController = require('./controllers/fitbit-auth'),
-	FitbitApiController = require('./controllers/fitbit-api');
+var	FitbitAuthController = require('./controllers/fitbit-auth');
 
 // configuration =================
 app.use(logger('dev'));
@@ -48,10 +46,39 @@ app.use('/', routes);
 app.use('/users', users);
 
 
+app.get('/api/fds', function(req, res) {
+// console.log(CircularJSON.stringify(models.sequelize));
+
+	//models.Sequelize.UserTest.findAll();
+	models.UserTest.all().then(function(usertests) {
+	  // usertests will be an array of all UserTest instances
+		console.log(JSON.stringify(usertests));
+	})
+});
 
 
 app.get('/api/todos', function(req, res) {
 	var json_data = {"name":"amita","pass":"12345"};
+	res.json(json_data);
+
+});
+
+
+app.get('/api/user/create', function(req, res) {
+
+	User.findOrCreate({where: {email: 'vanialeite94@gmail.com'} })
+	.success(function(user, created){
+  console.log(user.values);
+    res.send(200);
+		})
+	.error(function(err){
+	   console.log('Error occured' + err);
+	})
+});
+
+
+app.get('/api/user/:user_id', function(req, res) {
+	var json_data = {"name":"amita","pass":"12345", "id":req.params.user_id};
 	res.json(json_data);
 
 });
@@ -101,45 +128,6 @@ app.use(function(err, req, res, next) {
   });
 });
 
-/*
-var con = mysql.createConnection({
-  host: "localhost",
-  user: "root",
-  password: "root",
-  database: "orpheus"
-});
-
-
-con.connect(function(err){
-  if(err){
-    console.log('Error connecting to Db');
-    return;
-  }
-  console.log('Connection established');
-});
-
-//Example of database acces
-con.query('SELECT * FROM user',function(err,rows){
-  if(err) throw err;
-
-  console.log('Data received from Db:\n');
-  //may be useful for testing:
-  console.log(JSON.stringify(rows));
-
-  //accessing columns from the rows:
-  for (var i = 0; i < rows.length; i++) {
-    console.log(rows[i].firstname);
-  };
-
-});
-
-con.end(function(err) {
-  // The connection is terminated gracefully
-  // Ensures all previously enqueued queries are still
-  // before sending a COM_QUIT packet to the MySQL server.
-});
-
-*/
 
 module.exports = app;
 
