@@ -64,9 +64,9 @@ app.get('/api/todos', function(req, res) {
 });
 
 
-app.get('/api/user/create', function(req, res) {
+app.get('/api/fitbit/user/create', function(req, res) {
 
-	User.findOrCreate({where: {email: 'vanialeite94@gmail.com'} })
+	User.findOrCreate({where: {email: req.email} })
 	.success(function(user, created){
   console.log(user.values);
     res.send(200);
