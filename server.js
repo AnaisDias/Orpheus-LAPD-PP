@@ -64,10 +64,10 @@ app.get('/api/todos', function(req, res) {
 });
 
 
-app.post('/api/fitbit/user/create', function(req, res) {
+app.post('/api/fitbit/user/findorcreate', function(req, res) {
 
 	models.User.findOrCreate({
-		where: { auth_id: '4JJ92F'}, // we search for this user
+		where: { auth_id: req.body.auth_id}, // we search for this user
 		defaults: {fullname: req.body.fullname, avatar: req.body.avatar, displayName: req.body.displayName, gender: req.body.gender, age: req.body.age}});
 
 	console.log(req.body.fullname);
