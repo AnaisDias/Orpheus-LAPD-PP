@@ -23,6 +23,10 @@
     "passport-twitter": "1.0.2",
     "sequelize": "^2.0.0-rc1",
     "sequelize-cli": "^2.4.0",
-    "serve-favicon": "~2.3.0"
+    "serve-favicon": "~2.3.0",
+    "method-override": "2.3.5",
+    "oauth": "0.9.14",
+    "passport-fitbit-oauth2": "1.0.1",
+    "request": "2.72.0"
   }
 }

@@ -66,7 +66,7 @@ app.get('/api/todos', function(req, res) {
 
 app.get('/api/fitbit/user/create', function(req, res) {
 
-	User.findOrCreate({where: {email: req.email} })
+	User.findOrCreate({where: {fullname: req.fullname, avatar: req.avatar, displayName: req.displayName, gender: req.gender, age: req.age, avatar: req.avatar, auth_id: req.auth_id}})
 	.success(function(user, created){
   console.log(user.values);
     res.send(200);
