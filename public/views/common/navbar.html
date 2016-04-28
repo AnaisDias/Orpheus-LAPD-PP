@@ -5,16 +5,15 @@
         <ul class="nav navbar-nav pull-right hidden-md-down">
         	<li class="nav-item dropdown">
                 <a class="nav-link dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false" ng-controller="navbarCtrl">
-                    <img src="{{avatar}}" class="img-avatar" alt="assets/img/avatars/6.jpg">
+                    <img src="{{avatar}}" class="img-avatar" alt="USER">
                     	<span class="hidden-md-down">{{username}}</span>
-                    </div>
                 </a>
-                <div class="dropdown-menu dropdown-menu-right">
+                <div class="dropdown-menu dropdown-menu-right"  ng-controller="logout as log">
                     <div class="dropdown-header text-xs-center">
                         <strong>{{ 'ACCOUNT' | translate }}</strong>
                     </div>
                     <a class="dropdown-item" href="#"><i class="fa fa-user"></i> {{ 'PROFILE' | translate }}</a>
-                    <a class="dropdown-item" href="#"><i class="fa fa-lock"></i> {{ 'LOGOUT' | translate }}</a>
+                    <a class="dropdown-item" href="" ng-click="log.call()"><i class="fa fa-lock"></i> {{ 'LOGOUT' | translate }}</a>
                 </div>
             </li>
         </ul>

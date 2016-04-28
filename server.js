@@ -83,15 +83,17 @@ app.get('/api/user/:user_id', function(req, res) {
 });
 
 app.get('/api/username', function (req, res) {
-  var json_data = {username:req.user.profile.displayName , avatar:req.user.profile._json.user.avatar};
-  res.json(json_data);
+  
+    var json_data = {username:req.user.profile.displayName , avatar:req.user.profile._json.user.avatar};
+    res.json(json_data);
+
 });
 
-app.get('/api/weight/:date', function(req, res){
+app.get('/api/fitbit/activity/:date', function(req, res){
   console.log("Sending request!");
   console.log(req.params);
   console.log(req.user.accessToken);
-  var url1 = "https://api.fitbit.com/1/user/" + req.user.profile.id +"/body/log/weight/date/" + req.params.date + ".json";
+  var url1 = "https://api.fitbit.com/1/user/" + req.user.profile.id +"/activities/date/" + req.params.date + ".json";
   var fitAuth = "Bearer " + req.user.accessToken;
   var options = {
     url:url1,
@@ -103,8 +105,17 @@ app.get('/api/weight/:date', function(req, res){
   console.log(options.headers.Authorization);
   request(options, function(error, response, body){
     console.log(body); // Show the HTML for the Google homepage.
-  
+    var json_data ={summary:body.summary};
+    res.json(json_data);
   });
+});
+
+app.get('/api/logout', function(req,res){
+  console.log("Logging out");
+  req.session= null;
+  req.logout();
+  var json_data = {response: "0k"};
+  res.json(json_data);
 });
 
 // OAuth routes

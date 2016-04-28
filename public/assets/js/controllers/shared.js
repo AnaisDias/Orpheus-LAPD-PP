@@ -1,7 +1,26 @@
 //shared.js
 angular
     .module('app')
-    .controller('chartsCtrl', chartsCtrl);
+    .controller('chartsCtrl', chartsCtrl)
+    .controller('logout',logout);
+
+logout.$inject = ['$http','$window'];
+function logout($http,$window){
+    this.http = $http;  
+    this.window = $window;
+}
+
+logout.prototype.call = function(){
+    console.log("Logout called!");
+    this.http.get('api/logout').success (function (data){
+        alert("Logout success!");
+        this.window.location.href = '/#/login';
+    }).error(function (data){
+        alert("An error has occurred!");
+    });
+};
+
+
 
 function random(min,max) {
     return Math.floor(Math.random()*(max-min+1)+min);

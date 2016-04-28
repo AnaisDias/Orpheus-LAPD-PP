@@ -2,7 +2,7 @@
 angular
     .module('app')
     .controller('navbarCtrl', navbarCtrl)
-    .controller('fitbitWeight', fitbitWeight)
+    .controller('fitbitActivity', fitbitActivity)
     .controller('toastrWelcome', toastrWelcome)
     .controller('moodDemoCtrl', moodDemoCtrl)
     .controller('socialBoxCtrl', socialBoxCtrl)
@@ -21,20 +21,23 @@ angular
     .controller('cardChartCtrl4', cardChartCtrl4);
 
 
-navbarCtrl.$inject = ['$scope', '$http'];
-function navbarCtrl($scope,$http){
+navbarCtrl.$inject = ['$scope', '$http', '$window'];
+function navbarCtrl($scope,$http, $window){
+    console.log("navbarCtrl");
     $http.get('/api/username').success(function (data) {
         $scope.username = data.username;
         $scope.avatar = data.avatar;
+        if(data.username == undefined) $window.location.href = '/#/login';
     }).error(function (data){
-        alert("Error fetching username!");
+        $window.location.href = '/#/login';
     });
 }
 
-fitbitWeight.$inject = ['$scope', '$http'];
-function fitbitWeight($scope, $http){
-    $http.get('/api/weight/27-04-2016').success(function (data) {
+fitbitActivity.$inject = ['$scope', '$http'];
+function fitbitActivity($scope, $http){
+    $http.get('/api/fitbit/activity/27-04-2016').success(function (data) {
         console.log("success");
+        $scope.summary = data.summary;
     }).error(function (data){
         alert("Error weight!");
     });
