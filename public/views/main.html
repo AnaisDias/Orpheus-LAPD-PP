@@ -1,69 +1,209 @@
 <div class="animated fadeIn">
     <h1> </h1>
 </div>
-<div ng-controller="toastrWelcome"></div>
-<div class="col-sm-6 col-lg-3">
-    <div class="card card-inverse card-primary" ng-controller="cardChartCtrl1">
-        <div class="card-block p-b-0">
-            <div class="btn-group pull-right">
-                <button type="button" class="btn btn-primary-outline active dropdown-toggle p-a-0" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                    <i class="icon-settings"></i>
-                </button>
-                <div class="dropdown-menu">
-                    <a class="dropdown-item" href="#">Action</a>
-                    <a class="dropdown-item" href="#">Another action</a>
-                    <a class="dropdown-item" href="#">Something else here</a>
-                    <div class="dropdown-divider"></div>
-                    <a class="dropdown-item" href="#">Separated link</a>
-                </div>
-            </div>
-            <h4 class="m-b-0">9.823</h4>
-            <p>Moods from the last few days</p>
-        </div>
-        <div class="chart-wrapper p-x-1">
-            <canvas class="chart chart-line" chart-data="data" chart-labels="labels" chart-legend="false" chart-series="series" chart-options="options" chart-colours="colours" height="70"></canvas>
-        </div>
-    </div>
-    <div class="card card-inverse card-warning" ng-controller="cardChartCtrl3">
-        <div class="card-block p-b-0">
-            <div class="btn-group pull-right">
-                <button type="button" class="btn btn-warning-outline active dropdown-toggle p-a-0" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                    <i class="icon-settings"></i>
-                </button>
-                <div class="dropdown-menu">
-                    <a class="dropdown-item" href="#">Action</a>
-                    <a class="dropdown-item" href="#">Another action</a>
-                    <a class="dropdown-item" href="#">Something else here</a>
-                    <div class="dropdown-divider"></div>
-                    <a class="dropdown-item" href="#">Separated link</a>
-                </div>
-            </div>
-            <h4 class="m-b-0">Sleep</h4>
-            <p> </p>
 
-        </div>
-        <div class="chart-wrapper">
-            <canvas class="chart chart-line" chart-data="data" chart-labels="labels" chart-legend="false" chart-series="series" chart-options="options" chart-colours="colours" height="63"></canvas>
+<div class="row">
+    <div class="col-md-12">
+        <div class="card card-inverse ">
+            <div class="card-block">
+                <div class="row">
+                    <div class="col-sm-6">
+
+                        <div class="col-sm-6 col-sm-offset-9">
+
+                            <fieldset class="form-group " ng-controller="DatePickerCtrl">
+                                <div class="input-group input-group-sm ">
+                                    <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                                    <input date-range-picker class="form-control date-picker" type="text" ng-model="date" options="opts" />
+                                </div>
+                            </fieldset>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 </div>
 
-<!--/.col-->
-<div class="col-sm-6 col-lg-3">
-    <div class="social-box twitter">
-        <i class="fa fa-twitter"></i>
-        <div class="chart-wrapper">
-            <canvas class="chart chart-line" chart-data="data2" chart-labels="labels" chart-legend="false" chart-series="series" chart-options="options" chart-colours="colours" height="90"></canvas>
+
+<div ng-controller="toastrWelcome"></div>
+<div class="row row-equal">
+    <div class="col-sm-6 col-lg-3">
+        <div class="card card-inverse card-primary" ng-controller="cardChartCtrl1">
+            <div class="card-block p-b-0">
+                <div class="btn-group pull-right">
+                    <button type="button" class="btn btn-primary-outline active dropdown-toggle p-a-0" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        <i class="icon-settings"></i>
+                    </button>
+                    <div class="dropdown-menu">
+                        <a class="dropdown-item" href="#">Action</a>
+                        <a class="dropdown-item" href="#">Another action</a>
+                        <a class="dropdown-item" href="#">Something else here</a>
+                        <div class="dropdown-divider"></div>
+                        <a class="dropdown-item" href="#">Separated link</a>
+                    </div>
+                </div>
+                <h4 class="m-b-0">9.823</h4>
+                <p>Moods from the last few days</p>
+            </div>
+            <div class="chart-wrapper p-x-1">
+                <canvas class="chart chart-line" chart-data="data" chart-labels="labels" chart-legend="false" chart-series="series" chart-options="options" chart-colours="colours" height="70"></canvas>
+            </div>
         </div>
-        <ul>
-            <li>
-                <strong>1</strong>
-                <span>Positive tweet</span>
-            </li>
-            <li>
-                <strong>5</strong>
-                <span>Negative tweets</span>
-            </li>
-        </ul>
+        <div class="card card-inverse card-warning" ng-controller="cardChartCtrl3">
+            <div class="card-block p-b-0">
+                <div class="btn-group pull-right">
+                    <button type="button" class="btn btn-warning-outline active dropdown-toggle p-a-0" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        <i class="icon-settings"></i>
+                    </button>
+                    <div class="dropdown-menu">
+                        <a class="dropdown-item" href="#">Action</a>
+                        <a class="dropdown-item" href="#">Another action</a>
+                        <a class="dropdown-item" href="#">Something else here</a>
+                        <div class="dropdown-divider"></div>
+                        <a class="dropdown-item" href="#">Separated link</a>
+                    </div>
+                </div>
+                <h4 class="m-b-0">Sleep</h4>
+                <p> </p>
+
+            </div>
+            <div class="chart-wrapper">
+                <canvas class="chart chart-line" chart-data="data" chart-labels="labels" chart-legend="false" chart-series="series" chart-options="options" chart-colours="colours" height="63"></canvas>
+            </div>
+        </div>
     </div>
-    <!--/.social-box-->
+
+
+    <!--/.col-->
+    <div class="col-sm-6 col-lg-3">
+        <div class="social-box twitter">
+            <i class="fa fa-twitter"></i>
+            <div class="chart-wrapper">
+                <canvas class="chart chart-line" chart-data="data2" chart-labels="labels" chart-legend="false" chart-series="series" chart-options="options" chart-colours="colours" height="90"></canvas>
+            </div>
+
+            <ul>
+                <li>
+                    <strong>1</strong>
+                    <span>Positive tweet</span>
+                </li>
+
+                <li>
+                    <strong>5</strong>
+                    <span>Negative tweets</span>
+                </li>
+
+            </ul>
+        </div>
+
+        <!--/.social-box-->
+
+    </div>
+</div>
+
+<!--/.row-->
+<div class="row">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-block">
+                <div class="row">
+                    <div class="col-sm-6">
+                        <h3 class="card-title clearfix m-b-0">Fitbit activity</h3>
+                    </div>
+
+                </div>
+                <hr class="m-a-0">
+                <div class="row">
+                    <div class="col-sm-12 col-lg-6">
+
+                        <!--/.row-->
+                        <hr class="m-t-0">
+                        <ul class="horizontal-bars" ng-controller="horizontalBarsCtrl">
+                            <li ng-repeat="row in data">
+                                <div class="title">
+                                    {{ row.day }}
+                                </div>
+                                <div class="bars">
+                                    <progress class="progress progress-xs progress-info" value="{{ row.new }}" max="100" style="margin-bottom: 2px;">{{ row.new }}%</progress>
+                                    <progress class="progress progress-xs progress-danger m-a-0" value="{{ row.recurring }}" max="100">{{ row.recurring }}%</progress>
+                                </div>
+                            </li>
+                            <li class="legend">
+                                <span class="label label-pill label-info"></span>
+                                <small>Active minutes</small> &nbsp;
+                                <span class="label label-pill label-danger"></span>
+                                <small>Sedentary minutes</small>
+                            </li>
+                        </ul>
+                    </div>
+                    <!--/.col-->
+                    <div class="col-sm-6 col-lg-6">
+
+                        <!--/.row-->
+                        <hr class="m-t-0">
+                        <ul class="horizontal-bars type-2" ng-controller="horizontalBarsType2Ctrl">
+
+                            <li class="divider"></li>
+                            <li ng-repeat="row in source">
+                                <!-- <i ng-class="row.icon"></i> -->
+                                <span class="title">{{ row.title }}</span>
+                                <span class="value">{{ row.value | number }}
+                                      <span class="text-muted small">({{ row.percent }}%)</span>
+                                <!-- percentage steps/stepsgoal -->
+                                </span>
+                                <div class="bars">
+                                    <progress class="progress progress-xs progress-success m-a-0" value="{{ row.percent }}" max="100">{{ row.percent }}%</progress>
+                                </div>
+                            </li>
+                            <li class="divider text-xs-center">
+                                <button type="button" class="btn btn-sm btn-link text-muted" data-toggle="tooltip" data-placement="top" title="show more"><i class="icon-options"></i></button>
+                            </li>
+                        </ul>
+                    </div>
+                    <!--/.col-->
+
+                    <!--/.col-->
+                </div>
+                <!--/.row-->
+                <br/>
+            </div>
+        </div>
+    </div>
+    <!--/.col-->
+</div>
+<!--/.row-->
+
+<!--/row-->
+<div class="card" ng-controller="moodDemoCtrl">
+    <div class="card-block">
+        <div class="row">
+            <div class="col-sm-6">
+                <h4 class="card-title m-b-0">Patient mood progress</h4>
+                <div class="small text-muted">April 2016</div>
+            </div>
+            <div class="col-sm-6">
+                <div class="btn-toolbar pull-right" role="toolbar" aria-label="Toolbar with button groups">
+                    <div class="btn-group" data-toggle="buttons" aria-label="First group">
+                        <label class="btn btn-sm btn-secondary-outline">
+                            <input type="radio" name="options" id="option1"> Day
+                        </label>
+                        <label class="btn btn-sm btn-secondary-outline active">
+                            <input type="radio" name="options" id="option2" checked> Month
+                        </label>
+                        <label class="btn btn-sm btn-secondary-outline">
+                            <input type="radio" name="options" id="option3"> Year
+                        </label>
+                    </div>
+                    <div class="btn-group" role="group" aria-label="Second group">
+                        <button type="button" class="btn btn-sm btn-primary"><i class="icon-cloud-download"></i></button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="chart-wrapper" style="height:300px;margin-top:40px;">
+            <canvas class="chart chart-line" chart-data="data" chart-labels="labels" chart-legend="false" chart-series="series" chart-click="onClick" chart-options="options" chart-colours="colours" height="300"></canvas>
+        </div>
+    </div>
+</div>
+<!--/.card-->

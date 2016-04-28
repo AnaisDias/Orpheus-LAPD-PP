@@ -4,9 +4,9 @@ angular
     .controller('navbarCtrl', navbarCtrl)
     .controller('fitbitWeight', fitbitWeight)
     .controller('toastrWelcome', toastrWelcome)
-    .controller('trafficDemoCtrl', trafficDemoCtrl)
+    .controller('moodDemoCtrl', moodDemoCtrl)
     .controller('socialBoxCtrl', socialBoxCtrl)
-    .controller('dateRangeCtrl', dateRangeCtrl)
+    .controller('DatePickerCtrl', DatePickerCtrl)
     .controller('sparklineChartCtrl', sparklineChartCtrl)
     .controller('gaugeCtrl', gaugeCtrl)
     .controller('barChartCtrl', barChartCtrl)
@@ -42,10 +42,11 @@ function fitbitWeight($scope, $http){
 
 toastrWelcome.$inject = ['$scope', 'toastr'];
 function toastrWelcome($scope, toastr) {
-    toastr.info('Bootstrap 4 & AngularJS UI Kit', 'Welcome to ROOT Admin', {
+    /*toastr.info('Bootstrap 4 & AngularJS UI Kit', 'Welcome to ROOT Admin', {
         closeButton: true,
         progressBar: true,
     });
+    */
 }
 
 //convert Hex to RGBA
@@ -59,8 +60,8 @@ function convertHex(hex,opacity){
     return result;
 }
 
-trafficDemoCtrl.$inject = ['$scope'];
-function trafficDemoCtrl($scope){
+moodDemoCtrl.$inject = ['$scope'];
+function moodDemoCtrl($scope){
 
     function random(min,max) {
         return Math.floor(Math.random()*(max-min+1)+min);
@@ -112,13 +113,15 @@ function trafficDemoCtrl($scope){
     }
 }
 
-dateRangeCtrl.$inject = ['$scope'];
-function dateRangeCtrl($scope) {
+DatePickerCtrl.$inject = ['$scope'];
+function DatePickerCtrl($scope) {
     $scope.date = {
-       startDate: moment().subtract(5, 'days'),
-       endDate: moment()
+       startDate: moment().subtract(5, 'days')
+
    };
    $scope.opts = {
+     singleDatePicker: true,
+     showDropdowns: true,
         drops: 'down',
         opens: 'left',
         ranges: {
@@ -281,17 +284,18 @@ function horizontalBarsType2Ctrl($scope) {
 
     $scope.source = [
         {
-            title: 'Organic Search',
+            title: 'Steps',
             icon: 'icon-globe',
             value: 191235,
             percent: 56
         },
         {
-            title: 'Facebook',
+            title: 'Distance',
             icon: 'icon-social-facebook',
             value: 51223,
             percent: 15
-        },
+        }
+        /*
         {
             title: 'Twitter',
             icon: 'icon-social-twitter',
@@ -304,6 +308,7 @@ function horizontalBarsType2Ctrl($scope) {
             value: 27319,
             percent: 8
         }
+        */
     ];
 }
 
@@ -816,7 +821,7 @@ function gaugeJSDemoCtrl($scope, $timeout) {
 cardChartCtrl1.$inject = ['$scope'];
 function cardChartCtrl1($scope) {
 
-    $scope.labels = ['January','February','March','April','May','June','July'];
+    $scope.labels = ['April 22','April 23','April 24','April 25','April 26','Yesterday','Today'];
     $scope.data = [
         [65, 59, 84, 84, 51, 55, 40]
     ];
@@ -824,7 +829,7 @@ function cardChartCtrl1($scope) {
         showScale: true,
         scaleShowLabels: false,
         scaleShowGridLines: false,
-        scaleFontSize: 5,
+        scaleFontSize: 3,
         scaleLineColor: 'rgba(0,0,0,0)',
         scaleFontColor: 'rgba(0,0,0,0)'
     };
