@@ -1,4 +1,46 @@
 <div class="sidebar">
+  <div class="sidebar-header">
+        <img src="assets/img/avatars/8.jpg" class="img-avatar" alt="Avatar">
+        <div>
+            <strong>JOHN DOE</strong>
+        </div>
+        <div class="text-muted">
+            <small>Founder &amp; CEO</small>
+        </div>
+        <div class="btn-group" role="group" aria-label="Button group with nested dropdown">
+            <button type="button" class="btn btn-link">
+                <i class="icon-settings"></i>
+            </button>
+            <button type="button" class="btn btn-link">
+                <i class="icon-speech"></i>
+                <span class="label label-warning label-pill">5</span>
+            </button>
+            <div class="btn-group" role="group">
+                <button type="button" class="btn btn-link" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    <i class="icon-user"></i>
+                </button>
+                <div class="dropdown-menu">
+                    <div class="dropdown-header text-xs-center">
+                        <strong>{{ 'ACCOUNT' | translate }}</strong>
+                    </div>
+                    <a class="dropdown-item" href="#"><i class="fa fa-bell-o"></i> {{ 'UPDATES' | translate }}<span class="label label-info">42</span></a>
+                    <a class="dropdown-item" href="#"><i class="fa fa-envelope-o"></i> {{ 'MESSAGES' | translate }}<span class="label label-success">42</span></a>
+                    <a class="dropdown-item" href="#"><i class="fa fa-tasks"></i> {{ 'TASKS' | translate }}<span class="label label-danger">42</span></a>
+                    <a class="dropdown-item" href="#"><i class="fa fa-comments"></i> {{ 'COMMENTS' | translate }}<span class="label label-warning">42</span></a>
+                    <div class="dropdown-header text-xs-center">
+                        <strong>{{ 'SETTINGS' | translate }}</strong>
+                    </div>
+                    <a class="dropdown-item" href="#"><i class="fa fa-user"></i> {{ 'PROFILE' | translate }}</a>
+                    <a class="dropdown-item" href="#"><i class="fa fa-wrench"></i> {{ 'SETTINGS' | translate }}</a>
+                    <a class="dropdown-item" href="#"><i class="fa fa-usd"></i> {{ 'PAYMENTS' | translate }}<span class="label label-default">42</span></a>
+                    <a class="dropdown-item" href="#"><i class="fa fa-file"></i> {{ 'PROJECTS' | translate }}<span class="label label-primary">42</span></a>
+                    <div class="divider"></div>
+                    <a class="dropdown-item" href="#"><i class="fa fa-shield"></i> {{ 'LOCK_ACCOUNT' | translate }}</a>
+                    <a class="dropdown-item" href="#"><i class="fa fa-lock"></i> {{ 'LOGOUT' | translate }}</a>
+                </div>
+            </div>
+        </div>
+    </div>
     <nav class="sidebar-nav">
         <ul class="nav">
             <li class="nav-title">
