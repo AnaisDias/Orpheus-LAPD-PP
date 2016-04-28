@@ -8,14 +8,14 @@ var env       = process.env.NODE_ENV || 'development';
 var config    = require('../config/config.json');
 var db        = {};
 
-console.log("MERDA222");
+
 
 if (config.use_env_variable) {
   var sequelize = new Sequelize(process.env[config.use_env_variable]);
-  console.log("MERDA2");
+
 } else {
   var sequelize = new Sequelize(config.development.database, config.development.username, config.development.password, config.development);
-  console.log("MERDA");
+
   console.log("pPASSSSSSSSS  " + config.development.password);
 
   console.log("confiiiiiiiiiig " + JSON.stringify(config));
