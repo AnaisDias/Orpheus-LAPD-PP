@@ -26,7 +26,8 @@ angular
         'oc.lazyLoad',
         'pascalprecht.translate',
         'ncy-angular-breadcrumb',
-        'angular-loading-bar'
+        'angular-loading-bar',
+        'ngCookies'
     ])
     .config(['cfpLoadingBarProvider', function(cfpLoadingBarProvider) {
         cfpLoadingBarProvider.includeSpinner = false;

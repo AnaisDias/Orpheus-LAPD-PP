@@ -18,7 +18,22 @@ angular
     .controller('cardChartCtrl1', cardChartCtrl1)
     .controller('cardChartCtrl2', cardChartCtrl2)
     .controller('cardChartCtrl3', cardChartCtrl3)
-    .controller('cardChartCtrl4', cardChartCtrl4);
+    .controller('cardChartCtrl4', cardChartCtrl4)
+    .service('sharedProperties', function() {
+            var property = new Date();
+
+            return {
+                getProperty: function() {
+                    return property;
+                },
+                setProperty: function(value) {
+                    property = value;
+                }
+            };
+        });
+
+
+
 
 
 navbarCtrl.$inject = ['$scope', '$http', '$window'];
@@ -116,12 +131,19 @@ function moodDemoCtrl($scope){
     }
 }
 
-DatePickerCtrl.$inject = ['$scope'];
-function DatePickerCtrl($scope) {
+DatePickerCtrl.$inject = ['$scope',sharedProperties,'$cookies'];
+
+function DatePickerCtrl($scope,sharedProperties,$cookies) {
+
+
     $scope.date = {
        startDate: moment().subtract(5, 'days')
 
    };
+
+   var selectedDate=moment()._d;
+   $cookies.put('selDate',selectedDate);
+   console.log("PRIMEIRO " +$cookies.get('selDate'));
    $scope.opts = {
      singleDatePicker: true,
      showDropdowns: true,
@@ -138,7 +160,10 @@ function DatePickerCtrl($scope) {
 
     //Watch for date changes
     $scope.$watch('date', function(newDate) {
-        //console.log('New date set: ', newDate);
+      var selectedDate= newDate._d;
+
+      $cookies.put('selDate',selectedDate);
+      console.log($cookies.get('selDate'));
     }, false);
 
     function gd(year, month, day) {
@@ -241,12 +266,15 @@ function sparklineChartCtrl($scope) {
     }];
 }
 
-horizontalBarsCtrl.$inject = ['$scope'];
-function horizontalBarsCtrl($scope) {
+horizontalBarsCtrl.$inject = ['$scope',sharedProperties,'$cookies'];
+function horizontalBarsCtrl($scope,sharedProperties,$cookies) {
 
+
+
+  console.log($cookies.get('selDate'));
     $scope.data = [
         {
-            day: 'Monday',    new: 34, recurring: 78
+            day: 'Monday' +   $scope.date,    new: 34, recurring: 78
         },
         {
             day: 'Tuesday',   new: 56, recurring: 94

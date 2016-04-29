@@ -48,22 +48,14 @@ app.use('/', routes);
 app.use('/users', users);
 
 
-app.get('/api/fds', function(req, res) {
-// console.log(CircularJSON.stringify(models.sequelize));
 
-	//models.Sequelize.UserTest.findAll();
-	models.UserTest.all().then(function(usertests) {
-	  // usertests will be an array of all UserTest instances
-		console.log(JSON.stringify(usertests));
-	})
-});
+/*
 
+console.log(CircularJSON.stringify(models.sequelize));
 
-app.get('/api/todos', function(req, res) {
-	var json_data = {"name":"amita","pass":"12345"};
-	res.json(json_data);
-
-});
+var json_data = {"name":"amita","pass":"12345"};
+res.json(json_data);
+*/
 
 
 app.post('/api/fitbit/user/findorcreate', function(req, res) {
@@ -77,22 +69,34 @@ app.post('/api/fitbit/user/findorcreate', function(req, res) {
 
 
 app.get('/api/user/:user_id', function(req, res) {
+	/*
+
+	send user information
 	var json_data = {"name":"amita","pass":"12345", "id":req.params.user_id};
 	res.json(json_data);
+
+	*/
+
+
 
 });
 
 app.get('/api/username', function (req, res) {
-  
+
     var json_data = {username:req.user.profile.displayName , avatar:req.user.profile._json.user.avatar};
     res.json(json_data);
+		//console.log(JSON.stringify(req.user));
 
 });
 
 app.get('/api/fitbit/activity/:date', function(req, res){
   console.log("Sending request!");
+
   console.log(req.params);
-  console.log(req.user.accessToken);
+
+	console.log(JSON.stringify(req.user.accessToken));
+
+
   var url1 = "https://api.fitbit.com/1/user/" + req.user.profile.id +"/activities/date/" + req.params.date + ".json";
   var fitAuth = "Bearer " + req.user.accessToken;
   var options = {
@@ -108,6 +112,8 @@ app.get('/api/fitbit/activity/:date', function(req, res){
     var json_data ={summary:body.summary};
     res.json(json_data);
   });
+
+	
 });
 
 app.get('/api/logout', function(req,res){
