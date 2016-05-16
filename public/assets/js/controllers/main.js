@@ -19,46 +19,38 @@ angular
     .controller('cardChartCtrl2', cardChartCtrl2)
     .controller('cardChartCtrl3', cardChartCtrl3)
     .controller('cardChartCtrl4', cardChartCtrl4)
-    .service('sharedProperties', function() {
-            var property = new Date();
 
-            return {
-                getProperty: function() {
-                    return property;
-                },
-                setProperty: function(value) {
-                    property = value;
-                }
-            };
-        });
 
 
 
 
 
 navbarCtrl.$inject = ['$scope', '$http', '$window'];
-function navbarCtrl($scope,$http, $window){
+
+function navbarCtrl($scope, $http, $window) {
     console.log("navbarCtrl");
-    $http.get('/api/username').success(function (data) {
+    $http.get('/api/username').success(function(data) {
         $scope.username = data.username;
         $scope.avatar = data.avatar;
-        if(data.username == undefined) $window.location.href = '/#/login';
-    }).error(function (data){
+        if (data.username == undefined) $window.location.href = '/#/login';
+    }).error(function(data) {
         $window.location.href = '/#/login';
     });
 }
 
 fitbitActivity.$inject = ['$scope', '$http'];
-function fitbitActivity($scope, $http){
-    $http.get('/api/fitbit/activity/27-04-2016').success(function (data) {
+
+function fitbitActivity($scope, $http) {
+    $http.get('/api/fitbit/activity/27-04-2016').success(function(data) {
         console.log("success");
         $scope.summary = data.summary;
-    }).error(function (data){
+    }).error(function(data) {
         alert("Error weight!");
     });
 }
 
 toastrWelcome.$inject = ['$scope', 'toastr'];
+
 function toastrWelcome($scope, toastr) {
     /*toastr.info('Bootstrap 4 & AngularJS UI Kit', 'Welcome to ROOT Admin', {
         closeButton: true,
@@ -68,21 +60,22 @@ function toastrWelcome($scope, toastr) {
 }
 
 //convert Hex to RGBA
-function convertHex(hex,opacity){
-    hex = hex.replace('#','');
-    r = parseInt(hex.substring(0,2), 16);
-    g = parseInt(hex.substring(2,4), 16);
-    b = parseInt(hex.substring(4,6), 16);
+function convertHex(hex, opacity) {
+    hex = hex.replace('#', '');
+    r = parseInt(hex.substring(0, 2), 16);
+    g = parseInt(hex.substring(2, 4), 16);
+    b = parseInt(hex.substring(4, 6), 16);
 
-    result = 'rgba('+r+','+g+','+b+','+opacity/100+')';
+    result = 'rgba(' + r + ',' + g + ',' + b + ',' + opacity / 100 + ')';
     return result;
 }
 
 moodDemoCtrl.$inject = ['$scope'];
-function moodDemoCtrl($scope){
 
-    function random(min,max) {
-        return Math.floor(Math.random()*(max-min+1)+min);
+function moodDemoCtrl($scope) {
+
+    function random(min, max) {
+        return Math.floor(Math.random() * (max - min + 1) + min);
     }
 
     var elements = 27;
@@ -91,16 +84,16 @@ function moodDemoCtrl($scope){
     var data3 = [];
 
     for (var i = 0; i <= elements; i++) {
-        data1.push(random(50,200));
-        data2.push(random(80,100));
+        data1.push(random(50, 200));
+        data2.push(random(80, 100));
         data3.push(65);
     }
 
     $scope.labels = ['M', 'T', 'W', 'T', 'F', 'S', 'S', 'M', 'T', 'W', 'T', 'F', 'S', 'S', 'M', 'T', 'W', 'T', 'F', 'S', 'S', 'M', 'T', 'W', 'T', 'F', 'S', 'S'];
     $scope.series = ['Current', 'Previous', 'BEP'];
-    $scope.data = [ data1, data2, data3];
+    $scope.data = [data1, data2, data3];
     $scope.colours = [{
-        fillColor: convertHex(brandInfo,10),
+        fillColor: convertHex(brandInfo, 10),
         strokeColor: brandInfo,
         pointColor: brandInfo,
         pointStrokeColor: 'transparent'
@@ -109,7 +102,7 @@ function moodDemoCtrl($scope){
         strokeColor: brandSuccess,
         pointColor: brandSuccess,
         pointStrokeColor: 'transparent'
-    },{
+    }, {
         fillColor: 'transparent',
         strokeColor: brandDanger,
         pointColor: brandDanger,
@@ -127,26 +120,26 @@ function moodDemoCtrl($scope){
         scaleStepWidth: Math.ceil(250 / 5),
         //bezierCurve : false,
         scaleStartValue: 0,
-        pointDot : false,
+        pointDot: false,
     }
 }
 
-DatePickerCtrl.$inject = ['$scope',sharedProperties,'$cookies'];
+DatePickerCtrl.$inject = ['$scope', '$cookies'];
 
-function DatePickerCtrl($scope,sharedProperties,$cookies) {
+function DatePickerCtrl($scope, $cookies) {
 
 
     $scope.date = {
-       startDate: moment().subtract(5, 'days')
+        startDate: moment().subtract(5, 'days')
 
-   };
+    };
 
-   var selectedDate=moment()._d;
-   $cookies.put('selDate',selectedDate);
-   console.log("PRIMEIRO " +$cookies.get('selDate'));
-   $scope.opts = {
-     singleDatePicker: true,
-     showDropdowns: true,
+    var selectedDate = moment()._d;
+    $cookies.put('selDate', selectedDate);
+    console.log("PRIMEIRO " + $cookies.get('selDate'));
+    $scope.opts = {
+        singleDatePicker: true,
+        showDropdowns: true,
         drops: 'down',
         opens: 'left',
         ranges: {
@@ -160,10 +153,10 @@ function DatePickerCtrl($scope,sharedProperties,$cookies) {
 
     //Watch for date changes
     $scope.$watch('date', function(newDate) {
-      var selectedDate= newDate._d;
+        var selectedDate = newDate._d;
 
-      $cookies.put('selDate',selectedDate);
-      console.log($cookies.get('selDate'));
+        $cookies.put('selDate', selectedDate);
+        console.log($cookies.get('selDate'));
     }, false);
 
     function gd(year, month, day) {
@@ -172,9 +165,10 @@ function DatePickerCtrl($scope,sharedProperties,$cookies) {
 }
 
 socialBoxCtrl.$inject = ['$scope'];
+
 function socialBoxCtrl($scope) {
 
-    $scope.labels = ['January','February','March','April','May','June','July'];
+    $scope.labels = ['January', 'February', 'March', 'April', 'May', 'June', 'July'];
     $scope.data1 = [
         [65, 59, 84, 84, 51, 55, 40]
     ];
@@ -188,12 +182,12 @@ function socialBoxCtrl($scope) {
         [35, 23, 56, 22, 97, 23, 64]
     ];
     $scope.options = {
-        pointHitDetectionRadius : 0,
+        pointHitDetectionRadius: 0,
         showScale: false,
         scaleLineWidth: 0.001,
-        scaleShowLabels : false,
-        scaleShowGridLines : false,
-        pointDot : false,
+        scaleShowLabels: false,
+        scaleShowGridLines: false,
+        pointDot: false,
         showTooltips: false
     };
     $scope.colours = [{
@@ -205,8 +199,9 @@ function socialBoxCtrl($scope) {
 }
 
 sparklineChartCtrl.$inject = ['$scope'];
+
 function sparklineChartCtrl($scope) {
-    $scope.labels = ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'];
+    $scope.labels = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
     $scope.data1 = [
         [65, 59, 84, 84, 51, 55, 40]
     ];
@@ -220,12 +215,12 @@ function sparklineChartCtrl($scope) {
         [35, 23, 56, 22, 97, 23, 64]
     ];
     $scope.options = {
-        pointHitDetectionRadius : 0,
+        pointHitDetectionRadius: 0,
         showScale: false,
         scaleLineWidth: 0.001,
-        scaleShowLabels : false,
-        scaleShowGridLines : false,
-        pointDot : false,
+        scaleShowLabels: false,
+        scaleShowGridLines: false,
+        pointDot: false,
         showTooltips: false
     };
     $scope.default = [{
@@ -266,61 +261,81 @@ function sparklineChartCtrl($scope) {
     }];
 }
 
-horizontalBarsCtrl.$inject = ['$scope',sharedProperties,'$cookies'];
-function horizontalBarsCtrl($scope,sharedProperties,$cookies) {
+horizontalBarsCtrl.$inject = ['$scope', '$cookies', '$window', '$http', '$filter'];
+
+function horizontalBarsCtrl($scope, $cookies, $window, $http, $filter) {
+
+    $scope.$watch(function() {
+        return $cookies.get('selDate');
+    }, function(newVal, oldVal) {
+        console.log("The date has changed");
+        console.log($cookies.get('selDate'));
+        if ($cookies.get('selDate')) {
+            unparsedDate = $cookies.get('selDate');
+            parsedDate = $filter('date')(new Date(unparsedDate), 'yyyy-MM-dd');
+            $http.get('/api/fitbit/activity/' + parsedDate).success(function(data) {
+                jsonD = JSON.parse(data);
+                console.log("data:" + JSON.stringify(jsonD));
+                console.log("step goals:" + jsonD.goals.steps);
 
 
-
-  console.log($cookies.get('selDate'));
-    $scope.data = [
-        {
-            day: 'Monday' +   $scope.date,    new: 34, recurring: 78
-        },
-        {
-            day: 'Tuesday',   new: 56, recurring: 94
-        },
-        {
-            day: 'Wednesday', new: 12, recurring: 67
-        },
-        {
-            day: 'Thursday',  new: 43, recurring: 91
-        },
-        {
-            day: 'Friday',    new: 22, recurring: 73
-        },
-        {
-            day: 'Saturday',  new: 53, recurring: 82
-        },
-        {
-            day: 'Sunday',    new: 9,  recurring: 69
+            }).error(function(data) {
+                //what to do on error
+            });
         }
-    ];
+    }, true);
+
+    $scope.data = [{
+        day: 'Monday' + $scope.date,
+        new: 34,
+        recurring: 78
+    }, {
+        day: 'Tuesday',
+        new: 56,
+        recurring: 94
+    }, {
+        day: 'Wednesday',
+        new: 12,
+        recurring: 67
+    }, {
+        day: 'Thursday',
+        new: 43,
+        recurring: 91
+    }, {
+        day: 'Friday',
+        new: 22,
+        recurring: 73
+    }, {
+        day: 'Saturday',
+        new: 53,
+        recurring: 82
+    }, {
+        day: 'Sunday',
+        new: 9,
+        recurring: 69
+    }];
 }
 
 horizontalBarsType2Ctrl.$inject = ['$scope'];
+
 function horizontalBarsType2Ctrl($scope) {
 
-    $scope.gender = [
-        {
-            title: 'Male',
-            icon: 'icon-user',
-            value: 43
-        },
-        {
-            title: 'Female',
-            icon: 'icon-user-female',
-            value: 37
-        },
-    ];
+    $scope.gender = [{
+        title: 'Male',
+        icon: 'icon-user',
+        value: 43
+    }, {
+        title: 'Female',
+        icon: 'icon-user-female',
+        value: 37
+    }, ];
 
-    $scope.source = [
-        {
+    $scope.source = [{
             title: 'Steps',
             icon: 'icon-globe',
             value: 191235,
             percent: 56
-        },
-        {
+        }, {
             title: 'Distance',
             icon: 'icon-social-facebook',
             value: 51223,
@@ -344,103 +359,97 @@ function horizontalBarsType2Ctrl($scope) {
 }
 
 usersTableCtrl.$inject = ['$scope', '$timeout'];
+
 function usersTableCtrl($scope, $timeout) {
 
-    $scope.users = [
-        {
-            avatar: '1.jpg',
-            status: 'active',
-            name: 'Yiorgos Avraamu',
-            new: true,
-            registered: 'Jan 1, 2015',
-            country: 'USA',
-            flag: 'USA.png',
-            usage: '50',
-            period: 'Jun 11, 2015 - Jul 10, 2015',
-            payment: 'mastercard',
-            activity: '10 sec ago',
-            satisfaction: '48'
-        },
-        {
-            avatar: '2.jpg',
-            status: 'busy',
-            name: 'Avram Tarasios',
-            new: false,
-            registered: 'Jan 1, 2015',
-            country: 'Brazil',
-            flag: 'Brazil.png',
-            usage: '10',
-            period: 'Jun 11, 2015 - Jul 10, 2015',
-            payment: 'visa',
-            activity: '5 minutes ago',
-            satisfaction: '61'
-        },
-        {
-            avatar: '3.jpg',
-            status: 'away',
-            name: 'Quintin Ed',
-            new: true,
-            registered: 'Jan 1, 2015',
-            country: 'India',
-            flag: 'India.png',
-            usage: '74',
-            period: 'Jun 11, 2015 - Jul 10, 2015',
-            payment: 'stripe',
-            activity: '1 hour ago',
-            satisfaction: '33'
-        },
-        {
-            avatar: '4.jpg',
-            status: 'offline',
-            name: 'Enéas Kwadwo',
-            new: true,
-            registered: 'Jan 1, 2015',
-            country: 'France',
-            flag: 'France.png',
-            usage: '98',
-            period: 'Jun 11, 2015 - Jul 10, 2015',
-            payment: 'paypal',
-            activity: 'Last month',
-            satisfaction: '23'
-        },
-        {
-            avatar: '5.jpg',
-            status: 'active',
-            name: 'Agapetus Tadeáš',
-            new: true,
-            registered: 'Jan 1, 2015',
-            country: 'Spain',
-            flag: 'Spain.png',
-            usage: '22',
-            period: 'Jun 11, 2015 - Jul 10, 2015',
-            payment: 'google',
-            activity: 'Last week',
-            satisfaction: '78'
-        },
-        {
-            avatar: '6.jpg',
-            status: 'busy',
-            name: 'Friderik Dávid',
-            new: true,
-            registered: 'Jan 1, 2015',
-            country: 'Poland',
-            flag: 'Poland.png',
-            usage: '43',
-            period: 'Jun 11, 2015 - Jul 10, 2015',
-            payment: 'amex',
-            activity: 'Yesterday',
-            satisfaction: '11'
-        }
-    ]
+    $scope.users = [{
+        avatar: '1.jpg',
+        status: 'active',
+        name: 'Yiorgos Avraamu',
+        new: true,
+        registered: 'Jan 1, 2015',
+        country: 'USA',
+        flag: 'USA.png',
+        usage: '50',
+        period: 'Jun 11, 2015 - Jul 10, 2015',
+        payment: 'mastercard',
+        activity: '10 sec ago',
+        satisfaction: '48'
+    }, {
+        avatar: '2.jpg',
+        status: 'busy',
+        name: 'Avram Tarasios',
+        new: false,
+        registered: 'Jan 1, 2015',
+        country: 'Brazil',
+        flag: 'Brazil.png',
+        usage: '10',
+        period: 'Jun 11, 2015 - Jul 10, 2015',
+        payment: 'visa',
+        activity: '5 minutes ago',
+        satisfaction: '61'
+    }, {
+        avatar: '3.jpg',
+        status: 'away',
+        name: 'Quintin Ed',
+        new: true,
+        registered: 'Jan 1, 2015',
+        country: 'India',
+        flag: 'India.png',
+        usage: '74',
+        period: 'Jun 11, 2015 - Jul 10, 2015',
+        payment: 'stripe',
+        activity: '1 hour ago',
+        satisfaction: '33'
+    }, {
+        avatar: '4.jpg',
+        status: 'offline',
+        name: 'Enéas Kwadwo',
+        new: true,
+        registered: 'Jan 1, 2015',
+        country: 'France',
+        flag: 'France.png',
+        usage: '98',
+        period: 'Jun 11, 2015 - Jul 10, 2015',
+        payment: 'paypal',
+        activity: 'Last month',
+        satisfaction: '23'
+    }, {
+        avatar: '5.jpg',
+        status: 'active',
+        name: 'Agapetus Tadeáš',
+        new: true,
+        registered: 'Jan 1, 2015',
+        country: 'Spain',
+        flag: 'Spain.png',
+        usage: '22',
+        period: 'Jun 11, 2015 - Jul 10, 2015',
+        payment: 'google',
+        activity: 'Last week',
+        satisfaction: '78'
+    }, {
+        avatar: '6.jpg',
+        status: 'busy',
+        name: 'Friderik Dávid',
+        new: true,
+        registered: 'Jan 1, 2015',
+        country: 'Poland',
+        flag: 'Poland.png',
+        usage: '43',
+        period: 'Jun 11, 2015 - Jul 10, 2015',
+        payment: 'amex',
+        activity: 'Yesterday',
+        satisfaction: '11'
+    }]
 
 
-    function random(min,max) {
-        return Math.floor(Math.random()*(max-min+1)+min);
+    function random(min, max) {
+        return Math.floor(Math.random() * (max - min + 1) + min);
     }
 
     $scope.gauge = {
         animationTime: 10,
-        value: random(0,100),
+        value: random(0, 100),
         maxValue: 100,
         gaugeType: 'donut',
         options: {
@@ -472,76 +481,71 @@ function usersTableCtrl($scope, $timeout) {
 }
 
 clientsTableCtrl.$inject = ['$scope', '$timeout'];
+
 function clientsTableCtrl($scope, $timeout) {
 
-    $scope.users = [
-        {
-            avatar: '1.jpg',
-            status: 'active',
-            name: 'Yiorgos Avraamu',
-            registered: 'Jan 1, 2015',
-            activity: '10 sec ago',
-            transactions: 189,
-            comments: 72
-        },
-        {
-            avatar: '2.jpg',
-            status: 'busy',
-            name: 'Avram Tarasios',
-            registered: 'Jan 1, 2015',
-            activity: '5 minutes ago',
-            transactions: 156,
-            comments: 76
-        },
-        {
-            avatar: '3.jpg',
-            status: 'away',
-            name: 'Quintin Ed',
-            registered: 'Jan 1, 2015',
-            activity: '1 hour ago',
-            transactions: 189,
-            comments: 72
-        },
-        {
-            avatar: '4.jpg',
-            status: 'offline',
-            name: 'Enéas Kwadwo',
-            registered: 'Jan 1, 2015',
-            activity: 'Last month',
-            transactions: 189,
-            comments: 72
-        },
-        {
-            avatar: '5.jpg',
-            status: 'active',
-            name: 'Agapetus Tadeáš',
-            registered: 'Jan 1, 2015',
-            activity: 'Last week',
-            transactions: 189,
-            comments: 72
-        },
-        {
-            avatar: '6.jpg',
-            status: 'busy',
-            name: 'Friderik Dávid',
-            registered: 'Jan 1, 2015',
-            activity: 'Yesterday',
-            transactions: 189,
-            comments: 72
-        }
-    ]
+    $scope.users = [{
+        avatar: '1.jpg',
+        status: 'active',
+        name: 'Yiorgos Avraamu',
+        registered: 'Jan 1, 2015',
+        activity: '10 sec ago',
+        transactions: 189,
+        comments: 72
+    }, {
+        avatar: '2.jpg',
+        status: 'busy',
+        name: 'Avram Tarasios',
+        registered: 'Jan 1, 2015',
+        activity: '5 minutes ago',
+        transactions: 156,
+        comments: 76
+    }, {
+        avatar: '3.jpg',
+        status: 'away',
+        name: 'Quintin Ed',
+        registered: 'Jan 1, 2015',
+        activity: '1 hour ago',
+        transactions: 189,
+        comments: 72
+    }, {
+        avatar: '4.jpg',
+        status: 'offline',
+        name: 'Enéas Kwadwo',
+        registered: 'Jan 1, 2015',
+        activity: 'Last month',
+        transactions: 189,
+        comments: 72
+    }, {
+        avatar: '5.jpg',
+        status: 'active',
+        name: 'Agapetus Tadeáš',
+        registered: 'Jan 1, 2015',
+        activity: 'Last week',
+        transactions: 189,
+        comments: 72
+    }, {
+        avatar: '6.jpg',
+        status: 'busy',
+        name: 'Friderik Dávid',
+        registered: 'Jan 1, 2015',
+        activity: 'Yesterday',
+        transactions: 189,
+        comments: 72
+    }]
 }
 
 
 gaugeCtrl.$inject = ['$scope'];
+
 function gaugeCtrl($scope) {
-    function random(min,max) {
-        return Math.floor(Math.random()*(max-min+1)+min);
+    function random(min, max) {
+        return Math.floor(Math.random() * (max - min + 1) + min);
     }
 
     $scope.gauge1 = {
         animationTime: 10,
-        value: random(0,3000),
+        value: random(0, 3000),
         maxValue: 3000,
         gaugeType: 'donut',
         options: {
@@ -573,7 +577,7 @@ function gaugeCtrl($scope) {
 
     $scope.gauge2 = {
         animationTime: 10,
-        value: random(0,3000),
+        value: random(0, 3000),
         maxValue: 3000,
         gaugeType: 'donut',
         options: {
@@ -605,7 +609,7 @@ function gaugeCtrl($scope) {
 
     $scope.gauge3 = {
         animationTime: 10,
-        value: random(0,3000),
+        value: random(0, 3000),
         maxValue: 3000,
         gaugeType: 'donut',
         options: {
@@ -637,7 +641,7 @@ function gaugeCtrl($scope) {
 
     $scope.gauge4 = {
         animationTime: 10,
-        value: random(0,3000),
+        value: random(0, 3000),
         maxValue: 3000,
         gaugeType: 'donut',
         options: {
@@ -668,11 +672,12 @@ function gaugeCtrl($scope) {
     }
 }
 
-function random(min,max) {
-    return Math.floor(Math.random()*(max-min+1)+min);
+function random(min, max) {
+    return Math.floor(Math.random() * (max - min + 1) + min);
 }
 
 barChartCtrl.$inject = ['$scope'];
+
 function barChartCtrl($scope) {
 
     var elements = 16;
@@ -683,9 +688,9 @@ function barChartCtrl($scope) {
 
     for (var i = 0; i <= elements; i++) {
         labels.push('1');
-        data.push(random(40,100));
-        data1.push(random(20,100));
-        data2.push(random(60,100));
+        data.push(random(40, 100));
+        data1.push(random(20, 100));
+        data2.push(random(60, 100));
     }
 
     $scope.labels = labels;
@@ -698,7 +703,7 @@ function barChartCtrl($scope) {
         showScale: false,
         scaleFontSize: 0,
         scaleShowGridLines: false,
-        barStrokeWidth : 0,
+        barStrokeWidth: 0,
         barBackground: 'rgba(221, 224, 229, 1)',
 
         // pointDot :false,
@@ -706,23 +711,24 @@ function barChartCtrl($scope) {
     };
 
     $scope.colours = [{
-        fillColor : brandInfo,
-		strokeColor : 'rgba(0,0,0,1)',
-		highlightFill: '#818a91',
+        fillColor: brandInfo,
+        strokeColor: 'rgba(0,0,0,1)',
+        highlightFill: '#818a91',
         pointStrokeColor: '#000'
     }];
 }
 
 gaugeJSDemoCtrl.$inject = ['$scope', '$timeout'];
+
 function gaugeJSDemoCtrl($scope, $timeout) {
 
-    function random(min,max) {
-        return Math.floor(Math.random()*(max-min+1)+min);
+    function random(min, max) {
+        return Math.floor(Math.random() * (max - min + 1) + min);
     }
 
     $scope.gauge1 = {
         animationTime: 10,
-        value: random(0,3000),
+        value: random(0, 3000),
         maxValue: 3000,
         gaugeType: 'donut',
         options: {
@@ -754,7 +760,7 @@ function gaugeJSDemoCtrl($scope, $timeout) {
 
     $scope.gauge2 = {
         animationTime: 10,
-        value: random(0,3000),
+        value: random(0, 3000),
         maxValue: 3000,
         gaugeType: 'donut',
         options: {
@@ -786,7 +792,7 @@ function gaugeJSDemoCtrl($scope, $timeout) {
 
     $scope.gauge3 = {
         animationTime: 10,
-        value: random(0,3000),
+        value: random(0, 3000),
         maxValue: 3000,
         gaugeType: 'donut',
         options: {
@@ -818,7 +824,7 @@ function gaugeJSDemoCtrl($scope, $timeout) {
 
     $scope.gauge4 = {
         animationTime: 10,
-        value: random(0,3000),
+        value: random(0, 3000),
         maxValue: 3000,
         gaugeType: 'donut',
         options: {
@@ -850,9 +856,10 @@ function gaugeJSDemoCtrl($scope, $timeout) {
 }
 
 cardChartCtrl1.$inject = ['$scope'];
+
 function cardChartCtrl1($scope) {
 
-    $scope.labels = ['April 22','April 23','April 24','April 25','April 26','Yesterday','Today'];
+    $scope.labels = ['April 22', 'April 23', 'April 24', 'April 25', 'April 26', 'Yesterday', 'Today'];
     $scope.data = [
         [65, 59, 84, 84, 51, 55, 40]
     ];
@@ -874,9 +881,10 @@ function cardChartCtrl1($scope) {
 }
 
 cardChartCtrl2.$inject = ['$scope'];
+
 function cardChartCtrl2($scope) {
 
-    $scope.labels = ['January','February','March','April','May','June','July'];
+    $scope.labels = ['January', 'February', 'March', 'April', 'May', 'June', 'July'];
     $scope.data = [
         [1, 18, 9, 17, 34, 22, 11]
     ];
@@ -893,7 +901,7 @@ function cardChartCtrl2($scope) {
         scaleFontSize: 5,
         scaleLineColor: 'rgba(0,0,0,0)',
         scaleFontColor: 'rgba(0,0,0,0)',
-        bezierCurve : false,
+        bezierCurve: false,
     };
     $scope.colours = [{
         fillColor: brandInfo,
@@ -905,9 +913,10 @@ function cardChartCtrl2($scope) {
 }
 
 cardChartCtrl3.$inject = ['$scope'];
+
 function cardChartCtrl3($scope) {
 
-    $scope.labels = ['January','February','March','April','May','June','July'];
+    $scope.labels = ['January', 'February', 'March', 'April', 'May', 'June', 'July'];
     $scope.data = [
         [78, 81, 80, 45, 34, 12, 40]
     ];
@@ -918,9 +927,9 @@ function cardChartCtrl3($scope) {
         showScale: false,
         scaleShowGridLines: false,
         pointDot: false,
-        pointDotStrokeWidth : 0,
-        pointDotRadius : 0,
-        scaleGridLineWidth : 0,
+        pointDotStrokeWidth: 0,
+        pointDotRadius: 0,
+        scaleGridLineWidth: 0,
         //pointHitDetectionRadius : 0,
     };
     $scope.colours = [{
@@ -932,11 +941,12 @@ function cardChartCtrl3($scope) {
     }];
 }
 
-function random(min,max) {
-    return Math.floor(Math.random()*(max-min+1)+min);
+function random(min, max) {
+    return Math.floor(Math.random() * (max - min + 1) + min);
 }
 
 cardChartCtrl4.$inject = ['$scope'];
+
 function cardChartCtrl4($scope) {
 
     var elements = 16;
@@ -945,7 +955,7 @@ function cardChartCtrl4($scope) {
 
     for (var i = 0; i <= elements; i++) {
         labels.push('1');
-        data.push(random(40,100));
+        data.push(random(40, 100));
     }
 
     $scope.labels = labels;
@@ -956,10 +966,10 @@ function cardChartCtrl4($scope) {
         showScale: false,
         scaleFontSize: 0,
         scaleShowGridLines: false,
-        barShowStroke : false,
-        barStrokeWidth : 0,
-        scaleGridLineWidth : 0,
-        barValueSpacing : 3,
+        barShowStroke: false,
+        barStrokeWidth: 0,
+        scaleGridLineWidth: 0,
+        barValueSpacing: 3,
     };
     $scope.colours = [{
         fillColor: 'rgba(255,255,255,.3)',

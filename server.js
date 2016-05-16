@@ -109,11 +109,11 @@ app.get('/api/fitbit/activity/:date', function(req, res){
   console.log(options.headers.Authorization);
   request(options, function(error, response, body){
     console.log(body); // Show the HTML for the Google homepage.
-    var json_data ={summary:body.summary};
-    res.json(json_data);
+    var json_data ={summary:body};
+    res.json(body);
   });
 
-	
+
 });
 
 app.get('/api/logout', function(req,res){
