@@ -90,7 +90,7 @@ app.get('/api/username', function (req, res) {
 });
 
 app.get('/api/fitbit/activity/:date', function(req, res){
-  console.log("Sending request!");
+  console.log("Sending activity request!");
 
   console.log(req.params);
 
@@ -98,6 +98,34 @@ app.get('/api/fitbit/activity/:date', function(req, res){
 
 
   var url1 = "https://api.fitbit.com/1/user/" + req.user.profile.id +"/activities/date/" + req.params.date + ".json";
+  var fitAuth = "Bearer " + req.user.accessToken;
+  var options = {
+    url:url1,
+    headers:{
+      'Authorization' : fitAuth
+    }
+  };
+  console.log(options.url);
+  console.log(options.headers.Authorization);
+  request(options, function(error, response, body){
+    console.log(body); // Show the HTML for the Google homepage.
+    var json_data ={summary:body};
+    res.json(body);
+  });
+
+
+});
+
+
+app.get('/api/fitbit/sleep/:date', function(req, res){
+  console.log("Sending sleep request!");
+
+  console.log(req.params);
+
+	console.log(JSON.stringify(req.user.accessToken));
+
+
+  var url1 = "https://api.fitbit.com/1/user/" + req.user.profile.id +"/sleep/date/" + req.params.date + ".json";
   var fitAuth = "Bearer " + req.user.accessToken;
   var options = {
     url:url1,
@@ -125,7 +153,7 @@ app.get('/api/logout', function(req,res){
 });
 
 // OAuth routes
-app.get('/auth/fitbit', passport.authenticate('fitbit', {scope: ['weight', 'profile', 'activity','heartrate']}));
+app.get('/auth/fitbit', passport.authenticate('fitbit', {scope: ['weight', 'profile', 'activity','heartrate','sleep']}));
 app.get( '/auth/fitbit/callback', passport.authenticate( 'fitbit', {
         successRedirect: '/#/dashboard',
         failureRedirect: '/#/login'

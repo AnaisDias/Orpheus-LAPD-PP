@@ -16,11 +16,11 @@ angular
     .controller('cardChartCtrl2', cardChartCtrl2)
     .controller('cardChartCtrl3', cardChartCtrl3)
     .controller('cardChartCtrl4', cardChartCtrl4)
-    .filter('secondsToDateTime',[function() {
-    return function(seconds) {
-        return new Date(1970, 0, 1).setMilliseconds(seconds);
-    };
-}])
+    .filter('secondsToDateTime', [function() {
+        return function(seconds) {
+            return new Date(1970, 0, 1).setMilliseconds(seconds);
+        };
+    }])
 
 
 
@@ -318,13 +318,13 @@ function activityCtrl($scope, $cookies, $window, $http, $filter) {
                 }, {
                     title: 'Distance',
                     icon: 'icon-like',
-                    value: $scope.totalDistance ,
+                    value: $scope.totalDistance,
                     percent: $scope.distanceVSGoals
                 }, {
-                  title: 'Calories',
-                  icon: 'icon-like',
-                  value: $scope.summary.caloriesOut,
-                  percent: $scope.caloriesVSGoals
+                    title: 'Calories',
+                    icon: 'icon-like',
+                    value: $scope.summary.caloriesOut,
+                    percent: $scope.caloriesVSGoals
                 }
 
             ];
@@ -782,9 +782,9 @@ function cardChartCtrl2($scope) {
     }];
 }
 
-cardChartCtrl3.$inject = ['$scope'];
+cardChartCtrl3.$inject = ['$scope','$cookies','$filter','$http'];
 
-function cardChartCtrl3($scope) {
+function cardChartCtrl3($scope,$cookies,$filter,$http) {
 
     $scope.labels = ['January', 'February', 'March', 'April', 'May', 'June', 'July'];
     $scope.data = [
@@ -809,43 +809,64 @@ function cardChartCtrl3($scope) {
         highlightStroke: 'rgba(47, 132, 71, 0.8)',
         tooltipCornerRadius: 0,
     }];
-}
 
-function random(min, max) {
-    return Math.floor(Math.random() * (max - min + 1) + min);
-}
+    $scope.$watch(function() {
+            return $cookies.selDate;
+        }, function(newVal, oldVal) {
+            if (typeof(newVal) == 'undefined') {
+                newVal = moment()._d;
+            }
+            console.log("The date has changed from " + oldVal + " to " + newVal);
 
-cardChartCtrl4.$inject = ['$scope'];
+            unparsedDate = newVal;
+            parsedDate = $filter('date')(new Date(unparsedDate), 'yyyy-MM-dd');
+            $http.get('/api/fitbit/sleep/' + parsedDate).success(function(data) {
+                jsonD = JSON.parse(data);
+                console.log("sleep:" + JSON.stringify(jsonD));
 
-function cardChartCtrl4($scope) {
 
-    var elements = 16;
-    var labels = [];
-    var data = [];
+            }).error(function(data) {
+                //what to do on error
+            });
+        }, true);
 
-    for (var i = 0; i <= elements; i++) {
-        labels.push('1');
-        data.push(random(40, 100));
     }
 
-    $scope.labels = labels;
+    function random(min, max) {
+        return Math.floor(Math.random() * (max - min + 1) + min);
+    }
 
-    $scope.data = [data];
+    cardChartCtrl4.$inject = ['$scope'];
 
-    $scope.options = {
-        showScale: false,
-        scaleFontSize: 0,
-        scaleShowGridLines: false,
-        barShowStroke: false,
-        barStrokeWidth: 0,
-        scaleGridLineWidth: 0,
-        barValueSpacing: 3,
-    };
-    $scope.colours = [{
-        fillColor: 'rgba(255,255,255,.3)',
-        strokeColor: 'rgba(255,255,255,.55)',
-        highlightFill: 'rgba(255,255,255,.55)',
-        highlightStroke: 'rgba(255,255,255,.55)',
-        tooltipCornerRadius: 0,
-    }];
-}
+    function cardChartCtrl4($scope) {
+
+        var elements = 16;
+        var labels = [];
+        var data = [];
+
+        for (var i = 0; i <= elements; i++) {
+            labels.push('1');
+            data.push(random(40, 100));
+        }
+
+        $scope.labels = labels;
+
+        $scope.data = [data];
+
+        $scope.options = {
+            showScale: false,
+            scaleFontSize: 0,
+            scaleShowGridLines: false,
+            barShowStroke: false,
+            barStrokeWidth: 0,
+            scaleGridLineWidth: 0,
+            barValueSpacing: 3,
+        };
+        $scope.colours = [{
+            fillColor: 'rgba(255,255,255,.3)',
+            strokeColor: 'rgba(255,255,255,.55)',
+            highlightFill: 'rgba(255,255,255,.55)',
+            highlightStroke: 'rgba(255,255,255,.55)',
+            tooltipCornerRadius: 0,
+        }];
+    }
