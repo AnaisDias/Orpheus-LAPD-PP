@@ -7,6 +7,7 @@
         <div class="card card-inverse ">
             <div class="card-block">
                 <div class="row">
+
                     <div class="col-sm-6">
 
                         <div class="col-sm-6 col-sm-offset-9">
@@ -14,7 +15,7 @@
                             <fieldset class="form-group " ng-controller="DatePickerCtrl">
                                 <div class="input-group input-group-sm ">
                                     <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
-                                    <input date-range-picker class="form-control date-picker" type="text" ng-model="date" options="opts"  />
+                                    <input date-range-picker class="form-control date-picker" type="text" ng-model="date" options="opts" value="{{selDate}}" />
                                 </div>
                             </fieldset>
                         </div>
@@ -103,7 +104,7 @@
 </div>
 
 <!--/.row-->
-<div class="row">
+<div class="row" ng-controller="activityCtrl">
     <div class="col-md-12">
         <div class="card">
             <div class="card-block">
@@ -113,40 +114,52 @@
                     </div>
 
                 </div>
-                <hr class="m-a-0">
+                <br/>
+
+
+
                 <div class="row">
                     <div class="col-sm-12 col-lg-6">
 
-                        <!--/.row-->
-                        <hr class="m-t-0">
-                        <ul class="horizontal-bars" ng-controller="horizontalBarsCtrl">
-                            <li ng-repeat="row in data">
-                                <div class="title">
-                                    {{ row.day }}
-                                </div>
-                                <div class="bars">
-                                    <progress class="progress progress-xs progress-info" value="{{ row.new }}" max="100" style="margin-bottom: 2px;">{{ row.new }}%</progress>
-                                    <progress class="progress progress-xs progress-danger m-a-0" value="{{ row.recurring }}" max="100">{{ row.recurring }}%</progress>
-                                </div>
-                            </li>
-                            <li class="legend">
-                                <span class="label label-pill label-info"></span>
-                                <small>Active minutes</small> &nbsp;
-                                <span class="label label-pill label-danger"></span>
-                                <small>Sedentary minutes</small>
-                            </li>
-                        </ul>
+
+
+                        <div class="card-block">
+                            <table class="table table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>Name</th>
+                                        <th>Description</th>
+                                        <th>Distance</th>
+                                        <th>Duration</th>
+                                        <th>Start time </th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr ng-repeat="activity in activities">
+                                        <td>{{ activity.name }}</td>
+                                        <td>{{ activity.description }}</td>
+                                        <td>{{ activity.distance }}</td>
+                                        <td>
+                                            <span class="label label-success">{{ activity.duration | secondsToDateTime | date:'HH:mm:ss' }}</span>
+                                        </td>
+                                        <td> {{ activity.startTime}} </td>
+                                    </tr>
+
+                                </tbody>
+                            </table>
+
+                        </div>
+
                     </div>
                     <!--/.col-->
                     <div class="col-sm-6 col-lg-6">
 
-                        <!--/.row-->
-                        <hr class="m-t-0">
-                        <ul class="horizontal-bars type-2" ng-controller="horizontalBarsType2Ctrl">
+
+                        <ul class="horizontal-bars type-2">
 
                             <li class="divider"></li>
                             <li ng-repeat="row in source">
-                                <!-- <i ng-class="row.icon"></i> -->
+                                <i ng-show="{{ row.percent >100}}" ng-class="row.icon"></i>
                                 <span class="title">{{ row.title }}</span>
                                 <span class="value">{{ row.value | number }}
                                       <span class="text-muted small">({{ row.percent }}%)</span>
@@ -156,9 +169,7 @@
                                     <progress class="progress progress-xs progress-success m-a-0" value="{{ row.percent }}" max="100">{{ row.percent }}%</progress>
                                 </div>
                             </li>
-                            <li class="divider text-xs-center">
-                                <button type="button" class="btn btn-sm btn-link text-muted" data-toggle="tooltip" data-placement="top" title="show more"><i class="icon-options"></i></button>
-                            </li>
+                          
                         </ul>
                     </div>
                     <!--/.col-->
