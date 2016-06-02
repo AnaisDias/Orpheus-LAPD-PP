@@ -14,9 +14,8 @@ if (config.use_env_variable) {
   var sequelize = new Sequelize(process.env[config.use_env_variable]);
 
 } else {
-  var sequelize = new Sequelize(config.development.database, config.development.username, config.development.password, config.development);
+  var sequelize = new Sequelize(config.development.database, config.development.username, null, config.development);
 
-  console.log("pPASSSSSSSSS  " + config.development.password);
 
   console.log("confiiiiiiiiiig " + JSON.stringify(config));
 }

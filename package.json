@@ -18,16 +18,18 @@
     "grunt-contrib-watch": "^0.6.1",
     "grunt-execute": "^0.2.2",
     "jade": "~1.11.0",
+    "method-override": "2.3.5",
     "morgan": "~1.6.1",
     "mysql": "^2.10.2",
+    "oauth": "0.9.14",
     "passport": "0.2.1",
+    "passport-fitbit-oauth2": "1.0.1",
     "passport-twitter": "1.0.2",
+    "pg": "^4.5.5",
+    "pg-hstore": "^2.3.2",
+    "request": "2.72.0",
     "sequelize": "^2.0.0-rc1",
     "sequelize-cli": "^2.4.0",
-    "serve-favicon": "~2.3.0",
-    "method-override": "2.3.5",
-    "oauth": "0.9.14",
-    "passport-fitbit-oauth2": "1.0.1",
-    "request": "2.72.0"
+    "serve-favicon": "~2.3.0"
   }
 }
