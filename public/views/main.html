@@ -120,7 +120,7 @@
 
 
                 <div class="row">
-                    <div class="col-sm-12 col-lg-6">
+                    <div class="col-sm-12 col-lg-6" ng-show="activities.length">
 
 
 
@@ -136,6 +136,7 @@
                                     </tr>
                                 </thead>
                                 <tbody>
+
                                     <tr ng-repeat="activity in activities">
                                         <td>{{ activity.name }}</td>
                                         <td>{{ activity.description }}</td>
@@ -153,10 +154,26 @@
 
                     </div>
                     <!--/.col-->
-                    <div class="col-sm-6 col-lg-6">
+
+                    <div class="col-sm-6 col-md-4"  ng-show="!activities.length">
+                        <div class="card card-inverse card-danger text-xs-center">
+                            <div class="card-block">
+                                <blockquote class="card-blockquote">
+                                    <p>No physical activities today yet.</p>
+                                    <footer>Physical activity may help with endorphines release and self-esteem improvement!
+                                      <p>
+                                        <cite >Try going for a run</cite>
+                                      </p>
+                                    </footer>
+                                </blockquote>
+                            </div>
+                        </div>
+                    </div>
+                    <!--/col-->
+                    <div class="col-sm-6 col-lg-6" ng-show="activities.length">
 
 
-                        <ul class="horizontal-bars type-2">
+                        <ul class="horizontal-bars type-2" >
 
                             <li class="divider"></li>
                             <li ng-repeat="row in source">
