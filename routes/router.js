@@ -16,12 +16,14 @@
     var logger = require('morgan');
     var request = require("request");
     var models = require('../models');
+    var moment = require('moment');
+    moment().format();
 
     var FitbitAuthController = require('../controllers/fitbit-auth');
 
 
     module.exports = function(app) {
-
+        var models = app.get('models');
         app.post('/api/fitbit/user/findorcreate', function(req, res) {
 
             models.User.findOrCreate({
@@ -61,10 +63,9 @@
                     id: userid
                 }
             }).then(function(user) {
+
                 res.json(user)
             });
-
-
         });
 
         app.get('/api/fitbit/activity/:date/:id', function(req, res) {
@@ -146,7 +147,6 @@
         }));
         app.get('/auth/fitbit/callback', passport.authenticate('fitbit'),
             function(req, res) {
-                console.log(req);
                 // If this function gets called, authentication was successful.
                 // `req.user` contains the authenticated user.
 
@@ -155,12 +155,59 @@
                         auth_id: req.user.profile.id
                     }
                 }).then(function(user) {
+                    parseDate = user.createdAt.setMonth(user.createdAt.getMonth());
+                    var momentRegisterDate = moment(parseDate);
+                    console.log("*************CREATEEEEEEEEEEEEEEEEED " + momentRegisterDate);
 
-                    console.log("fuuuuuuck " + user.id)
+
+                    var momentToday = moment();
+
+                    console.log("*************TODAY " + momentToday);
+
+                    //cycle that asks activity and stores it from registration date untill today, adding one day after each iteration
+                    while (momentRegisterDate.isSameOrBefore(momentToday)) {
+                        var thisdate = momentRegisterDate.year() + "-" + (momentRegisterDate.month() + 1) + "-" + momentRegisterDate.date();
+                        console.log("sending activity request for " + thisdate);
+                        var url1 = "https://api.fitbit.com/1/user/" + user.auth_id + "/activities/date/" + thisdate + ".json";
+                        var fitAuth = "Bearer " + req.user.accessToken;
+                        var options = {
+                            url: url1,
+                            headers: {
+                                'Authorization': fitAuth
+                            }
+                        };
+                        request(options, function(error, response, body) {
+                            var json_data = {
+                                summary: body
+                            };
+
+                            console.log("content to be created:" + json_data);
+
+
+                            console.log("user id line 190:" + user.id);
+                            console.log("date to be created:" + thisdate);
+
+
+                            models.Activity.create({
+
+                                date: thisdate,
+                                content: json_data,
+                                UserId: user.id
+                            }).then(function() {
+                                return;
+                            });
+
+
+
+                        });
+                        momentRegisterDate.add(1, 'days');
+                    }
+
                     res.redirect('/#/user?id=' + user.id);
                 });
 
             });
+
 
 
 
