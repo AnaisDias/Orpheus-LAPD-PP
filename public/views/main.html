@@ -180,7 +180,8 @@
                                 <i ng-show="{{ row.percent >100}}" ng-class="row.icon"></i>
                                 <span class="title">{{ row.title }}</span>
                                 <span class="value">{{ row.value | number }}
-                                      <span class="text-muted small">({{ row.percent }}%)</span>
+                                      <span class="text-muted small" ng-show="row.percent<1">({{ row.percent | percentage }}%)</span>
+                                      <span class="text-muted small" ng-show="row.percent>=1">({{ 1 | percentage }}%)</span>
                                 <!-- percentage steps/stepsgoal -->
                                 </span>
                                 <div class="bars">

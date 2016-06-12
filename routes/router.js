@@ -1,5 +1,5 @@
 (function() {
-    
+
     var express = require('express');
     var CircularJSON = require('circular-json');
     var bodyParser = require('body-parser'); // pull information from HTML POST (express4)
@@ -77,13 +77,11 @@
                     date: req.params.date
                 }
             }).then(function(activity) {
-                if (activity.length) {
                     res.json(activity.content);
-                }
-                return res.send({
-                    message: "Could not find activity."
-                });
             }).catch(function(error) {
+              console.log("user id on activity request: "+req.params.id);
+              console.log("date on activity request: "+req.params.date);
+              console.log(error.message);
                 return res.send({
                     message: "Error retrieving activity."
                 });
@@ -137,7 +135,67 @@
             res.json(json_data);
         });
 
-        // OAuth routes
+        var toCheck = function(thisdate, userid, auth_id, accessToken) {
+                models.Activity.count({
+                    where: {
+                        date: thisdate,
+                        UserId: userid
+                    }
+                }).then(count => {
+                    if (count != 0) {
+                        console.log("ENONTROOOOOOOOU " + thisdate);
+                    } else {
+                        console.log("NAAAAAAAAAAAAAAAAOy " + thisdate);
+
+                        console.log("sending activity request for " + thisdate);
+                        var urlAct = "https://api.fitbit.com/1/user/" + auth_id + "/activities/date/" + thisdate + ".json";
+                        var fitAuth = "Bearer " + accessToken;
+                        var optionsAct = {
+                            url: urlAct,
+                            headers: {
+                                'Authorization': fitAuth
+                            }
+                        };
+                        request(optionsAct, function(error, response, body) {
+
+                            models.Activity.create({
+
+                                date: thisdate,
+                                UserId: userid,
+                                content: body
+
+                            });
+
+
+                        });
+
+                        console.log("sending sleep request for " + thisdate);
+                        var urlSleep = "https://api.fitbit.com/1/user/" + auth_id + "/sleep/date/" + thisdate + ".json";
+                        var fitAuth = "Bearer " + accessToken;
+                        var optionsSleep = {
+                            url: urlSleep,
+                            headers: {
+                                'Authorization': fitAuth
+                            }
+                        };
+                        request(optionsSleep, function(error, response, body) {
+
+                            models.Sleep.findOrCreate({
+                                where: {
+                                    date: thisdate
+                                }, // we search for this user
+                                defaults: {
+                                    content: body,
+                                    UserId: userid
+                                }
+                            });
+
+
+                        });
+                    }
+                });
+            }
+            // OAuth routes
         app.get('/auth/fitbit', passport.authenticate('fitbit', {
             scope: ['weight', 'profile', 'activity', 'heartrate', 'sleep']
         }));
@@ -158,103 +216,8 @@
                     //cycle that requests activity and stores it from registration date untill today, adding one day after each iteration
                     while (momentRegisterDate.isSameOrBefore(momentToday)) {
                         var thisdate = momentRegisterDate.year() + "-" + (momentRegisterDate.month() + 1) + "-" + momentRegisterDate.date();
-                        console.log(momentRegisterDate.year() + "-" + (momentRegisterDate.month() + 1) + "-" + momentRegisterDate.date());
-                        var datetocheck = true;
-
-                        models.Activity.count({
-                            where: {
-                                date: momentRegisterDate.year() + "-" + (momentRegisterDate.month() + 1) + "-" + momentRegisterDate.date(),
-                                UserId:user.id
-                            }
-                        }).then(count => {
-                          if(count!=0){
-                            datetocheck = false;
-                            console.log("0");
-                            console.log("0");
-                            console.log("0");
-                            console.log("0");
-                            console.log("0");
-                            console.log("0");
-                            console.log("ENONTROOOOOOOOU " + momentRegisterDate.year() + "-" + (momentRegisterDate.month() + 1) + "-" + momentRegisterDate.date());
-                            console.log("0");
-                            console.log("0");
-                            console.log("0");
-                            console.log("0");
-                            console.log("0");
-                            console.log("0");
-                            console.log("0");}
-                            else{
-                              console.log("0");
-                              console.log("0");
-                              console.log("0");
-                              console.log("0");
-                              console.log("0");
-                              console.log("0");
-                              console.log("NAAAAAAAAAAAAAAAAOy " + momentRegisterDate.year() + "-" + (momentRegisterDate.month() + 1) + "-" + momentRegisterDate.date());
-                              console.log("0");
-                              console.log("0");
-                              console.log("0");
-                              console.log("0");
-                              console.log("0");
-                              console.log("0");
-                              console.log("0");
-                            }
-                        });
-
-                        if (datetocheck) {
-                          /*
-                            console.log("sending activity request for " + thisdate);
-                            var urlAct = "https://api.fitbit.com/1/user/" + user.auth_id + "/activities/date/" + thisdate + ".json";
-                            var fitAuth = "Bearer " + req.user.accessToken;
-                            var optionsAct = {
-                                url: urlAct,
-                                headers: {
-                                    'Authorization': fitAuth
-                                }
-                            };
-                            request(optionsAct, function(error, response, body) {
-                                var json_data = {
-                                    summary: body
-                                };
-                                models.Activity.create({
-
-                                    date: thisdate,
-                                    UserId: user.id,
-                                    content: json_data
-
-                                });
-
-
-                            });
-
-                            console.log("sending sleep request for " + thisdate);
-                            var urlSleep = "https://api.fitbit.com/1/user/" + user.auth_id + "/sleep/date/" + thisdate + ".json";
-                            var fitAuth = "Bearer " + req.user.accessToken;
-                            var optionsSleep = {
-                                url: urlSleep,
-                                headers: {
-                                    'Authorization': fitAuth
-                                }
-                            };
-                            request(optionsSleep, function(error, response, body) {
-                                var json_data = {
-                                    summary: body
-                                };
-                                models.Sleep.findOrCreate({
-                                    where: {
-                                        date: thisdate
-                                    }, // we search for this user
-                                    defaults: {
-                                        content: json_data,
-                                        UserId: user.id
-                                    }
-                                });
-
-
-                            });
-                            */
-                        }
-
+                        console.log(thisdate);
+                        toCheck(thisdate, user.id, user.auth_id, req.user.accessToken);
                         momentRegisterDate.add(1, 'days');
                     }
 
@@ -263,74 +226,81 @@
 
             });
 
-                //login in our application
+        //login in our application
 
-                app.post('/api/login', function (req, res){
-                    var username = req.body.username;
-                    var password = req.body.password;
-                });
+        app.post('/api/login', function(req, res) {
+            var username = req.body.username;
+            var password = req.body.password;
+        });
 
-                //register in our application
-                app.post('/api/register', function (req, res) {
+        //register in our application
+        app.post('/api/register', function(req, res) {
 
-                    var nusername = req.body.username;
-                    var name = req.body.fullname;
-                    var nemail = req.body.email;
-                    var npassword = req.body.password;
-                    var rPassword = req.body.rPassword;
+            var nusername = req.body.username;
+            var name = req.body.fullname;
+            var nemail = req.body.email;
+            var npassword = req.body.password;
+            var rPassword = req.body.rPassword;
 
-                    var secret = "orpheusapp";
+            var secret = "orpheusapp";
 
 
-                    if(npassword == rPassword){
-                        var hashPass = crypto.createHmac('sha256',secret)
-                            .update(npassword)
-                            .digest('hex');
-                        console.log(hashPass);
-                        models.usertest.find({where: {
-                            $or: [
-                                {username: nusername},
-                                {email: nemail}
-                            ]
-                        }
-                        }).then(function(user) {
-                            console.log(user);
-                            if (user != null) {
-                                var json_data = {
-                                    success: false,
-                                    exists: true
-                                };
-                                console.log("not null");
-                            }else {
-                                models.usertest.create({ username: nusername, email: nemail, fullname: name, password: hashPass},
-                                    { fields: [ 'username' , 'email', 'fullname', 'password'] }).then(function(user) {
-                                    console.log(user.get({
+            if (npassword == rPassword) {
+                var hashPass = crypto.createHmac('sha256', secret)
+                    .update(npassword)
+                    .digest('hex');
+                console.log(hashPass);
+                models.usertest.find({
+                    where: {
+                        $or: [{
+                            username: nusername
+                        }, {
+                            email: nemail
+                        }]
+                    }
+                }).then(function(user) {
+                        console.log(user);
+                        if (user != null) {
+                            var json_data = {
+                                success: false,
+                                exists: true
+                            };
+                            console.log("not null");
+                        } else {
+                            models.usertest.create({
+                                username: nusername,
+                                email: nemail,
+                                fullname: name,
+                                password: hashPass
+                            }, {
+                                fields: ['username', 'email', 'fullname', 'password']
+                            }).then(function(user) {
+                                console.log(user.get({
                                         plain: true
                                     })) // => { username: 'barfooz', isAdmin: false }
-                                });
-                                var json_data = {
-                                    success : true
-                                };
-                            }
-                            res.json(json_data);
-                        },
-                        function (err) {
+                            });
                             var json_data = {
-                                success : false
+                                success: true
                             };
-                            res.json(json_data);
-                        });
-
-                    }
-                    else{
-
+                        }
+                        res.json(json_data);
+                    },
+                    function(err) {
                         var json_data = {
-                            success : false
+                            success: false
                         };
                         res.json(json_data);
-                    }
+                    });
 
-                });
+            } else {
+
+                var json_data = {
+                    success: false
+                };
+                res.json(json_data);
+            }
+
+        });
 
 
         app.get('*', function(req, res) {

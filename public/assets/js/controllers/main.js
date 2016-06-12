@@ -268,8 +268,10 @@ function activityCtrl($scope, $cookies, $window, $http, $filter,$location) {
         unparsedDate = newVal;
         parsedDate = $filter('date')(new Date(unparsedDate), 'yyyy-MM-dd');
         $http.get('/api/fitbit/activity/' + parsedDate +"/"+$location.search().id).success(function(data) {
-            console.log("summary:" + JSON.stringify(data.summary));
-            console.log("goals:" + JSON.stringify(data.goals));
+            console.log(data);
+            data=JSON.parse(data);
+            console.log("goals: ");
+            console.log(data.goals.activeMinutes);
             console.log("step goals:" + data.goals.steps);
             $scope.activities = data.activities;
             $scope.goals = data.goals;
