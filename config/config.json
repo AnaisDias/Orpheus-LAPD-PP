@@ -4,7 +4,8 @@
     "user":"postgres",
     "database": "orpheus",
     "host": "localhost",
-    "dialect": "postgres"
+    "dialect": "postgres",
+    "password": "root"
   },
   "test": {
     "username": "postgres",

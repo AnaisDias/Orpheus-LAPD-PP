@@ -14,7 +14,7 @@ if (config.use_env_variable) {
   var sequelize = new Sequelize(process.env[config.use_env_variable]);
 
 } else {
-  var sequelize = new Sequelize(config.development.database, config.development.username, null, config.development);
+  var sequelize = new Sequelize(config.development.database, config.development.username, config.development.password, config.development);
 
 
   console.log("confiiiiiiiiiig " + JSON.stringify(config));
@@ -42,6 +42,7 @@ db.Sequelize = Sequelize;
 if(db){
   console.log("db existe");
 }
+
 
 
 module.exports = db;

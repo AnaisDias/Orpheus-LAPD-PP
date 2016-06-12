@@ -16,6 +16,7 @@ angular
     .controller('cardChartCtrl2', cardChartCtrl2)
     .controller('cardChartCtrl3', cardChartCtrl3)
     .controller('cardChartCtrl4', cardChartCtrl4)
+    .controller('situmanCtrl', situmanCtrl)
     .filter('secondsToDateTime', [function() {
         return function(seconds) {
             return new Date(1970, 0, 1).setMilliseconds(seconds);
@@ -298,6 +299,97 @@ function activityCtrl($scope, $cookies, $window, $http, $filter) {
 
 
             //$scope.caloriesVSGoals=
+
+
+            $scope.gender = [{
+                title: 'Male',
+                icon: 'icon-user',
+                value: 43
+            }, {
+                title: 'Female',
+                icon: 'icon-user-female',
+                value: 37
+            }, ];
+
+            $scope.source = [{
+                    title: 'Steps',
+                    icon: 'icon-like',
+                    value: $scope.summary.steps,
+                    percent: $scope.stepsVSGoals
+                }, {
+                    title: 'Distance',
+                    icon: 'icon-like',
+                    value: $scope.totalDistance,
+                    percent: $scope.distanceVSGoals
+                }, {
+                    title: 'Calories',
+                    icon: 'icon-like',
+                    value: $scope.summary.caloriesOut,
+                    percent: $scope.caloriesVSGoals
+                }
+
+            ];
+
+
+
+
+
+        }).error(function(data) {
+            //what to do on error
+        });
+
+
+    }, true);
+
+
+
+}
+
+//change to take situations from database, 
+situmanCtrl.$inject = ['$scope', '$cookies', '$window', '$http', '$filter'];
+
+function situmanCtrl($scope, $cookies, $window, $http, $filter) {
+
+
+
+    $scope.$watch(function() {
+        return $cookies.selDate;
+    }, function(newVal, oldVal) {
+        if (typeof(newVal) == 'undefined') {
+            newVal = moment()._d;
+        }
+        console.log("The date has changed from " + oldVal + " to " + newVal);
+
+        unparsedDate = newVal;
+        parsedDate = $filter('date')(new Date(unparsedDate), 'yyyy-MM-dd');
+        $http.get('/api/situationData/' + parsedDate).success(function(data) {
+            jsonD = JSON.parse(data);
+            console.log("situations:" + JSON.stringify(jsonD.situations));
+
+            console.log("activity1:" + JSON.stringify(jsonD.activities[0]));
+
+            console.log("goals:" + JSON.stringify(jsonD.goals));
+            console.log("step goals:" + jsonD.goals.steps);
+            $scope.situations = jsonD.activities;
+            $scope.goals = jsonD.goals;
+            $scope.summary = jsonD.summary;
+
+            $scope.stepsVSGoals = ($scope.goals.steps / $scope.summary.steps) * 100;
+            console.log("stepsVSGoals: " + $scope.stepsVSGoals);
+            $scope.activitiesTotal;
+
+            $scope.caloriesVSGoals = ($scope.goals.caloriesOut / $scope.summary.caloriesOut) * 100;
+            console.log("caloriesVSGoals: " + $scope.caloriesVSGoals);
+
+
+
+            angular.forEach($scope.summary.distances, function(summaryAct) {
+                if (summaryAct.activity == 'total') {
+                    $scope.totalDistance = summaryAct.distance;
+                    $scope.distanceVSGoals = ($scope.goals.distance / $scope.totalDistance) * 100;
+                }
+
+            });
 
 
             $scope.gender = [{

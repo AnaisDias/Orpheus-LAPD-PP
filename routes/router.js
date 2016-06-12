@@ -76,6 +76,19 @@
                  res.json(user);
                });
 
+            app.get('/api/situationData/:date', function(req,res){
+                var userid = req.user.id;
+                var date = req.params.date;
+                var data = SituationData.findAll({
+                    where: {
+                        id: userid,
+                        date: date
+                    }
+                });
+
+                res.json(data);
+            });
+
                 app.get('/api/fitbit/activity/:date', function(req, res) {
                     console.log("Sending activity request!");
 

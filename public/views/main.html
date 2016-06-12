@@ -203,6 +203,113 @@
 </div>
 <!--/.row-->
 
+<div class="row" ng-controller="situmanCtrl">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-block">
+                <div class="row">
+                    <div class="col-sm-6">
+                        <h3 class="card-title clearfix m-b-0">Situman activity</h3>
+                    </div>
+
+                </div>
+                <br/>
+
+
+
+                <div class="row">
+                    <div class="col-sm-12 col-lg-6" ng-show="activities.length">
+
+
+
+                        <div class="card-block">
+                            <table class="table table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>Name</th>
+                                        <th>Description</th>
+                                        <th>Distance</th>
+                                        <th>Duration</th>
+                                        <th>Start time </th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+
+                                    <tr ng-repeat="activity in activities">
+                                        <td>{{ activity.name }}</td>
+                                        <td>{{ activity.description }}</td>
+                                        <td>{{ activity.distance }}</td>
+                                        <td>
+                                            <span class="label label-success">{{ activity.duration | secondsToDateTime | date:'HH:mm:ss' }}</span>
+                                        </td>
+                                        <td> {{ activity.startTime}} </td>
+                                    </tr>
+
+                                </tbody>
+                            </table>
+
+                        </div>
+
+                    </div>
+                    <!--/.col-->
+
+                    <div class="col-sm-6 col-md-4"  ng-show="!situations.length">
+                        <div class="card card-inverse card-danger text-xs-center">
+                            <div class="card-block">
+                                <form method="post" enctype="multipart/form-data" action="/file-upload">
+                                    <fieldset class="form-group">
+                                        <label for="exampleInputFile">File input</label>
+                                        <input type="file" class="form-control-file" id="exampleInputFile">
+                                        <small class="text-muted">This is some placeholder block-level help text for the above input. It's a bit lighter and easily wraps to a new line.
+                                        </small>
+                                    </fieldset>
+                                    <button type="submit" class="btn btn-primary">Submit</button>
+                                </form>
+                                <!-- <blockquote class="card-blockquote">
+                                    <p>No physical activities today yet.</p>
+                                    <footer>Physical activity may help with endorphines release and self-esteem improvement!
+                                      <p>
+                                        <cite >Try going for a run</cite>
+                                      </p>
+                                    </footer>
+                                </blockquote> -->
+                            </div>
+                        </div>
+                    </div>
+                    <!--/col-->
+                    <div class="col-sm-6 col-lg-6" ng-show="situations.length">
+
+
+                        <ul class="horizontal-bars type-2" >
+
+                            <li class="divider"></li>
+                            <li ng-repeat="row in source">
+                                <i ng-show="{{ row.percent >100}}" ng-class="row.icon"></i>
+                                <span class="title">{{ row.title }}</span>
+                                <span class="value">{{ row.value | number }}
+                                      <span class="text-muted small">({{ row.percent }}%)</span>
+                                <!-- percentage steps/stepsgoal -->
+                                </span>
+                                <div class="bars">
+                                    <progress class="progress progress-xs progress-success m-a-0" value="{{ row.percent }}" max="100">{{ row.percent }}%</progress>
+                                </div>
+                            </li>
+
+                        </ul>
+                    </div>
+                    <!--/.col-->
+
+                    <!--/.col-->
+                </div>
+                <!--/.row-->
+                <br/>
+            </div>
+        </div>
+    </div>
+    <!--/.col-->
+</div>
+<!--/.row-->
+
 <!--/row-->
 <div class="card" ng-controller="moodDemoCtrl">
     <div class="card-block">
