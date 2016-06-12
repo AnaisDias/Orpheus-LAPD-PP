@@ -1,158 +1,213 @@
 (function() {
+    
+    var express = require('express');
+    var CircularJSON = require('circular-json');
+    var bodyParser = require('body-parser'); // pull information from HTML POST (express4)
+    var methodOverride = require('method-override'); // simulate DELETE and PUT (express4)
+    var cookieParser = require('cookie-parser');
+    var cookieSession = require('cookie-session');
+    var session = require('express-session');
+    var passport = require('passport');
+    var OAuth = require('oauth');
+    var FitbitStrategy = require('passport-fitbit-oauth2').FitbitOAuth2Strategy;
+    var mysql = require("mysql");
+    var path = require('path');
+    var favicon = require('serve-favicon');
+    var logger = require('morgan');
+    var request = require("request");
+    var models = require('../models');
+    var moment = require('moment');
+    moment().format();
+    var crypto = require('crypto');
 
-        var express = require('express');
-        var CircularJSON = require('circular-json');
-        var bodyParser = require('body-parser'); // pull information from HTML POST (express4)
-        var methodOverride = require('method-override'); // simulate DELETE and PUT (express4)
-        var cookieParser = require('cookie-parser');
-        var cookieSession = require('cookie-session');
-        var session = require('express-session');
-        var passport = require('passport');
-        var OAuth = require('oauth');
-        var FitbitStrategy = require('passport-fitbit-oauth2').FitbitOAuth2Strategy;
-        var mysql = require("mysql");
-        var path = require('path');
-        var favicon = require('serve-favicon');
-        var logger = require('morgan');
-        var request = require("request");
-        var models = require('../models');
-        var crypto = require('crypto');
-
-        var FitbitAuthController = require('../controllers/fitbit-auth');
+    var FitbitAuthController = require('../controllers/fitbit-auth');
 
 
-        module.exports = function(app) {
+    module.exports = function(app) {
+        var models = app.get('models');
+        app.post('/api/fitbit/user/findorcreate', function(req, res) {
 
-            app.post('/api/fitbit/user/findorcreate', function(req, res) {
+            models.User.findOrCreate({
+                where: {
+                    auth_id: req.body.auth_id
+                }, // we search for this user
+                defaults: {
+                    fullname: req.body.fullname,
+                    avatar: req.body.avatar,
+                    displayName: req.body.displayName,
+                    gender: req.body.gender,
+                    age: req.body.age
+                }
+            });
 
-                models.User.findOrCreate({
-                        where: {
-                            auth_id: req.body.auth_id
-                        }, // we search for this user
-                        defaults: {
-                            fullname: req.body.fullname,
-                            avatar: req.body.avatar,
-                            displayName: req.body.displayName,
-                            gender: req.body.gender,
-                        age: req.body.age
+            console.log(req.body.fullname);
+        });
+
+
+        app.get('/api/username', function(req, res) {
+
+            var json_data = {
+                username: req.user.profile.displayName,
+                avatar: req.user.profile._json.user.avatar
+            };
+            res.json(json_data);
+            //console.log(JSON.stringify(req.user));
+
+        });
+
+        app.get('/api/getUserById/:userid', function(req, res) {
+            console.log(req.params);
+
+            var userid = req.params.userid;
+            models.User.find({
+                where: {
+                    id: userid
+                }
+            }).then(function(user) {
+
+                res.json(user)
+            });
+        });
+
+        app.get('/api/fitbit/activity/:date/:id', function(req, res) {
+            console.log("Sending activity request!");
+
+            models.User.find({
+                where: {
+                    id: req.params.id
+                }
+            }).then(function(user) {
+                var url1 = "https://api.fitbit.com/1/user/" + user.auth_id + "/activities/date/" + req.params.date + ".json";
+                var fitAuth = "Bearer " + req.user.accessToken;
+                var options = {
+                    url: url1,
+                    headers: {
+                        'Authorization': fitAuth
                     }
-                });
-
-                console.log(req.body.fullname);
-            });
-
-
-            app.get('/api/user/:user_id', function(req, res) {
-                /*
-
-                send user information
-                var json_data = {"name":"amita","pass":"12345", "id":req.params.user_id};
-                res.json(json_data);
-
-                */
-
-
-
-            });
-
-            app.get('/api/username', function(req, res) {
-
-                var json_data = {
-                    username: req.user.profile.displayName,
-                    avatar: req.user.profile._json.user.avatar
                 };
-                res.json(json_data);
-                //console.log(JSON.stringify(req.user));
-
+                console.log(options.url);
+                console.log(options.headers.Authorization);
+                request(options, function(error, response, body) {
+                    console.log(body); // Show the HTML for the Google homepage.
+                    var json_data = {
+                        summary: body
+                    };
+                    res.json(body);
+                });
             });
 
-            app.get('/api/getUserById', function(req, res) {
-               var userid = req.params.userid;
-               var user = User.findfindAll({
-                        where: {
-                            id: useid
-                        }
-                    });
-
-                 res.json(user);
-               });
-
-                app.get('/api/fitbit/activity/:date', function(req, res) {
-                    console.log("Sending activity request!");
-
-                    console.log(req.params);
-
-                    console.log(JSON.stringify(req.user.accessToken));
+        });
 
 
-                    var url1 = "https://api.fitbit.com/1/user/" + req.user.profile.id + "/activities/date/" + req.params.date + ".json";
-                    var fitAuth = "Bearer " + req.user.accessToken;
-                    var options = {
-                        url: url1,
-                        headers: {
-                            'Authorization': fitAuth
-                        }
-                    };
-                    console.log(options.url);
-                    console.log(options.headers.Authorization);
-                    request(options, function(error, response, body) {
-                        console.log(body); // Show the HTML for the Google homepage.
-                        var json_data = {
-                            summary: body
-                        };
-                        res.json(body);
-                    });
+        app.get('/api/fitbit/sleep/:date/:id', function(req, res) {
+            console.log("Sending sleep request!");
 
+            console.log(req.params);
 
-                });
+            console.log(JSON.stringify(req.user.accessToken));
 
-
-                app.get('/api/fitbit/sleep/:date', function(req, res) {
-                    console.log("Sending sleep request!");
-
-                    console.log(req.params);
-
-                    console.log(JSON.stringify(req.user.accessToken));
-
-
-                    var url1 = "https://api.fitbit.com/1/user/" + req.user.profile.id + "/sleep/date/" + req.params.date + ".json";
-                    var fitAuth = "Bearer " + req.user.accessToken;
-                    var options = {
-                        url: url1,
-                        headers: {
-                            'Authorization': fitAuth
-                        }
-                    };
-                    console.log(options.url);
-                    console.log(options.headers.Authorization);
-                    request(options, function(error, response, body) {
-                        console.log(body); // Show the HTML for the Google homepage.
-                        var json_data = {
-                            summary: body
-                        };
-                        res.json(body);
-                    });
-
-
-                });
-
-                app.get('/api/logout', function(req, res) {
-                    console.log("Logging out");
-                    req.session = null;
-                    req.logout();
+            models.User.find({
+                where: {
+                    id: req.params.id
+                }
+            }).then(function(user) {
+                var url1 = "https://api.fitbit.com/1/user/" + user.auth_id + "/sleep/date/" + req.params.date + ".json";
+                var fitAuth = "Bearer " + req.user.accessToken;
+                var options = {
+                    url: url1,
+                    headers: {
+                        'Authorization': fitAuth
+                    }
+                };
+                console.log(options.url);
+                console.log(options.headers.Authorization);
+                request(options, function(error, response, body) {
+                    console.log(body); // Show the HTML for the Google homepage.
                     var json_data = {
-                        response: "0k"
+                        summary: body
                     };
-                    res.json(json_data);
+                    res.json(body);
+                });
+            });
+
+        });
+
+        app.get('/api/logout', function(req, res) {
+            console.log("Logging out");
+            req.session = null;
+            req.logout();
+            var json_data = {
+                response: "0k"
+            };
+            res.json(json_data);
+        });
+
+        // OAuth routes
+        app.get('/auth/fitbit', passport.authenticate('fitbit', {
+            scope: ['weight', 'profile', 'activity', 'heartrate', 'sleep']
+        }));
+        app.get('/auth/fitbit/callback', passport.authenticate('fitbit'),
+            function(req, res) {
+                // If this function gets called, authentication was successful.
+                // `req.user` contains the authenticated user.
+
+                models.User.find({
+                    where: {
+                        auth_id: req.user.profile.id
+                    }
+                }).then(function(user) {
+                    parseDate = user.createdAt.setMonth(user.createdAt.getMonth());
+                    var momentRegisterDate = moment(parseDate);
+                    console.log("*************CREATEEEEEEEEEEEEEEEEED " + momentRegisterDate);
+
+
+                    var momentToday = moment();
+
+                    console.log("*************TODAY " + momentToday);
+
+                    //cycle that asks activity and stores it from registration date untill today, adding one day after each iteration
+                    while (momentRegisterDate.isSameOrBefore(momentToday)) {
+                        var thisdate = momentRegisterDate.year() + "-" + (momentRegisterDate.month() + 1) + "-" + momentRegisterDate.date();
+                        console.log("sending activity request for " + thisdate);
+                        var url1 = "https://api.fitbit.com/1/user/" + user.auth_id + "/activities/date/" + thisdate + ".json";
+                        var fitAuth = "Bearer " + req.user.accessToken;
+                        var options = {
+                            url: url1,
+                            headers: {
+                                'Authorization': fitAuth
+                            }
+                        };
+                        request(options, function(error, response, body) {
+                            var json_data = {
+                                summary: body
+                            };
+
+                            console.log("content to be created:" + json_data);
+
+
+                            console.log("user id line 190:" + user.id);
+                            console.log("date to be created:" + thisdate);
+
+
+                            models.Activity.create({
+
+                                date: thisdate,
+                                content: json_data,
+                                UserId: user.id
+                            }).then(function() {
+                                return;
+                            });
+
+
+
+                        });
+                        momentRegisterDate.add(1, 'days');
+                    }
+
+                    res.redirect('/#/user?id=' + user.id);
                 });
 
-                // OAuth routes
-                app.get('/auth/fitbit', passport.authenticate('fitbit', {
-                    scope: ['weight', 'profile', 'activity', 'heartrate', 'sleep']
-                })); app.get('/auth/fitbit/callback', passport.authenticate('fitbit', {
-                    successRedirect: '/#/dashboard',
-                    failureRedirect: '/#/login'
-                }));
+            });
 
                 //login in our application
 
@@ -223,42 +278,43 @@
 
                 });
 
-                app.get('*', function(req, res) {
-                    res.sendfile('./public/index.html'); // load the single view file (angular will handle the page changes on the front-end)
+
+        app.get('*', function(req, res) {
+            res.sendfile('./public/index.html'); // load the single view file (angular will handle the page changes on the front-end)
+        });
+
+        // catch 404 and forward to error handler
+        app.use(function(req, res, next) {
+            var err = new Error('Not Found');
+            err.status = 404;
+            next(err);
+        });
+
+        // error handlers
+
+        // development error handler
+        // will print stacktrace
+        if (app.get('env') === 'development') {
+            app.use(function(err, req, res, next) {
+                res.status(err.status || 500);
+                res.render('error', {
+                    message: err.message,
+                    error: err
                 });
+            });
+        }
 
-                // catch 404 and forward to error handler
-                app.use(function(req, res, next) {
-                    var err = new Error('Not Found');
-                    err.status = 404;
-                    next(err);
-                });
-
-                // error handlers
-
-                // development error handler
-                // will print stacktrace
-                if (app.get('env') === 'development') {
-                    app.use(function(err, req, res, next) {
-                        res.status(err.status || 500);
-                        res.render('error', {
-                            message: err.message,
-                            error: err
-                        });
-                    });
-                }
-
-                // production error handler
-                // no stacktraces leaked to user
-                app.use(function(err, req, res, next) {
-                    res.status(err.status || 500);
-                    res.render('error', {
-                        message: err.message,
-                        error: {}
-                    });
-                });
+        // production error handler
+        // no stacktraces leaked to user
+        app.use(function(err, req, res, next) {
+            res.status(err.status || 500);
+            res.render('error', {
+                message: err.message,
+                error: {}
+            });
+        });
 
 
-            }
+    }
 
-        }());
+}());

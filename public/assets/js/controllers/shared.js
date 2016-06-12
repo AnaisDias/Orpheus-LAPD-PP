@@ -6,7 +6,7 @@ angular
 
 logout.$inject = ['$http','$window'];
 function logout($http,$window){
-    this.http = $http;  
+    this.http = $http;
     this.window = $window;
 }
 
