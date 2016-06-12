@@ -16,6 +16,7 @@
         var logger = require('morgan');
         var request = require("request");
         var models = require('../models');
+        var crypto = require('crypto');
 
         var FitbitAuthController = require('../controllers/fitbit-auth');
 
@@ -25,14 +26,14 @@
             app.post('/api/fitbit/user/findorcreate', function(req, res) {
 
                 models.User.findOrCreate({
-                    where: {
-                        auth_id: req.body.auth_id
-                    }, // we search for this user
-                    defaults: {
-                        fullname: req.body.fullname,
-                        avatar: req.body.avatar,
-                        displayName: req.body.displayName,
-                        gender: req.body.gender,
+                        where: {
+                            auth_id: req.body.auth_id
+                        }, // we search for this user
+                        defaults: {
+                            fullname: req.body.fullname,
+                            avatar: req.body.avatar,
+                            displayName: req.body.displayName,
+                            gender: req.body.gender,
                         age: req.body.age
                     }
                 });
@@ -153,8 +154,74 @@
                     failureRedirect: '/#/login'
                 }));
 
+                //login in our application
+
+                app.post('/api/login', function (req, res){
+                    var username = req.body.username;
+                    var password = req.body.password;
+                });
+
+                //register in our application
+                app.post('/api/register', function (req, res) {
+
+                    var nusername = req.body.username;
+                    var name = req.body.fullname;
+                    var nemail = req.body.email;
+                    var npassword = req.body.password;
+                    var rPassword = req.body.rPassword;
+
+                    var secret = "orpheusapp";
 
 
+                    if(npassword == rPassword){
+                        var hashPass = crypto.createHmac('sha256',secret)
+                            .update(npassword)
+                            .digest('hex');
+                        console.log(hashPass);
+                        models.usertest.find({where: {
+                            $or: [
+                                {username: nusername},
+                                {email: nemail}
+                            ]
+                        }
+                        }).then(function(user) {
+                            console.log(user);
+                            if (user != null) {
+                                var json_data = {
+                                    success: false,
+                                    exists: true
+                                };
+                                console.log("not null");
+                            }else {
+                                models.usertest.create({ username: nusername, email: nemail, fullname: name, password: hashPass},
+                                    { fields: [ 'username' , 'email', 'fullname', 'password'] }).then(function(user) {
+                                    console.log(user.get({
+                                        plain: true
+                                    })) // => { username: 'barfooz', isAdmin: false }
+                                });
+                                var json_data = {
+                                    success : true
+                                };
+                            }
+                            res.json(json_data);
+                        },
+                        function (err) {
+                            var json_data = {
+                                success : false
+                            };
+                            res.json(json_data);
+                        });
+
+                    }
+                    else{
+
+                        var json_data = {
+                            success : false
+                        };
+                        res.json(json_data);
+                    }
+
+                });
 
                 app.get('*', function(req, res) {
                     res.sendfile('./public/index.html'); // load the single view file (angular will handle the page changes on the front-end)
