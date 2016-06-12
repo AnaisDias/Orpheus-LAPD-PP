@@ -10,7 +10,8 @@ module.exports = function(sequelize, DataTypes) {
   }, {
     classMethods: {
       associate: function(models) {
-        User.hasMany(models.Activity, {as: 'Activities'})
+        User.hasMany(models.Activity, {as: 'Activities'});
+        User.hasMany(models.Sleep, {as: 'SleepLogs'})
       }
     }
   });

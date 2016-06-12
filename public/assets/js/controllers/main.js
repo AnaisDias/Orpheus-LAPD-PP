@@ -269,16 +269,12 @@ function activityCtrl($scope, $cookies, $window, $http, $filter,$location) {
         unparsedDate = newVal;
         parsedDate = $filter('date')(new Date(unparsedDate), 'yyyy-MM-dd');
         $http.get('/api/fitbit/activity/' + parsedDate +"/"+$location.search().id).success(function(data) {
-            jsonD = JSON.parse(data);
-            console.log("summary:" + JSON.stringify(jsonD.summary));
-
-            console.log("activity1:" + JSON.stringify(jsonD.activities[0]));
-
-            console.log("goals:" + JSON.stringify(jsonD.goals));
-            console.log("step goals:" + jsonD.goals.steps);
-            $scope.activities = jsonD.activities;
-            $scope.goals = jsonD.goals;
-            $scope.summary = jsonD.summary;
+            console.log("summary:" + JSON.stringify(data.summary));
+            console.log("goals:" + JSON.stringify(data.goals));
+            console.log("step goals:" + data.goals.steps);
+            $scope.activities = data.activities;
+            $scope.goals = data.goals;
+            $scope.summary = data.summary;
 
             $scope.stepsVSGoals = ($scope.goals.steps / $scope.summary.steps) * 100;
             console.log("stepsVSGoals: " + $scope.stepsVSGoals);
@@ -859,8 +855,7 @@ function cardChartCtrl3($scope,$cookies,$filter,$http,$location) {
             unparsedDate = newVal;
             parsedDate = $filter('date')(new Date(unparsedDate), 'yyyy-MM-dd');
             $http.get('/api/fitbit/sleep/' + parsedDate+"/"+$location.search().id).success(function(data) {
-                jsonD = JSON.parse(data);
-                console.log("sleep:" + JSON.stringify(jsonD));
+                console.log("sleep:" + JSON.stringify(data));
 
 
             }).error(function(data) {
