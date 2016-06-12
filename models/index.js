@@ -1,3 +1,6 @@
+
+
+
 'use strict';
 
 var fs        = require('fs');
@@ -14,7 +17,8 @@ if (config.use_env_variable) {
   var sequelize = new Sequelize(process.env[config.use_env_variable]);
 
 } else {
-  var sequelize = new Sequelize(config.development.database, config.development.username, null, config.development);
+  var sequelize = new Sequelize(config.development.database, config.development.username, null, config.development,{  logging: false
+});
 
 
   console.log("confiiiiiiiiiig " + JSON.stringify(config));

@@ -70,30 +70,25 @@
 
         app.get('/api/fitbit/activity/:date/:id', function(req, res) {
             console.log("Sending activity request!");
-
-            models.User.find({
+            models.Activity.find({
                 where: {
-                    id: req.params.id
+                    UserId: req.params.id,
+                    date: req.params.date
                 }
-            }).then(function(user) {
-                var url1 = "https://api.fitbit.com/1/user/" + user.auth_id + "/activities/date/" + req.params.date + ".json";
-                var fitAuth = "Bearer " + req.user.accessToken;
-                var options = {
-                    url: url1,
-                    headers: {
-                        'Authorization': fitAuth
-                    }
-                };
-                console.log(options.url);
-                console.log(options.headers.Authorization);
-                request(options, function(error, response, body) {
-                    console.log(body); // Show the HTML for the Google homepage.
-                    var json_data = {
-                        summary: body
-                    };
-                    res.json(body);
+            }).then(function(activity) {
+                if (activity.length) {
+                    res.json(activity.content);
+                }
+                return res.send({
+                    message: "Could not find activity."
+                });
+            }).catch(function(error) {
+                return res.send({
+                    message: "Error retrieving activity."
                 });
             });
+
+
 
         });
 
@@ -157,49 +152,108 @@
                 }).then(function(user) {
                     parseDate = user.createdAt.setMonth(user.createdAt.getMonth());
                     var momentRegisterDate = moment(parseDate);
-                    console.log("*************CREATEEEEEEEEEEEEEEEEED " + momentRegisterDate);
-
-
                     var momentToday = moment();
 
-                    console.log("*************TODAY " + momentToday);
-
-                    //cycle that asks activity and stores it from registration date untill today, adding one day after each iteration
+                    //cycle that requests activity and stores it from registration date untill today, adding one day after each iteration
                     while (momentRegisterDate.isSameOrBefore(momentToday)) {
                         var thisdate = momentRegisterDate.year() + "-" + (momentRegisterDate.month() + 1) + "-" + momentRegisterDate.date();
-                        console.log("sending activity request for " + thisdate);
-                        var url1 = "https://api.fitbit.com/1/user/" + user.auth_id + "/activities/date/" + thisdate + ".json";
-                        var fitAuth = "Bearer " + req.user.accessToken;
-                        var options = {
-                            url: url1,
-                            headers: {
-                                'Authorization': fitAuth
+                        console.log(momentRegisterDate.year() + "-" + (momentRegisterDate.month() + 1) + "-" + momentRegisterDate.date());
+                        var datetocheck = true;
+
+                        models.Activity.count({
+                            where: {
+                                date: momentRegisterDate.year() + "-" + (momentRegisterDate.month() + 1) + "-" + momentRegisterDate.date(),
+                                UserId:user.id
                             }
-                        };
-                        request(options, function(error, response, body) {
-                            var json_data = {
-                                summary: body
+                        }).then(count => {
+                          if(count!=0){
+                            datetocheck = false;
+                            console.log("0");
+                            console.log("0");
+                            console.log("0");
+                            console.log("0");
+                            console.log("0");
+                            console.log("0");
+                            console.log("ENONTROOOOOOOOU " + momentRegisterDate.year() + "-" + (momentRegisterDate.month() + 1) + "-" + momentRegisterDate.date());
+                            console.log("0");
+                            console.log("0");
+                            console.log("0");
+                            console.log("0");
+                            console.log("0");
+                            console.log("0");
+                            console.log("0");}
+                            else{
+                              console.log("0");
+                              console.log("0");
+                              console.log("0");
+                              console.log("0");
+                              console.log("0");
+                              console.log("0");
+                              console.log("NAAAAAAAAAAAAAAAAOy " + momentRegisterDate.year() + "-" + (momentRegisterDate.month() + 1) + "-" + momentRegisterDate.date());
+                              console.log("0");
+                              console.log("0");
+                              console.log("0");
+                              console.log("0");
+                              console.log("0");
+                              console.log("0");
+                              console.log("0");
+                            }
+                        });
+
+                        if (datetocheck) {
+                          /*
+                            console.log("sending activity request for " + thisdate);
+                            var urlAct = "https://api.fitbit.com/1/user/" + user.auth_id + "/activities/date/" + thisdate + ".json";
+                            var fitAuth = "Bearer " + req.user.accessToken;
+                            var optionsAct = {
+                                url: urlAct,
+                                headers: {
+                                    'Authorization': fitAuth
+                                }
                             };
+                            request(optionsAct, function(error, response, body) {
+                                var json_data = {
+                                    summary: body
+                                };
+                                models.Activity.create({
 
-                            console.log("content to be created:" + json_data);
+                                    date: thisdate,
+                                    UserId: user.id,
+                                    content: json_data
+
+                                });
 
 
-                            console.log("user id line 190:" + user.id);
-                            console.log("date to be created:" + thisdate);
-
-
-                            models.Activity.create({
-
-                                date: thisdate,
-                                content: json_data,
-                                UserId: user.id
-                            }).then(function() {
-                                return;
                             });
 
+                            console.log("sending sleep request for " + thisdate);
+                            var urlSleep = "https://api.fitbit.com/1/user/" + user.auth_id + "/sleep/date/" + thisdate + ".json";
+                            var fitAuth = "Bearer " + req.user.accessToken;
+                            var optionsSleep = {
+                                url: urlSleep,
+                                headers: {
+                                    'Authorization': fitAuth
+                                }
+                            };
+                            request(optionsSleep, function(error, response, body) {
+                                var json_data = {
+                                    summary: body
+                                };
+                                models.Sleep.findOrCreate({
+                                    where: {
+                                        date: thisdate
+                                    }, // we search for this user
+                                    defaults: {
+                                        content: json_data,
+                                        UserId: user.id
+                                    }
+                                });
 
 
-                        });
+                            });
+                            */
+                        }
+
                         momentRegisterDate.add(1, 'days');
                     }
 
