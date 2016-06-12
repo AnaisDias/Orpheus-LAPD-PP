@@ -12,7 +12,7 @@ module.exports = {
       date: {
         type: Sequelize.DATE
       },
-      data: {
+      situations: {
         type: Sequelize.JSONB
       },
       userid: {

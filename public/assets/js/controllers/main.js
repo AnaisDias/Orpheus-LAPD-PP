@@ -252,9 +252,9 @@ function sparklineChartCtrl($scope) {
     }];
 }
 
-activityCtrl.$inject = ['$scope', '$cookies', '$window', '$http', '$filter'];
+activityCtrl.$inject = ['$scope', '$cookies', '$window', '$http', '$filter','$location'];
 
-function activityCtrl($scope, $cookies, $window, $http, $filter) {
+function activityCtrl($scope, $cookies, $window, $http, $filter,$location) {
 
 
 
@@ -268,7 +268,7 @@ function activityCtrl($scope, $cookies, $window, $http, $filter) {
 
         unparsedDate = newVal;
         parsedDate = $filter('date')(new Date(unparsedDate), 'yyyy-MM-dd');
-        $http.get('/api/fitbit/activity/' + parsedDate).success(function(data) {
+        $http.get('/api/fitbit/activity/' + parsedDate +"/"+$location.search().id).success(function(data) {
             jsonD = JSON.parse(data);
             console.log("summary:" + JSON.stringify(jsonD.summary));
 
@@ -874,9 +874,9 @@ function cardChartCtrl2($scope) {
     }];
 }
 
-cardChartCtrl3.$inject = ['$scope','$cookies','$filter','$http'];
+cardChartCtrl3.$inject = ['$scope','$cookies','$filter','$http','$location'];
 
-function cardChartCtrl3($scope,$cookies,$filter,$http) {
+function cardChartCtrl3($scope,$cookies,$filter,$http,$location) {
 
     $scope.labels = ['January', 'February', 'March', 'April', 'May', 'June', 'July'];
     $scope.data = [
@@ -912,7 +912,7 @@ function cardChartCtrl3($scope,$cookies,$filter,$http) {
 
             unparsedDate = newVal;
             parsedDate = $filter('date')(new Date(unparsedDate), 'yyyy-MM-dd');
-            $http.get('/api/fitbit/sleep/' + parsedDate).success(function(data) {
+            $http.get('/api/fitbit/sleep/' + parsedDate+"/"+$location.search().id).success(function(data) {
                 jsonD = JSON.parse(data);
                 console.log("sleep:" + JSON.stringify(jsonD));
 

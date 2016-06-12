@@ -2,7 +2,7 @@
 module.exports = function(sequelize, DataTypes) {
   var SituationData = sequelize.define('SituationData', {
     date: DataTypes.DATE,
-    data: DataTypes.JSONB
+    situations: DataTypes.JSONB
   }, {
     classMethods: {
       associate: function(models) {
