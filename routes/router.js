@@ -55,6 +55,10 @@
 
         });
 
+        var upload = require('../controllers/upload');
+        app.route('/fileupload')
+           .post(upload.file);
+
         app.get('/api/getUserById/:userid', function(req, res) {
             console.log(req.params);
 

@@ -17,6 +17,8 @@ var logger = require('morgan');
 var request = require("request");
 app.set('models', require('./models'));
 var models = app.get('models');
+var busboy = require('connect-busboy');
+
 
 // Initialize controllers
 var FitbitAuthController = require('./controllers/fitbit-auth');
@@ -39,6 +41,7 @@ app.use(cookieSession({
 }));
 app.use(passport.initialize());
 app.use(passport.session());
+app.use(busboy());
 
 require('./routes/router')(app);
 

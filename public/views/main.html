@@ -256,12 +256,12 @@
                     <div class="col-sm-6 col-md-4"  ng-show="!situations.length">
                         <div class="card card-inverse card-danger text-xs-center">
                             <div class="card-block">
-                                <form method="post" enctype="multipart/form-data" action="/file-upload">
+                                <form method="post" enctype="multipart/form-data" action="/fileupload">
                                     <fieldset class="form-group">
-                                        <label for="exampleInputFile">File input</label>
-                                        <input type="file" class="form-control-file" id="exampleInputFile">
-                                        <small class="text-muted">This is some placeholder block-level help text for the above input. It's a bit lighter and easily wraps to a new line.
-                                        </small>
+                                        <label for="file">You have no situation data for this day</label>
+                                        <input type="file" class="form-control-file" id="file" name="file">
+                                        <small class="text-muted">Please select a Situman summary file</small>
+                                        
                                     </fieldset>
                                     <button type="submit" class="btn btn-primary">Submit</button>
                                 </form>
