@@ -1,5 +1,5 @@
 (function() {
-
+    
     var express = require('express');
     var CircularJSON = require('circular-json');
     var bodyParser = require('body-parser'); // pull information from HTML POST (express4)
@@ -18,6 +18,7 @@
     var models = require('../models');
     var moment = require('moment');
     moment().format();
+    var crypto = require('crypto');
 
     var FitbitAuthController = require('../controllers/fitbit-auth');
 
@@ -208,8 +209,74 @@
 
             });
 
+                //login in our application
+
+                app.post('/api/login', function (req, res){
+                    var username = req.body.username;
+                    var password = req.body.password;
+                });
+
+                //register in our application
+                app.post('/api/register', function (req, res) {
+
+                    var nusername = req.body.username;
+                    var name = req.body.fullname;
+                    var nemail = req.body.email;
+                    var npassword = req.body.password;
+                    var rPassword = req.body.rPassword;
+
+                    var secret = "orpheusapp";
 
 
+                    if(npassword == rPassword){
+                        var hashPass = crypto.createHmac('sha256',secret)
+                            .update(npassword)
+                            .digest('hex');
+                        console.log(hashPass);
+                        models.usertest.find({where: {
+                            $or: [
+                                {username: nusername},
+                                {email: nemail}
+                            ]
+                        }
+                        }).then(function(user) {
+                            console.log(user);
+                            if (user != null) {
+                                var json_data = {
+                                    success: false,
+                                    exists: true
+                                };
+                                console.log("not null");
+                            }else {
+                                models.usertest.create({ username: nusername, email: nemail, fullname: name, password: hashPass},
+                                    { fields: [ 'username' , 'email', 'fullname', 'password'] }).then(function(user) {
+                                    console.log(user.get({
+                                        plain: true
+                                    })) // => { username: 'barfooz', isAdmin: false }
+                                });
+                                var json_data = {
+                                    success : true
+                                };
+                            }
+                            res.json(json_data);
+                        },
+                        function (err) {
+                            var json_data = {
+                                success : false
+                            };
+                            res.json(json_data);
+                        });
+
+                    }
+                    else{
+
+                        var json_data = {
+                            success : false
+                        };
+                        res.json(json_data);
+                    }
+
+                });
 
 
         app.get('*', function(req, res) {
