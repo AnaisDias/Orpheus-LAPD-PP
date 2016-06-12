@@ -29,7 +29,6 @@ angular
 navbarCtrl.$inject = ['$scope', '$http', '$window'];
 
 function navbarCtrl($scope, $http, $window) {
-    console.log("navbarCtrl");
     $http.get('/api/username').success(function(data) {
         $scope.username = data.username;
         $scope.avatar = data.avatar;
@@ -125,7 +124,6 @@ function DatePickerCtrl($scope, $cookies) {
     };
 
     $cookies.selDate = moment()._d;
-    console.log("PRIMEIRO " + $cookies.selDate);
 
     $scope.opts = {
         singleDatePicker: true,
@@ -146,7 +144,6 @@ function DatePickerCtrl($scope, $cookies) {
         var selectedDate = newDate._d;
 
         $cookies.selDate = selectedDate;
-        console.log($cookies.selDate);
     }, false);
 
     function gd(year, month, day) {
@@ -263,25 +260,36 @@ function activityCtrl($scope, $cookies, $window, $http, $filter,$location) {
         if (typeof(newVal) == 'undefined') {
             newVal = moment()._d;
         }
-        console.log("The date has changed from " + oldVal + " to " + newVal);
 
         unparsedDate = newVal;
         parsedDate = $filter('date')(new Date(unparsedDate), 'yyyy-MM-dd');
         $http.get('/api/fitbit/activity/' + parsedDate +"/"+$location.search().id).success(function(data) {
             console.log(data);
             data=JSON.parse(data);
-            console.log("goals: ");
-            console.log(data.goals.activeMinutes);
-            console.log("step goals:" + data.goals.steps);
             $scope.activities = data.activities;
             $scope.goals = data.goals;
             $scope.summary = data.summary;
 
-            $scope.stepsVSGoals = ($scope.goals.steps / $scope.summary.steps) * 100;
+            $scope.stepsVSGoals = ($scope.summary.steps / $scope.goals.steps);
             console.log("stepsVSGoals: " + $scope.stepsVSGoals);
             $scope.activitiesTotal;
 
-            $scope.caloriesVSGoals = ($scope.goals.caloriesOut / $scope.summary.caloriesOut) * 100;
+            $scope.caloriesVSGoals = ($scope.summary.caloriesOut / $scope.goals.caloriesOut);
+
+            if($scope.caloriesVSGoals>=1){
+              $scope.calgreaterthanone=true;
+            }
+            else{
+              $scope.calgreaterthanone=false;
+            }
+
+            if($scope.stepsoriesVSGoals>=1){
+              $scope.stepsgreaterthanone=true;
+            }
+            else{
+              $scope.calgreaterthanone=false;
+
+            }
             console.log("caloriesVSGoals: " + $scope.caloriesVSGoals);
 
 
@@ -289,7 +297,13 @@ function activityCtrl($scope, $cookies, $window, $http, $filter,$location) {
             angular.forEach($scope.summary.distances, function(summaryAct) {
                 if (summaryAct.activity == 'total') {
                     $scope.totalDistance = summaryAct.distance;
-                    $scope.distanceVSGoals = ($scope.goals.distance / $scope.totalDistance) * 100;
+                    $scope.distanceVSGoals = ( $scope.totalDistance  / $scope.goals.distance);
+                    if($scope.stepsVSGoals>=1){
+                      $scope.distgreaterthanone=true;
+                    }
+                    else{
+                      $scope.distgreaterthanone=false;
+                    }
                 }
 
             });
@@ -312,17 +326,23 @@ function activityCtrl($scope, $cookies, $window, $http, $filter,$location) {
                     title: 'Steps',
                     icon: 'icon-like',
                     value: $scope.summary.steps,
-                    percent: $scope.stepsVSGoals
+                    percentOut: $scope.stepsVSGoals,
+                    percent: $scope.stepsVSGoals*100,
+                    greterthan: $scope.stepsgreaterthanone
                 }, {
                     title: 'Distance',
                     icon: 'icon-like',
                     value: $scope.totalDistance,
-                    percent: $scope.distanceVSGoals
+                    percentOut: $scope.distanceVSGoals,
+                    percent: $scope.distanceVSGoals*100,
+                    greterthan: $scope.distgreaterthanone
                 }, {
                     title: 'Calories',
                     icon: 'icon-like',
-                    value: $scope.summary.caloriesOut,
-                    percent: $scope.caloriesVSGoals
+                    value: $scope.summary.caloriesOut*100,
+                    percentOut: $scope.caloriesVSGoals,
+                    percent: $scope.caloriesVSGoals*100,
+                    greterthan: $scope.calgreaterthanone
                 }
 
             ];
@@ -814,12 +834,11 @@ function cardChartCtrl3($scope,$cookies,$filter,$http,$location) {
             if (typeof(newVal) == 'undefined') {
                 newVal = moment()._d;
             }
-            console.log("The date has changed from " + oldVal + " to " + newVal);
 
             unparsedDate = newVal;
             parsedDate = $filter('date')(new Date(unparsedDate), 'yyyy-MM-dd');
             $http.get('/api/fitbit/sleep/' + parsedDate+"/"+$location.search().id).success(function(data) {
-                console.log("sleep:" + JSON.stringify(data));
+
 
 
             }).error(function(data) {

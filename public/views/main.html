@@ -130,9 +130,10 @@
                                     <tr>
                                         <th>Name</th>
                                         <th>Description</th>
-                                        <th>Distance</th>
+                                        <th>Distance (km)</th>
                                         <th>Duration</th>
-                                        <th>Start time </th>
+                                        <th>Start</th>
+                                        <th>Calories</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -145,6 +146,7 @@
                                             <span class="label label-success">{{ activity.duration | secondsToDateTime | date:'HH:mm:ss' }}</span>
                                         </td>
                                         <td> {{ activity.startTime}} </td>
+                                        <td> - {{ activity.calories}} </td>
                                     </tr>
 
                                 </tbody>
@@ -180,8 +182,8 @@
                                 <i ng-show="{{ row.percent >100}}" ng-class="row.icon"></i>
                                 <span class="title">{{ row.title }}</span>
                                 <span class="value">{{ row.value | number }}
-                                      <span class="text-muted small" ng-show="row.percent<1">({{ row.percent | percentage }}%)</span>
-                                      <span class="text-muted small" ng-show="row.percent>=1">({{ 1 | percentage }}%)</span>
+                                      <span class="text-muted small" ng-show="!row.greaterthan">({{ row.percent | number : 2 }}%)</span>
+                                      <span class="text-muted small" ng-show="row.greaterthan">({{ 1 | number : 2 }}%)</span>
                                 <!-- percentage steps/stepsgoal -->
                                 </span>
                                 <div class="bars">

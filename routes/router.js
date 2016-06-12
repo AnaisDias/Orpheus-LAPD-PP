@@ -203,7 +203,6 @@
             function(req, res) {
                 // If this function gets called, authentication was successful.
                 // `req.user` contains the authenticated user.
-
                 models.User.find({
                     where: {
                         auth_id: req.user.profile.id
