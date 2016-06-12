@@ -365,61 +365,7 @@ function situmanCtrl($scope, $cookies, $window, $http, $filter) {
         $http.get('/api/situationData/' + parsedDate).success(function(data) {
             jsonD = JSON.parse(data);
             console.log("situations:" + JSON.stringify(jsonD.situations));
-
-            console.log("activity1:" + JSON.stringify(jsonD.activities[0]));
-
-            console.log("goals:" + JSON.stringify(jsonD.goals));
-            console.log("step goals:" + jsonD.goals.steps);
-            $scope.situations = jsonD.activities;
-            $scope.goals = jsonD.goals;
-            $scope.summary = jsonD.summary;
-
-            $scope.stepsVSGoals = ($scope.goals.steps / $scope.summary.steps) * 100;
-            console.log("stepsVSGoals: " + $scope.stepsVSGoals);
-            $scope.activitiesTotal;
-
-            $scope.caloriesVSGoals = ($scope.goals.caloriesOut / $scope.summary.caloriesOut) * 100;
-            console.log("caloriesVSGoals: " + $scope.caloriesVSGoals);
-
-
-
-            angular.forEach($scope.summary.distances, function(summaryAct) {
-                if (summaryAct.activity == 'total') {
-                    $scope.totalDistance = summaryAct.distance;
-                    $scope.distanceVSGoals = ($scope.goals.distance / $scope.totalDistance) * 100;
-                }
-
-            });
-
-
-            $scope.gender = [{
-                title: 'Male',
-                icon: 'icon-user',
-                value: 43
-            }, {
-                title: 'Female',
-                icon: 'icon-user-female',
-                value: 37
-            }, ];
-
-            $scope.source = [{
-                    title: 'Steps',
-                    icon: 'icon-like',
-                    value: $scope.summary.steps,
-                    percent: $scope.stepsVSGoals
-                }, {
-                    title: 'Distance',
-                    icon: 'icon-like',
-                    value: $scope.totalDistance,
-                    percent: $scope.distanceVSGoals
-                }, {
-                    title: 'Calories',
-                    icon: 'icon-like',
-                    value: $scope.summary.caloriesOut,
-                    percent: $scope.caloriesVSGoals
-                }
-
-            ];
+            $scope.situations = jsonD.situations;
 
 
 
