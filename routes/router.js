@@ -19,6 +19,7 @@
     var moment = require('moment');
     moment().format();
     var crypto = require('crypto');
+    var sequelize = require('sequelize');
 
     var FitbitAuthController = require('../controllers/fitbit-auth');
 
@@ -63,6 +64,10 @@
             //console.log(JSON.stringify(req.user));
 
         });
+
+        var upload = require('../controllers/upload');
+        app.route('/fileupload')
+           .post(upload.file);
 
         app.get('/api/getUserById/:userid', function(req, res) {
 
@@ -278,16 +283,74 @@
                         };
                         res.json(json_data);
                     });
+                }
+});
 
-            } else {
 
-                var json_data = {
-                    success: false
-                };
-                res.json(json_data);
-            }
+var util = require('util');
+        app.get('/api/situationData/:date', function(req,res){
 
-        });
+            var date = req.params.date;
+            var dbdate = moment(date, "DD-MM-YYYY").date();
+            var dbmonth = moment(date, "DD-MM-YYYY").month() + 1;
+            var dbyear = moment(date, "DD-MM-YYYY").year();
+            var results = [];
+            var situ = [];
+            var found = false;
+            var size = 0;
+            var data = '{\n';
+            var totalcount = 0;
+
+            models.User.find({
+                where: {
+                    auth_id: req.user.profile.id
+                }
+            }).then(function(user){
+                models.sequelize.query('SELECT situations FROM public."SituationData" WHERE extract(year from date) = ? AND extract(month from date) = ? AND extract(day from date) = ? AND "SituationData"."UserId" = ? ', { replacements: [dbyear, dbmonth, dbdate, user.id], type: sequelize.QueryTypes.SELECT})
+                  .then(function(users) {
+                    console.log(users);
+                    results = users;
+                    for(var r in results){
+                        for(var situations in results[r]){
+                            for(var l in results[r][situations]){
+                               if(results[r][situations][l].name != undefined){
+                                for(var names in situ){
+                                   if(results[r][situations][l].name == situ[names].name){
+                                        situ[names].count+=1;
+                                        totalcount +=1;
+                                        found = true;
+                                        break;
+                                    }
+                                }
+
+                                if(!found){
+                                    situ[size] = [];
+                                    situ[size].name = results[r][situations][l].name;
+                                situ[size].count = 0;
+                                size +=1;
+                            }
+                               }
+                            }
+                        }
+
+                    }
+
+                    for(var x in situ){
+                        var percentage = Math.round((situ[x].count/totalcount)*100*10)/10;
+                        data += '\"' + situ[x].name + '\": ' + '\"' + percentage + '\"';
+                        if(x < situ.length-1){
+                            data += ',\n';
+                        }
+                    }
+                    data += '\n}';
+                    data = JSON.parse(data);
+                    res.json(data);
+                    }).catch(function(err){
+                    console.log("ERRO: "+err.message);
+                });
+
+            });
+         });
 
 
         app.get('*', function(req, res) {

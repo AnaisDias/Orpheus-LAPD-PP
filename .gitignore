@@ -1,3 +1,4 @@
 # Ignore node modules. Run 'npm install' after cloning.
 node_modules/
 *.md
+config/config.json

@@ -197,6 +197,85 @@
 </div>
 <!--/.row-->
 
+<div class="row" ng-controller="situmanCtrl">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-block">
+                <div class="row">
+                    <div class="col-sm-6">
+                        <h3 class="card-title clearfix m-b-0">Situman activity</h3>
+                    </div>
+
+                </div>
+                <br/>
+
+
+
+                <div class="row">
+                    <div class="col-sm-12 col-lg-8" ng-show="situations.length">
+
+
+
+                        <div class="card-block">
+                            <table class="table table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>Situation</th>
+                                        <th>Percentage of time</th>
+                                        <th>Mood</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+
+                                    <tr ng-repeat="situation in situations">
+                                        <td>{{ situation.name }}</td>
+                                        <td>{{ situation.count }}</td>
+                                        <td><button type="button" class="btn btn-primary">Good</button><button type="button" class="btn btn-warning">Neutral</button><button type="button" class="btn btn-danger">Bad</button></td>
+                                    </tr>
+
+                                </tbody>
+                            </table>
+
+                        </div>
+
+                    </div>
+                    <!--/.col-->
+
+                    <div class="col-sm-6 col-md-4"  ng-show="!situations.length">
+                        <div class="card card-inverse card-danger text-xs-center">
+                            <div class="card-block">
+                                <form method="post" enctype="multipart/form-data" action="/fileupload">
+                                    <fieldset class="form-group">
+                                        <label for="file">You have no situation data for this day</label>
+                                        <input type="file" class="form-control-file" id="file" name="file">
+                                        <small class="text-muted">Please select a Situman summary file</small>
+                                        
+                                    </fieldset>
+                                    <button type="submit" class="btn btn-primary">Submit</button>
+                                </form>
+                                <!-- <blockquote class="card-blockquote">
+                                    <p>No physical activities today yet.</p>
+                                    <footer>Physical activity may help with endorphines release and self-esteem improvement!
+                                      <p>
+                                        <cite >Try going for a run</cite>
+                                      </p>
+                                    </footer>
+                                </blockquote> -->
+                            </div>
+                        </div>
+                    </div>
+
+                    <!--/.col-->
+                </div>
+                <!--/.row-->
+                <br/>
+            </div>
+        </div>
+    </div>
+    <!--/.col-->
+</div>
+<!--/.row-->
+
 <!--/row-->
 <div class="card" ng-controller="moodDemoCtrl">
     <div class="card-block">

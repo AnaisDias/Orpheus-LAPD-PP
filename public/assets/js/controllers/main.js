@@ -16,6 +16,7 @@ angular
     .controller('cardChartCtrl2', cardChartCtrl2)
     .controller('sleepCtrl', sleepCtrl)
     .controller('cardChartCtrl4', cardChartCtrl4)
+    .controller('situmanCtrl', situmanCtrl)
     .filter('secondsToDateTime', [function() {
         return function(seconds) {
             return new Date(1970, 0, 1).setMilliseconds(seconds);
@@ -369,6 +370,46 @@ function activityCtrl($scope, $cookies, $window, $http, $filter,$location) {
 
         }).error(function(data) {
             //what to do on error
+        });
+
+
+    }, true);
+
+
+
+}
+//change to take situations from database, 
+situmanCtrl.$inject = ['$scope', '$cookies', '$window', '$http', '$filter'];
+
+function situmanCtrl($scope, $cookies, $window, $http, $filter) {
+
+
+
+    $scope.$watch(function() {
+        return $cookies.selDate;
+    }, function(newVal, oldVal) {
+        if (typeof(newVal) == 'undefined') {
+            newVal = moment()._d;
+        }
+        console.log("The date has changed from " + oldVal + " to " + newVal);
+
+        unparsedDate = newVal;
+        var size = 0;
+        $scope.situations = [];
+        parsedDate = $filter('date')(new Date(unparsedDate), 'dd-MM-yyyy');
+        $http.get('/api/situationData/' + parsedDate).success(function(data) {
+            console.debug(data);
+            //jsonD = JSON.parse(JSONdata);
+            for(var i in data){
+                $scope.situations[size] = [];
+                $scope.situations[size].name = i;
+                $scope.situations[size].count = data[i];
+                size +=1;
+            }
+            console.log("situations:" + $scope.situations[0].name);
+            //$scope.situations = jsonD.situations;
+        }).error(function(data) {
+            console.log("error on situmanCtrl");
         });
 
 
