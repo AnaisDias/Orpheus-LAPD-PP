@@ -25,8 +25,6 @@ angular
     }])
 
 
-
-
     twitterCtrl.$inject = ['$scope', '$http','$location','$cookies','$filter'];
 
     function twitterCtrl($scope, $http,$location,$cookies,$filter) {
