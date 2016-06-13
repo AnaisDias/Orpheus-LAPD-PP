@@ -17,6 +17,7 @@ angular
     .controller('sleepCtrl', sleepCtrl)
     .controller('cardChartCtrl4', cardChartCtrl4)
     .controller('twitterCtrl', twitterCtrl)
+    .controller('situmanCtrl', situmanCtrl)
     .filter('secondsToDateTime', [function() {
         return function(seconds) {
             return new Date(1970, 0, 1).setMilliseconds(seconds);
@@ -57,9 +58,9 @@ navbarCtrl.$inject = ['$scope', '$http', '$window'];
 
 function navbarCtrl($scope, $http, $window) {
     $http.get('/api/username').success(function(data) {
+        if (data.username == undefined) $window.location.href = '/#/login';
         $scope.username = data.username;
         $scope.avatar = data.avatar;
-        if (data.username == undefined) $window.location.href = '/#/login';
     }).error(function(data) {
         $window.location.href = '/#/login';
     });
@@ -393,6 +394,46 @@ function activityCtrl($scope, $cookies, $window, $http, $filter, $location) {
 
         }).error(function(data) {
             //what to do on error
+        });
+
+
+    }, true);
+
+
+
+}
+//change to take situations from database,
+situmanCtrl.$inject = ['$scope', '$cookies', '$window', '$http', '$filter'];
+
+function situmanCtrl($scope, $cookies, $window, $http, $filter) {
+
+
+
+    $scope.$watch(function() {
+        return $cookies.selDate;
+    }, function(newVal, oldVal) {
+        if (typeof(newVal) == 'undefined') {
+            newVal = moment()._d;
+        }
+        console.log("The date has changed from " + oldVal + " to " + newVal);
+
+        unparsedDate = newVal;
+        var size = 0;
+        $scope.situations = [];
+        parsedDate = $filter('date')(new Date(unparsedDate), 'dd-MM-yyyy');
+        $http.get('/api/situationData/' + parsedDate).success(function(data) {
+            console.debug(data);
+            //jsonD = JSON.parse(JSONdata);
+            for(var i in data){
+                $scope.situations[size] = [];
+                $scope.situations[size].name = i;
+                $scope.situations[size].count = data[i];
+                size +=1;
+            }
+            console.log("situations:" + $scope.situations[0].name);
+            //$scope.situations = jsonD.situations;
+        }).error(function(data) {
+            console.log("error on situmanCtrl");
         });
 
 

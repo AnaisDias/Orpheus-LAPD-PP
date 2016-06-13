@@ -25,26 +25,17 @@ passport.use(new FitbitStrategy({
 	callbackURL: "http://127.0.0.1:8000/auth/fitbit/callback"
 },
 function(accessToken, refreshToken, profile, done) {
-  console.log("egrfdse");
-  fitbit_accessToken=accessToken;
-  fitbit_refreshToken=refreshToken;
-  fitbit_profile=profile;
-  console.log(fitbit_profile);
+    console.log("egrfdse");
+    fitbit_accessToken = accessToken;
+    fitbit_refreshToken = refreshToken;
+    fitbit_profile = profile;
+    console.log(fitbit_profile);
 
-  models.User.findOrCreate({
-		where: { auth_id: fitbit_profile.id}, // we search for this user
-		defaults: {fullname: fitbit_profile._json.user.fullName, avatar: fitbit_profile._json.user.avatar, displayName: fitbit_profile._json.user.displayName, gender: fitbit_profile._json.user.gender, age: fitbit_profile._json.user.age}}).then(function(user){
-      console.log("auth id: "+fitbit_profile.id);
-      console.log(JSON.stringify(fitbit_profile._json.user.displayName));
-      done(null, {
+    console.log("auth id: " + fitbit_profile.id);
+    console.log(JSON.stringify(fitbit_profile._json.user.displayName));
+    done(null, {
         accessToken: accessToken,
         refreshToken: refreshToken,
         profile: profile
-      });
     });
-
-
-
-
-}
-));
+}));
