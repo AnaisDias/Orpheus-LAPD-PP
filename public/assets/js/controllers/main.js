@@ -340,7 +340,6 @@ function activityCtrl($scope, $cookies, $window, $http, $filter,$location) {
 
 
 }
-
 //change to take situations from database, 
 situmanCtrl.$inject = ['$scope', '$cookies', '$window', '$http', '$filter'];
 
@@ -357,18 +356,22 @@ function situmanCtrl($scope, $cookies, $window, $http, $filter) {
         console.log("The date has changed from " + oldVal + " to " + newVal);
 
         unparsedDate = newVal;
-        parsedDate = $filter('date')(new Date(unparsedDate), 'yyyy-MM-dd');
+        var size = 0;
+        $scope.situations = [];
+        parsedDate = $filter('date')(new Date(unparsedDate), 'dd-MM-yyyy');
         $http.get('/api/situationData/' + parsedDate).success(function(data) {
-            jsonD = JSON.parse(data);
-            console.log("situations:" + JSON.stringify(jsonD.situations));
-            $scope.situations = jsonD.situations;
-
-
-
-
-
+            console.debug(data);
+            //jsonD = JSON.parse(JSONdata);
+            for(var i in data){
+                $scope.situations[size] = [];
+                $scope.situations[size].name = i;
+                $scope.situations[size].count = data[i];
+                size +=1;
+            }
+            console.log("situations:" + $scope.situations[0].name);
+            //$scope.situations = jsonD.situations;
         }).error(function(data) {
-            //what to do on error
+            console.log("error on situmanCtrl");
         });
 
 
