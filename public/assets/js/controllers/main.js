@@ -403,9 +403,9 @@ function activityCtrl($scope, $cookies, $window, $http, $filter, $location) {
 
 }
 //change to take situations from database,
-situmanCtrl.$inject = ['$scope', '$cookies', '$window', '$http', '$filter'];
+situmanCtrl.$inject = ['$scope', '$cookies', '$window', '$http', '$filter','$location'];
 
-function situmanCtrl($scope, $cookies, $window, $http, $filter) {
+function situmanCtrl($scope, $cookies, $window, $http, $filter,$location) {
 
 
 
@@ -421,7 +421,7 @@ function situmanCtrl($scope, $cookies, $window, $http, $filter) {
         var size = 0;
         $scope.situations = [];
         parsedDate = $filter('date')(new Date(unparsedDate), 'dd-MM-yyyy');
-        $http.get('/api/situationData/' + parsedDate).success(function(data) {
+        $http.get('/api/situationData/' + parsedDate+"/"+$location.search().id).success(function(data) {
             console.debug(data);
             //jsonD = JSON.parse(JSONdata);
             for(var i in data){

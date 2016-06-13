@@ -22,7 +22,7 @@
     var bcrypt = require('bcrypt-nodejs');
     var Twitter = require('twitter');
     var unirest = require('unirest');
- 
+
     var client = new Twitter({
       consumer_key: '3W9XwzPeGgTqUZebf8R8N3M22',
       consumer_secret: 'V2Hzz4MtMtaJt3sM2MLale8lXpZmxUsL8zwrx6kuPdVgGelgLp',
@@ -145,7 +145,7 @@
             ts.push(tweets[i].text);
           }
       }
-        
+
                     //var ts = ['I hate my life', "I want to die", "The new album by Kasabian is great"];
                     var counterPos = 0;
                     var counterNeg = 0;
@@ -282,7 +282,7 @@
 
         app.get('/auth/twitter', passport.authenticate('twitter'));
         app.get( '/auth/twitter/callback', passport.authenticate( 'twitter', {failureRedirect: '/api/logout'}), function(req, res){
-            
+
             if(id != null){
                 models.User.findById(id).then(function(user){
                     models.User.update({
@@ -391,9 +391,10 @@
 
 
 var util = require('util');
-        app.get('/api/situationData/:date', function(req,res){
+        app.get('/api/situationData/:date/:id', function(req,res){
 
             var date = req.params.date;
+            var id = req.params.id;
             var dbdate = moment(date, "DD-MM-YYYY").date();
             var dbmonth = moment(date, "DD-MM-YYYY").month() + 1;
             var dbyear = moment(date, "DD-MM-YYYY").year();
@@ -404,12 +405,12 @@ var util = require('util');
             var data = '{\n';
             var totalcount = 0;
 
-            models.User.find({
+            /*models.User.find({
                 where: {
                     auth_id: req.user.profile.id
                 }
-            }).then(function(user){
-                models.sequelize.query('SELECT situations FROM public."SituationData" WHERE extract(year from date) = ? AND extract(month from date) = ? AND extract(day from date) = ? AND "SituationData"."UserId" = ? ', { replacements: [dbyear, dbmonth, dbdate, user.id], type: sequelize.QueryTypes.SELECT})
+            }).then(function(user){*/
+                models.sequelize.query('SELECT situations FROM public."SituationData" WHERE extract(year from date) = ? AND extract(month from date) = ? AND extract(day from date) = ? AND "SituationData"."UserId" = ? ', { replacements: [dbyear, dbmonth, dbdate, id], type: sequelize.QueryTypes.SELECT})
                   .then(function(users) {
                     console.log(users);
                     results = users;
@@ -452,7 +453,7 @@ var util = require('util');
                     console.log("ERRO: "+err.message);
                 });
 
-            });
+          
          });
 
 
