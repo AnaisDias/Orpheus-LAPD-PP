@@ -2,7 +2,7 @@
     <h1> </h1>
 </div>
 
-<div class="row" ng-controller="DatePickerCtrl">
+<div class="row">
     <div class="col-md-12">
         <div class="card card-inverse ">
             <div class="card-block">
@@ -12,7 +12,7 @@
 
                         <div class="col-sm-6 col-sm-offset-9">
 
-                            <fieldset class="form-group " >
+                            <fieldset class="form-group " ng-controller="DatePickerCtrl">
 
                                 <div class="input-group input-group-sm ">
                                     <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
@@ -68,8 +68,8 @@
     </div>
 
     <!--/.col-->
-    <div class="col-sm-6 col-lg-3">
-        <div class="social-box twitter">
+    <div class="col-sm-6 col-lg-3" >
+        <div class="social-box twitter" ng-controller="twitterCtrl">
             <i class="fa fa-twitter"></i>
             <div class="chart-wrapper">
                 <canvas class="chart chart-line" chart-data="data2" chart-labels="labels" chart-legend="false" chart-series="series" chart-options="options" chart-colours="colours" height="90"></canvas>
@@ -248,7 +248,7 @@
                                         <label for="file">You have no situation data for this day</label>
                                         <input type="file" class="form-control-file" id="file" name="file">
                                         <small class="text-muted">Please select a Situman summary file</small>
-                                        
+
                                     </fieldset>
                                     <button type="submit" class="btn btn-primary">Submit</button>
                                 </form>

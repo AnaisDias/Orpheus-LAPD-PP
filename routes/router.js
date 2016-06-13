@@ -119,6 +119,40 @@
 
         });
 
+        app.get('/api/sentimentalanalysis/:id/:date', function(req, res) {
+
+                    var tweets = ['I hate my life', "I want to die", "The new album by Kasabian is great"];
+                    var counterPos = 0;
+                    var counterNeg = 0;
+
+                    var itemsProcessed = 0;
+                    tweets.forEach(function(tweet){
+                        unirest.post("https://twinword-sentiment-analysis.p.mashape.com/analyze/")
+                            .header("X-Mashape-Key", "huDuunzqEXmshFHOpfPv3vaO9RdYp1K9sc0jsnMkFVRl4DlqEq")
+                            .header("Content-Type", "application/x-www-form-urlencoded")
+                            .header("Accept", "application/json")
+                            .send("text=" + tweet)
+                            .end(function(result) {
+                                if (result.body.type == "positive") {
+                                    counterPos++;
+                                } else if (result.body.type == "negative") {
+                                    counterNeg++;
+                                }
+                                itemsProcessed++;
+                                if (itemsProcessed === tweets.length) {
+                                  var response = {
+                                      'positive': counterPos,
+                                      'negative': counterNeg
+                                  };
+                                  res.send(response);
+                                }
+
+                            });
+
+
+                    });
+                });
+
         var toCheck = function(thisdate, userid, auth_id, accessToken) {
                 models.Activity.count({
                     where: {

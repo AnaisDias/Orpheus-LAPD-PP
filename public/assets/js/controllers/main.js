@@ -16,6 +16,7 @@ angular
     .controller('cardChartCtrl2', cardChartCtrl2)
     .controller('sleepCtrl', sleepCtrl)
     .controller('cardChartCtrl4', cardChartCtrl4)
+    .controller('twitterCtrl', twitterCtrl)
     .controller('situmanCtrl', situmanCtrl)
     .filter('secondsToDateTime', [function() {
         return function(seconds) {
@@ -26,7 +27,33 @@ angular
 
 
 
+    twitterCtrl.$inject = ['$scope', '$http','$location','$cookies','$filter'];
 
+    function twitterCtrl($scope, $http,$location,$cookies,$filter) {
+
+        $scope.$watch(function() {
+            return $cookies.selDate;
+        }, function(newVal, oldVal) {
+            if (typeof(newVal) == 'undefined') {
+                newVal = moment()._d;
+            }
+
+            unparsedDate = newVal;
+            parsedDate = $filter('date')(new Date(unparsedDate), 'yyyy-MM-dd');
+
+            console.log("user id: "+$location.search().id);
+            console.log("parsed date: " + parsedDate);
+
+            $http.get('/api/sentimentalanalysis/' + $location.search().id + "/"+parsedDate).success(function(data) {
+              console.log(data);
+            }).error(function(data) {
+                console.log("erro ao ir buscar moods");
+            });
+
+
+        }, true);
+
+    }
 navbarCtrl.$inject = ['$scope', '$http', '$window'];
 
 function navbarCtrl($scope, $http, $window) {
@@ -59,6 +86,7 @@ function convertHex(hex, opacity) {
     result = 'rgba(' + r + ',' + g + ',' + b + ',' + opacity / 100 + ')';
     return result;
 }
+
 
 moodDemoCtrl.$inject = ['$scope'];
 
@@ -114,25 +142,24 @@ function moodDemoCtrl($scope) {
     }
 }
 
-DatePickerCtrl.$inject = ['$scope', '$cookies','$http','$location','$filter'];
+DatePickerCtrl.$inject = ['$scope', '$cookies', '$http', '$location', '$filter'];
 
-function DatePickerCtrl($scope, $cookies,$http,$location,$filter) {
-$scope.registerdate;
-  $http.get('/api/registerdate/'+$location.search().id).success(function(data) {
-    var thisdate=moment(data);
-    month=thisdate.month()+1;
-    if(month<10){
-      $scope.registerdate=thisdate.year()+"-0"+month+"-"+thisdate.date();
-    }
-    else{
-      $scope.registerdate=thisdate.year()+"-"+month+"-"+thisdate.date();
-    }
+function DatePickerCtrl($scope, $cookies, $http, $location, $filter) {
+    $scope.registerdate;
+    $http.get('/api/registerdate/' + $location.search().id).success(function(data) {
+        var thisdate = moment(data);
+        month = thisdate.month() + 1;
+        if (month < 10) {
+            $scope.registerdate = thisdate.year() + "-0" + month + "-" + thisdate.date();
+        } else {
+            $scope.registerdate = thisdate.year() + "-" + month + "-" + thisdate.date();
+        }
 
 
-    console.log("register date " + $scope.registerdate);
-  }).error(function(data) {
-      //what to do on error
-  });
+        console.log("register date " + $scope.registerdate);
+    }).error(function(data) {
+        //what to do on error
+    });
     $scope.date = {
         startDate: moment()
 
@@ -265,9 +292,9 @@ function sparklineChartCtrl($scope) {
     }];
 }
 
-activityCtrl.$inject = ['$scope', '$cookies', '$window', '$http', '$filter','$location'];
+activityCtrl.$inject = ['$scope', '$cookies', '$window', '$http', '$filter', '$location'];
 
-function activityCtrl($scope, $cookies, $window, $http, $filter,$location) {
+function activityCtrl($scope, $cookies, $window, $http, $filter, $location) {
 
 
 
@@ -280,9 +307,9 @@ function activityCtrl($scope, $cookies, $window, $http, $filter,$location) {
 
         unparsedDate = newVal;
         parsedDate = $filter('date')(new Date(unparsedDate), 'yyyy-MM-dd');
-        $http.get('/api/fitbit/activity/' + parsedDate +"/"+$location.search().id).success(function(data) {
+        $http.get('/api/fitbit/activity/' + parsedDate + "/" + $location.search().id).success(function(data) {
             console.log(data);
-            data=JSON.parse(data);
+            data = JSON.parse(data);
             $scope.activities = data.activities;
             $scope.goals = data.goals;
             $scope.summary = data.summary;
@@ -293,18 +320,16 @@ function activityCtrl($scope, $cookies, $window, $http, $filter,$location) {
 
             $scope.caloriesVSGoals = ($scope.summary.caloriesOut / $scope.goals.caloriesOut);
 
-            if($scope.caloriesVSGoals>=1){
-              $scope.calgreaterthanone=true;
-            }
-            else{
-              $scope.calgreaterthanone=false;
+            if ($scope.caloriesVSGoals >= 1) {
+                $scope.calgreaterthanone = true;
+            } else {
+                $scope.calgreaterthanone = false;
             }
 
-            if($scope.stepsoriesVSGoals>=1){
-              $scope.stepsgreaterthanone=true;
-            }
-            else{
-              $scope.calgreaterthanone=false;
+            if ($scope.stepsoriesVSGoals >= 1) {
+                $scope.stepsgreaterthanone = true;
+            } else {
+                $scope.calgreaterthanone = false;
 
             }
             console.log("caloriesVSGoals: " + $scope.caloriesVSGoals);
@@ -314,12 +339,11 @@ function activityCtrl($scope, $cookies, $window, $http, $filter,$location) {
             angular.forEach($scope.summary.distances, function(summaryAct) {
                 if (summaryAct.activity == 'total') {
                     $scope.totalDistance = summaryAct.distance;
-                    $scope.distanceVSGoals = ( $scope.totalDistance  / $scope.goals.distance);
-                    if($scope.stepsVSGoals>=1){
-                      $scope.distgreaterthanone=true;
-                    }
-                    else{
-                      $scope.distgreaterthanone=false;
+                    $scope.distanceVSGoals = ($scope.totalDistance / $scope.goals.distance);
+                    if ($scope.stepsVSGoals >= 1) {
+                        $scope.distgreaterthanone = true;
+                    } else {
+                        $scope.distgreaterthanone = false;
                     }
                 }
 
@@ -344,21 +368,21 @@ function activityCtrl($scope, $cookies, $window, $http, $filter,$location) {
                     icon: 'icon-like',
                     value: $scope.summary.steps,
                     percentOut: $scope.stepsVSGoals,
-                    percent: $scope.stepsVSGoals*100,
+                    percent: $scope.stepsVSGoals * 100,
                     greterthan: $scope.stepsgreaterthanone
                 }, {
                     title: 'Distance',
                     icon: 'icon-like',
                     value: $scope.totalDistance,
                     percentOut: $scope.distanceVSGoals,
-                    percent: $scope.distanceVSGoals*100,
+                    percent: $scope.distanceVSGoals * 100,
                     greterthan: $scope.distgreaterthanone
                 }, {
                     title: 'Calories',
                     icon: 'icon-like',
-                    value: $scope.summary.caloriesOut*100,
+                    value: $scope.summary.caloriesOut,
                     percentOut: $scope.caloriesVSGoals,
-                    percent: $scope.caloriesVSGoals*100,
+                    percent: $scope.caloriesVSGoals * 100,
                     greterthan: $scope.calgreaterthanone
                 }
 
@@ -378,7 +402,7 @@ function activityCtrl($scope, $cookies, $window, $http, $filter,$location) {
 
 
 }
-//change to take situations from database, 
+//change to take situations from database,
 situmanCtrl.$inject = ['$scope', '$cookies', '$window', '$http', '$filter'];
 
 function situmanCtrl($scope, $cookies, $window, $http, $filter) {
@@ -857,10 +881,10 @@ function cardChartCtrl2($scope) {
     }];
 }
 
-sleepCtrl.$inject = ['$scope','$cookies','$filter','$http','$location'];
+sleepCtrl.$inject = ['$scope', '$cookies', '$filter', '$http', '$location'];
 
-function sleepCtrl($scope,$cookies,$filter,$http,$location) {
-  $scope.labels = ['January', 'February', 'March', 'April', 'May', 'June', 'July'];
+function sleepCtrl($scope, $cookies, $filter, $http, $location) {
+    $scope.labels = ['January', 'February', 'March', 'April', 'May', 'June', 'July'];
     $scope.data = [
         [78, 81, 80, 45, 34, 12, 40]
     ];
@@ -884,75 +908,77 @@ function sleepCtrl($scope,$cookies,$filter,$http,$location) {
         tooltipCornerRadius: 0,
     }];
     $scope.$watch(function() {
-            return $cookies.selDate;
-        }, function(newVal, oldVal) {
-            if (typeof(newVal) == 'undefined') {
-                newVal = moment()._d;
-            }
-
-            unparsedDate = newVal;
-            parsedDate = $filter('date')(new Date(unparsedDate), 'yyyy-MM-dd');
-            $http.get('/api/fitbit/sleep/' + parsedDate+"/"+$location.search().id).success(function(data) {
-              var labelsArray=[];
-              var graphData=[[]];
-              console.log(JSON.parse(data));
-              data=JSON.parse(data);
-              angular.forEach(data.sleep[0].minuteData, function(datevalue) {
-                graphData[0].push(parseInt(datevalue.value));
-              });
-              var totalTimeInBed=data.summary.totalTimeInBed;
-              var i=1;
-              while(i<=totalTimeInBed){
-                labelsArray.push(i.toString());
-                i++;
-              }
-              console.log(graphData);
-              console.log($scope.data);
-              $scope.data=graphData;
-              $scope.labels=labelsArray;
-
-            }).error(function(data) {
-                //what to do on error
-            });
-        }, true);
-
-    }
-
-    function random(min, max) {
-        return Math.floor(Math.random() * (max - min + 1) + min);
-    }
-
-    cardChartCtrl4.$inject = ['$scope'];
-
-    function cardChartCtrl4($scope) {
-
-        var elements = 16;
-        var labels = [];
-        var data = [];
-
-        for (var i = 0; i <= elements; i++) {
-            labels.push('1');
-            data.push(random(40, 100));
+        return $cookies.selDate;
+    }, function(newVal, oldVal) {
+        if (typeof(newVal) == 'undefined') {
+            newVal = moment()._d;
         }
 
-        $scope.labels = labels;
+        unparsedDate = newVal;
+        parsedDate = $filter('date')(new Date(unparsedDate), 'yyyy-MM-dd');
+        $http.get('/api/fitbit/sleep/' + parsedDate + "/" + $location.search().id).success(function(data) {
+            var labelsArray = [];
+            var graphData = [
+                []
+            ];
+            console.log(JSON.parse(data));
+            data = JSON.parse(data);
+            angular.forEach(data.sleep[0].minuteData, function(datevalue) {
+                graphData[0].push(parseInt(datevalue.value));
+            });
+            var totalTimeInBed = data.summary.totalTimeInBed;
+            var i = 1;
+            while (i <= totalTimeInBed) {
+                labelsArray.push(i.toString());
+                i++;
+            }
+            console.log(graphData);
+            console.log($scope.data);
+            $scope.data = graphData;
+            $scope.labels = labelsArray;
 
-        $scope.data = [data];
+        }).error(function(data) {
+            //what to do on error
+        });
+    }, true);
 
-        $scope.options = {
-            showScale: false,
-            scaleFontSize: 0,
-            scaleShowGridLines: false,
-            barShowStroke: false,
-            barStrokeWidth: 0,
-            scaleGridLineWidth: 0,
-            barValueSpacing: 3,
-        };
-        $scope.colours = [{
-            fillColor: 'rgba(255,255,255,.3)',
-            strokeColor: 'rgba(255,255,255,.55)',
-            highlightFill: 'rgba(255,255,255,.55)',
-            highlightStroke: 'rgba(255,255,255,.55)',
-            tooltipCornerRadius: 0,
-        }];
+}
+
+function random(min, max) {
+    return Math.floor(Math.random() * (max - min + 1) + min);
+}
+
+cardChartCtrl4.$inject = ['$scope'];
+
+function cardChartCtrl4($scope) {
+
+    var elements = 16;
+    var labels = [];
+    var data = [];
+
+    for (var i = 0; i <= elements; i++) {
+        labels.push('1');
+        data.push(random(40, 100));
     }
+
+    $scope.labels = labels;
+
+    $scope.data = [data];
+
+    $scope.options = {
+        showScale: false,
+        scaleFontSize: 0,
+        scaleShowGridLines: false,
+        barShowStroke: false,
+        barStrokeWidth: 0,
+        scaleGridLineWidth: 0,
+        barValueSpacing: 3,
+    };
+    $scope.colours = [{
+        fillColor: 'rgba(255,255,255,.3)',
+        strokeColor: 'rgba(255,255,255,.55)',
+        highlightFill: 'rgba(255,255,255,.55)',
+        highlightStroke: 'rgba(255,255,255,.55)',
+        tooltipCornerRadius: 0,
+    }];
+}
