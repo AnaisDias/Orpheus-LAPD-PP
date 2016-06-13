@@ -31,9 +31,9 @@ navbarCtrl.$inject = ['$scope', '$http', '$window'];
 
 function navbarCtrl($scope, $http, $window) {
     $http.get('/api/username').success(function(data) {
+        if (data.username == undefined) $window.location.href = '/#/login';
         $scope.username = data.username;
         $scope.avatar = data.avatar;
-        if (data.username == undefined) $window.location.href = '/#/login';
     }).error(function(data) {
         $window.location.href = '/#/login';
     });

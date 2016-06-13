@@ -15,35 +15,20 @@
     var favicon = require('serve-favicon');
     var logger = require('morgan');
     var request = require("request");
-    var models = require('../models');
+    var models1 = require('../models');
     var moment = require('moment');
     moment().format();
-    var crypto = require('crypto');
     var sequelize = require('sequelize');
+    var bcrypt = require('bcrypt-nodejs');
 
+    var localAuthController = require('../controllers/local-auth');
     var FitbitAuthController = require('../controllers/fitbit-auth');
+    var twitterAuthController = require('../controllers/twitter-auth');
 
 
     module.exports = function(app) {
         var models = app.get('models');
-        app.post('/api/fitbit/user/findorcreate', function(req, res) {
-
-            models.User.findOrCreate({
-                where: {
-                    auth_id: req.body.auth_id
-                }, // we search for this user
-                defaults: {
-                    fullname: req.body.fullname,
-                    avatar: req.body.avatar,
-                    displayName: req.body.displayName,
-                    gender: req.body.gender,
-                    age: req.body.age
-                }
-            });
-
-            console.log(req.body.fullname);
-        });
-
+        var id = null;
         app.get('/api/registerdate/:id',function(req,res){
           var userid = req.params.id;
           models.User.find({
@@ -128,11 +113,10 @@
         app.get('/api/logout', function(req, res) {
             console.log("Logging out");
             req.session = null;
+            id = null;
             req.logout();
-            var json_data = {
-                response: "0k"
-            };
-            res.json(json_data);
+            res.redirect('/#/login');
+
         });
 
         var toCheck = function(thisdate, userid, auth_id, accessToken) {
@@ -196,6 +180,20 @@
             function(req, res) {
                 // If this function gets called, authentication was successful.
                 // `req.user` contains the authenticated user.
+                models.User.findById(id).then(function (user){
+                    models.User.update({
+                        auth_id: req.user.profile.id,
+                        avatar : req.user.profile._json.user.avatar,
+                        displayName : req.user.profile._json.user.displayName,
+                        gender : req.user.profile._json.user.gender,
+                        age : req.user.profile._json.user.age
+                    }, {
+                        where: {
+                            id : user.id
+                        }
+                    });
+                });
+
                 models.User.find({
                     where: {
                         auth_id: req.user.profile.id
@@ -218,15 +216,43 @@
 
             });
 
+        app.get('/auth/twitter', passport.authenticate('twitter'));
+        app.get( '/auth/twitter/callback', passport.authenticate( 'twitter', {
+            successRedirect: '/auth/fitbit',
+            failureRedirect: '/api/logout'
+        }));
+
+        //login in our application
         //login in our application
 
-        app.post('/api/login', function(req, res) {
-            var username = req.body.username;
-            var password = req.body.password;
+        app.post('/api/login', function (req, res, next) {
+
+            passport.authenticate('user-local', function (err, user, info) {
+
+                var error = err || info;
+                if (error) {
+                    console.log("Error");
+                    return res.status(401).json(error);
+                }
+
+                req.logIn(user, function (err) {
+                    console.log(err);
+                    console.log("Success");
+                    if (err) return res.send(err);
+                    var json_data = {
+                        success:  true,
+                        fullname: req.user.fullname,
+                        username: req.user.username,
+                        id: req.user.id
+                    };
+                    id = req.user.id;
+                    console.log("\n\n\n\nREQ LOCAL: \n" + id);
+                    res.json(json_data);
+                });
+            })(req, res, next);
         });
 
-        //register in our application
-        app.post('/api/register', function(req, res) {
+        app.post('/api/register', function (req, res) {
 
             var nusername = req.body.username;
             var name = req.body.fullname;
@@ -234,22 +260,16 @@
             var npassword = req.body.password;
             var rPassword = req.body.rPassword;
 
-            var secret = "orpheusapp";
 
-
-            if (npassword == rPassword) {
-                var hashPass = crypto.createHmac('sha256', secret)
-                    .update(npassword)
-                    .digest('hex');
+            if(npassword == rPassword){
+                var hashPass = bcrypt.hashSync(npassword, bcrypt.genSaltSync(8), null);
                 console.log(hashPass);
-                models.usertest.find({
-                    where: {
-                        $or: [{
-                            username: nusername
-                        }, {
-                            email: nemail
-                        }]
-                    }
+                models.User.find({where: {
+                    $or: [
+                        {username: nusername},
+                        {email: nemail}
+                    ]
+                }
                 }).then(function(user) {
                         console.log(user);
                         if (user != null) {
@@ -258,33 +278,37 @@
                                 exists: true
                             };
                             console.log("not null");
-                        } else {
-                            models.usertest.create({
-                                username: nusername,
-                                email: nemail,
-                                fullname: name,
-                                password: hashPass
-                            }, {
-                                fields: ['username', 'email', 'fullname', 'password']
-                            }).then(function(user) {
+                            res.json(json_data);
+                        }else {
+                            models.User.create({ username: nusername, email: nemail, fullname: name, password: hashPass, type : 0},
+                                { fields: [ 'username' , 'email', 'fullname', 'password', 'type'] }).then(function(user) {
                                 console.log(user.get({
-                                        plain: true
-                                    })) // => { username: 'barfooz', isAdmin: false }
+                                    plain: true
+                                }));
+                                var json_data = {
+                                    success : true
+                                };
+                                res.json(json_data);// => { username: 'barfooz', isAdmin: false }
                             });
-                            var json_data = {
-                                success: true
-                            };
                         }
-                        res.json(json_data);
                     },
-                    function(err) {
+                    function (err) {
                         var json_data = {
-                            success: false
+                            success : false
                         };
                         res.json(json_data);
                     });
-                }
-});
+
+            }
+            else{
+
+                var json_data = {
+                    success : false
+                };
+                res.json(json_data);
+            }
+
+        });
 
 
 var util = require('util');

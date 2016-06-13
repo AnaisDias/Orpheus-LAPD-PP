@@ -1,39 +1,36 @@
 var Models = require('../models');
+var passport = require('passport');
+var LocalStrategy = require('passport-local').Strategy;
+var bcrypt = require('bcrypt-nodejs');
 
 passport.use('user-local', new LocalStrategy({
-        username: 'username',
-        password: 'password' // this is the virtual field on the model
+        usernameField: 'user',
+        passwordField: 'pass' // this is the virtual field on the model
     },
     function(username, password, done) {
-        Models.usertests.find({
-            username: username
-        }, function(err, user) {
-            if (err) return done(err);
+        console.log(username);
 
+        console.log(password);
+
+        Models.User.findOne({
+            where: {
+                username: username
+            }
+        }).then( function(user) {
+            console.log("User\n" + user.username + "\nfull name\n" + user.fullname);
             if (!user) {
                 return done(null, false, {
                     message: 'This username is not registered.'
                 });
             }
-            if (!user.authenticate(password)) {
+            if (!bcrypt.compareSync(password,user.password)) {
+                console.log("passwords not match");
                 return done(null, false, {
                     message: 'This password is not correct.'
                 });
             }
+            console.log("Calling done!");
             return done(null, user);
         });
     }
 ));
-
-exports.loginUser = function (req, res, next)
-{
-    passport.authenticate('local-user', function(err,user, info){
-        var error = err || info;
-        if(error) return res.json(401, error);
-
-        req.logIn(user, function(err) {
-            if (err) return res.send(err);
-            res.json(req.user.userInfo);
-        });
-    })(req,res,next);
-};
