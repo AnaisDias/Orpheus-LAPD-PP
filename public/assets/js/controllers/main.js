@@ -14,7 +14,7 @@ angular
     .controller('clientsTableCtrl', clientsTableCtrl)
     .controller('cardChartCtrl1', cardChartCtrl1)
     .controller('cardChartCtrl2', cardChartCtrl2)
-    .controller('cardChartCtrl3', cardChartCtrl3)
+    .controller('sleepCtrl', sleepCtrl)
     .controller('cardChartCtrl4', cardChartCtrl4)
     .filter('secondsToDateTime', [function() {
         return function(seconds) {
@@ -113,19 +113,35 @@ function moodDemoCtrl($scope) {
     }
 }
 
-DatePickerCtrl.$inject = ['$scope', '$cookies'];
+DatePickerCtrl.$inject = ['$scope', '$cookies','$http','$location','$filter'];
 
-function DatePickerCtrl($scope, $cookies) {
+function DatePickerCtrl($scope, $cookies,$http,$location,$filter) {
+$scope.registerdate;
+  $http.get('/api/registerdate/'+$location.search().id).success(function(data) {
+    var thisdate=moment(data);
+    month=thisdate.month()+1;
+    if(month<10){
+      $scope.registerdate=thisdate.year()+"-0"+month+"-"+thisdate.date();
+    }
+    else{
+      $scope.registerdate=thisdate.year()+"-"+month+"-"+thisdate.date();
+    }
 
 
+    console.log("register date " + $scope.registerdate);
+  }).error(function(data) {
+      //what to do on error
+  });
     $scope.date = {
         startDate: moment()
+
 
     };
 
     $cookies.selDate = moment()._d;
 
     $scope.opts = {
+
         singleDatePicker: true,
         showDropdowns: true,
         drops: 'down',
@@ -800,11 +816,10 @@ function cardChartCtrl2($scope) {
     }];
 }
 
-cardChartCtrl3.$inject = ['$scope','$cookies','$filter','$http','$location'];
+sleepCtrl.$inject = ['$scope','$cookies','$filter','$http','$location'];
 
-function cardChartCtrl3($scope,$cookies,$filter,$http,$location) {
-
-    $scope.labels = ['January', 'February', 'March', 'April', 'May', 'June', 'July'];
+function sleepCtrl($scope,$cookies,$filter,$http,$location) {
+  $scope.labels = ['January', 'February', 'March', 'April', 'May', 'June', 'July'];
     $scope.data = [
         [78, 81, 80, 45, 34, 12, 40]
     ];
@@ -827,7 +842,6 @@ function cardChartCtrl3($scope,$cookies,$filter,$http,$location) {
         highlightStroke: 'rgba(47, 132, 71, 0.8)',
         tooltipCornerRadius: 0,
     }];
-
     $scope.$watch(function() {
             return $cookies.selDate;
         }, function(newVal, oldVal) {
@@ -838,8 +852,23 @@ function cardChartCtrl3($scope,$cookies,$filter,$http,$location) {
             unparsedDate = newVal;
             parsedDate = $filter('date')(new Date(unparsedDate), 'yyyy-MM-dd');
             $http.get('/api/fitbit/sleep/' + parsedDate+"/"+$location.search().id).success(function(data) {
-
-
+              var labelsArray=[];
+              var graphData=[[]];
+              console.log(JSON.parse(data));
+              data=JSON.parse(data);
+              angular.forEach(data.sleep[0].minuteData, function(datevalue) {
+                graphData[0].push(parseInt(datevalue.value));
+              });
+              var totalTimeInBed=data.summary.totalTimeInBed;
+              var i=1;
+              while(i<=totalTimeInBed){
+                labelsArray.push(i.toString());
+                i++;
+              }
+              console.log(graphData);
+              console.log($scope.data);
+              $scope.data=graphData;
+              $scope.labels=labelsArray;
 
             }).error(function(data) {
                 //what to do on error

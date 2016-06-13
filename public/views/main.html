@@ -2,7 +2,8 @@
     <h1> </h1>
 </div>
 
-<div class="row">
+<div class="row" ng-controller="DatePickerCtrl">
+    <h1> {{registerdate}} </h1>
     <div class="col-md-12">
         <div class="card card-inverse ">
             <div class="card-block">
@@ -12,10 +13,11 @@
 
                         <div class="col-sm-6 col-sm-offset-9">
 
-                            <fieldset class="form-group " ng-controller="DatePickerCtrl">
+                            <fieldset class="form-group " >
+
                                 <div class="input-group input-group-sm ">
                                     <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
-                                    <input date-range-picker class="form-control date-picker" type="text" ng-model="date" options="opts" value="{{selDate}}" />
+                                    <input date-range-picker  class="form-control date-picker" type="text" ng-model="date" options="opts" value="{{selDate}}" />
                                 </div>
                             </fieldset>
                         </div>
@@ -52,21 +54,10 @@
             </div>
         </div>
     </div>
-    <div class="col-sm-6 col-lg-3">
-        <div class="card card-inverse card-warning" ng-controller="cardChartCtrl3">
+    <div class="col-sm-12 col-lg-6">
+        <div class="card card-inverse card-warning" ng-controller="sleepCtrl">
             <div class="card-block p-b-0">
-                <div class="btn-group pull-right">
-                    <button type="button" class="btn btn-warning-outline active dropdown-toggle p-a-0" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                        <i class="icon-settings"></i>
-                    </button>
-                    <div class="dropdown-menu">
-                        <a class="dropdown-item" href="#">Action</a>
-                        <a class="dropdown-item" href="#">Another action</a>
-                        <a class="dropdown-item" href="#">Something else here</a>
-                        <div class="dropdown-divider"></div>
-                        <a class="dropdown-item" href="#">Separated link</a>
-                    </div>
-                </div>
+
                 <h4 class="m-b-0">Sleep</h4>
                 <p> Restlessness of this night's sleep. </p>
 

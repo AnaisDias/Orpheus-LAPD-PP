@@ -43,7 +43,16 @@
             console.log(req.body.fullname);
         });
 
-
+        app.get('/api/registerdate/:id',function(req,res){
+          var userid = req.params.id;
+          models.User.find({
+              where: {
+                  id: userid
+              }
+          }).then(function(user) {
+              res.json(user.createdAt)
+          });
+        });
         app.get('/api/username', function(req, res) {
 
             var json_data = {
@@ -56,7 +65,6 @@
         });
 
         app.get('/api/getUserById/:userid', function(req, res) {
-            console.log(req.params);
 
             var userid = req.params.userid;
             models.User.find({
@@ -93,34 +101,21 @@
 
 
         app.get('/api/fitbit/sleep/:date/:id', function(req, res) {
-            console.log("Sending sleep request!");
-
-            console.log(req.params);
-
-            console.log(JSON.stringify(req.user.accessToken));
-
-            models.User.find({
-                where: {
-                    id: req.params.id
-                }
-            }).then(function(user) {
-                var url1 = "https://api.fitbit.com/1/user/" + user.auth_id + "/sleep/date/" + req.params.date + ".json";
-                var fitAuth = "Bearer " + req.user.accessToken;
-                var options = {
-                    url: url1,
-                    headers: {
-                        'Authorization': fitAuth
-                    }
-                };
-                console.log(options.url);
-                console.log(options.headers.Authorization);
-                request(options, function(error, response, body) {
-                    console.log(body); // Show the HTML for the Google homepage.
-                    var json_data = {
-                        summary: body
-                    };
-                    res.json(body);
-                });
+          console.log("Sending sleep request!");
+          models.Sleep.find({
+              where: {
+                  UserId: req.params.id,
+                  date: req.params.date
+              }
+          }).then(function(sleep) {
+                  res.json(sleep.content);
+          }).catch(function(error) {
+            console.log("user id on sleep request: "+req.params.id);
+            console.log("date on sleep request: "+req.params.date);
+            console.log(error.message);
+              return res.send({
+                  message: "Error retrieving sleep log."
+              });
             });
 
         });
@@ -163,10 +158,7 @@
                                 date: thisdate,
                                 UserId: userid,
                                 content: body
-
                             });
-
-
                         });
 
                         console.log("sending sleep request for " + thisdate);
@@ -180,17 +172,13 @@
                         };
                         request(optionsSleep, function(error, response, body) {
 
-                            models.Sleep.findOrCreate({
-                                where: {
-                                    date: thisdate
-                                }, // we search for this user
-                                defaults: {
-                                    content: body,
-                                    UserId: userid
-                                }
-                            });
-
-
+                          models.Sleep.create({
+                              date: thisdate,
+                              UserId: userid,
+                              content: body
+                          }).catch(function(error){
+                            console.log("Erro ao gravar sleep log: "+error.message);
+                          });
                         });
                     }
                 });
