@@ -7,7 +7,14 @@ registerCtrl.$inject = ['$scope', '$http', '$window'];
 function registerCtrl($scope, $http, $window) {
     $scope.submit = function (){
         $scope.statusMsg = 'Sending data to server...';
-        if(this.password == this.rPassword) {
+        if(this.fullname == "" || this.username == "" || this.email == "" || this.password == ""){
+            $scope.statusMsg = "Some data is missing. Make sure you fill everything!";
+        }
+        else if(this.password == this.rPassword) {
+            var ntype = 0;
+            if (this.typeOf == "therapist"){
+                ntype = 1;
+            }
             var data1 = {
                 method: 'POST',
                 url: '/api/register',
@@ -16,7 +23,8 @@ function registerCtrl($scope, $http, $window) {
                     'username': this.username,
                     'email': this.email,
                     'password': this.password,
-                    'rPassword': this.rPassword
+                    'rPassword': this.rPassword,
+                    'type': ntype
                 }
             };
             $http(data1).then( function(response){

@@ -27,6 +27,10 @@
                             <span class="input-group-addon"><i class="icon-lock"></i></span>
                             <input type="password" class="form-control" ng-model="rPassword" placeholder="Repeat password">
                         </div>
+                        <div class="input-group m-b-2">
+                            Pacient<input type="radio" class="form-control" ng-model="typeOf" value="pacient" checked><br>
+                            Therapist<input type="radio" class="form-control" ng-model="typeOf" value="therapist">
+                        </div>
                         <!--<button type="button" class="btn btn-block btn-success" >Create Account</button>-->
                         <input type="submit" id="submit" value="Create Account"/>
                         <p class="text-muted"> {{ statusMsg }} </p>

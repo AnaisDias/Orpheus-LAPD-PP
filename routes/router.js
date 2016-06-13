@@ -259,6 +259,7 @@
             var nemail = req.body.email;
             var npassword = req.body.password;
             var rPassword = req.body.rPassword;
+            var ntype = req.body.type;
 
 
             if(npassword == rPassword){
@@ -280,7 +281,7 @@
                             console.log("not null");
                             res.json(json_data);
                         }else {
-                            models.User.create({ username: nusername, email: nemail, fullname: name, password: hashPass, type : 0},
+                            models.User.create({ username: nusername, email: nemail, fullname: name, password: hashPass, type : ntype},
                                 { fields: [ 'username' , 'email', 'fullname', 'password', 'type'] }).then(function(user) {
                                 console.log(user.get({
                                     plain: true
