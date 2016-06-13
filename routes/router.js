@@ -48,6 +48,8 @@
               res.json(user.createdAt)
           });
         });
+
+
         app.get('/api/username', function(req, res) {
 
             var json_data = {
@@ -98,7 +100,31 @@
 
         });
 
+        app.get('/api/patient/list/:id', function(req, res){
+            var id_ter = req.params.id;
+            var array={
+                usersArr: []
+            };
 
+            models.User.findAll({
+                where :{
+                    therapist: id_ter
+                }
+            }).then(function(users){
+                users.forEach(function(user){
+                    console.log("User");
+                    console.log(user);
+                    console.log(user.dataValues.username);
+                    console.log(user.dataValues.id);
+                    console.log(user.dataValues.fullname);
+                    array.usersArr.push({ "username" : user.dataValues.username,
+                        "id" : user.dataValues.id , "fullname": user.dataValues.fullname});
+
+                });
+                console.log(array.toString());
+                res.json(array);
+            })
+        });
         app.get('/api/fitbit/sleep/:date/:id', function(req, res) {
           console.log("Sending sleep request!");
           models.Sleep.find({
@@ -119,14 +145,6 @@
 
         });
 
-        app.get('/api/logout', function(req, res) {
-            console.log("Logging out");
-            req.session = null;
-            id = null;
-            req.logout();
-            res.redirect('/#/login');
-
-        });
 
         app.get('/api/sentimentalanalysis/:id/:date', function(req, res) {
         models.User.find({
@@ -456,6 +474,14 @@ var util = require('util');
           
          });
 
+        app.get('/api/logout', function(req, res) {
+            console.log("Logging out");
+            req.session = null;
+            id = null;
+            req.logout();
+            res.redirect('/#/login');
+
+        });
 
         app.get('*', function(req, res) {
             res.sendfile('./public/index.html'); // load the single view file (angular will handle the page changes on the front-end)
