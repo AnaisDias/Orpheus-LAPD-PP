@@ -246,7 +246,11 @@
                         momentRegisterDate.add(1, 'days');
                     }
 
+                    if (user.type==1){
+                      res.redirect('/#/therapist?id=' + user.id);
+                    }else{
                     res.redirect('/#/user?id=' + user.id);
+                  }
                 });
 
             });
