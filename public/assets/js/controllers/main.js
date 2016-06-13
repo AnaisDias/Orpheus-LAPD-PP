@@ -14,7 +14,7 @@ angular
     .controller('clientsTableCtrl', clientsTableCtrl)
     .controller('cardChartCtrl1', cardChartCtrl1)
     .controller('cardChartCtrl2', cardChartCtrl2)
-    .controller('cardChartCtrl3', cardChartCtrl3)
+    .controller('sleepCtrl', sleepCtrl)
     .controller('cardChartCtrl4', cardChartCtrl4)
     .controller('situmanCtrl', situmanCtrl)
     .filter('secondsToDateTime', [function() {
@@ -30,7 +30,6 @@ angular
 navbarCtrl.$inject = ['$scope', '$http', '$window'];
 
 function navbarCtrl($scope, $http, $window) {
-    console.log("navbarCtrl");
     $http.get('/api/username').success(function(data) {
         $scope.username = data.username;
         $scope.avatar = data.avatar;
@@ -115,20 +114,35 @@ function moodDemoCtrl($scope) {
     }
 }
 
-DatePickerCtrl.$inject = ['$scope', '$cookies'];
+DatePickerCtrl.$inject = ['$scope', '$cookies','$http','$location','$filter'];
 
-function DatePickerCtrl($scope, $cookies) {
+function DatePickerCtrl($scope, $cookies,$http,$location,$filter) {
+$scope.registerdate;
+  $http.get('/api/registerdate/'+$location.search().id).success(function(data) {
+    var thisdate=moment(data);
+    month=thisdate.month()+1;
+    if(month<10){
+      $scope.registerdate=thisdate.year()+"-0"+month+"-"+thisdate.date();
+    }
+    else{
+      $scope.registerdate=thisdate.year()+"-"+month+"-"+thisdate.date();
+    }
 
 
+    console.log("register date " + $scope.registerdate);
+  }).error(function(data) {
+      //what to do on error
+  });
     $scope.date = {
         startDate: moment()
+
 
     };
 
     $cookies.selDate = moment()._d;
-    console.log("PRIMEIRO " + $cookies.selDate);
 
     $scope.opts = {
+
         singleDatePicker: true,
         showDropdowns: true,
         drops: 'down',
@@ -147,7 +161,6 @@ function DatePickerCtrl($scope, $cookies) {
         var selectedDate = newDate._d;
 
         $cookies.selDate = selectedDate;
-        console.log($cookies.selDate);
     }, false);
 
     function gd(year, month, day) {
@@ -264,23 +277,36 @@ function activityCtrl($scope, $cookies, $window, $http, $filter,$location) {
         if (typeof(newVal) == 'undefined') {
             newVal = moment()._d;
         }
-        console.log("The date has changed from " + oldVal + " to " + newVal);
 
         unparsedDate = newVal;
         parsedDate = $filter('date')(new Date(unparsedDate), 'yyyy-MM-dd');
         $http.get('/api/fitbit/activity/' + parsedDate +"/"+$location.search().id).success(function(data) {
-            console.log("summary:" + JSON.stringify(data.summary));
-            console.log("goals:" + JSON.stringify(data.goals));
-            console.log("step goals:" + data.goals.steps);
+            console.log(data);
+            data=JSON.parse(data);
             $scope.activities = data.activities;
             $scope.goals = data.goals;
             $scope.summary = data.summary;
 
-            $scope.stepsVSGoals = ($scope.goals.steps / $scope.summary.steps) * 100;
+            $scope.stepsVSGoals = ($scope.summary.steps / $scope.goals.steps);
             console.log("stepsVSGoals: " + $scope.stepsVSGoals);
             $scope.activitiesTotal;
 
-            $scope.caloriesVSGoals = ($scope.goals.caloriesOut / $scope.summary.caloriesOut) * 100;
+            $scope.caloriesVSGoals = ($scope.summary.caloriesOut / $scope.goals.caloriesOut);
+
+            if($scope.caloriesVSGoals>=1){
+              $scope.calgreaterthanone=true;
+            }
+            else{
+              $scope.calgreaterthanone=false;
+            }
+
+            if($scope.stepsoriesVSGoals>=1){
+              $scope.stepsgreaterthanone=true;
+            }
+            else{
+              $scope.calgreaterthanone=false;
+
+            }
             console.log("caloriesVSGoals: " + $scope.caloriesVSGoals);
 
 
@@ -288,7 +314,13 @@ function activityCtrl($scope, $cookies, $window, $http, $filter,$location) {
             angular.forEach($scope.summary.distances, function(summaryAct) {
                 if (summaryAct.activity == 'total') {
                     $scope.totalDistance = summaryAct.distance;
-                    $scope.distanceVSGoals = ($scope.goals.distance / $scope.totalDistance) * 100;
+                    $scope.distanceVSGoals = ( $scope.totalDistance  / $scope.goals.distance);
+                    if($scope.stepsVSGoals>=1){
+                      $scope.distgreaterthanone=true;
+                    }
+                    else{
+                      $scope.distgreaterthanone=false;
+                    }
                 }
 
             });
@@ -311,17 +343,23 @@ function activityCtrl($scope, $cookies, $window, $http, $filter,$location) {
                     title: 'Steps',
                     icon: 'icon-like',
                     value: $scope.summary.steps,
-                    percent: $scope.stepsVSGoals
+                    percentOut: $scope.stepsVSGoals,
+                    percent: $scope.stepsVSGoals*100,
+                    greterthan: $scope.stepsgreaterthanone
                 }, {
                     title: 'Distance',
                     icon: 'icon-like',
                     value: $scope.totalDistance,
-                    percent: $scope.distanceVSGoals
+                    percentOut: $scope.distanceVSGoals,
+                    percent: $scope.distanceVSGoals*100,
+                    greterthan: $scope.distgreaterthanone
                 }, {
                     title: 'Calories',
                     icon: 'icon-like',
-                    value: $scope.summary.caloriesOut,
-                    percent: $scope.caloriesVSGoals
+                    value: $scope.summary.caloriesOut*100,
+                    percentOut: $scope.caloriesVSGoals,
+                    percent: $scope.caloriesVSGoals*100,
+                    greterthan: $scope.calgreaterthanone
                 }
 
             ];
@@ -819,11 +857,10 @@ function cardChartCtrl2($scope) {
     }];
 }
 
-cardChartCtrl3.$inject = ['$scope','$cookies','$filter','$http','$location'];
+sleepCtrl.$inject = ['$scope','$cookies','$filter','$http','$location'];
 
-function cardChartCtrl3($scope,$cookies,$filter,$http,$location) {
-
-    $scope.labels = ['January', 'February', 'March', 'April', 'May', 'June', 'July'];
+function sleepCtrl($scope,$cookies,$filter,$http,$location) {
+  $scope.labels = ['January', 'February', 'March', 'April', 'May', 'June', 'July'];
     $scope.data = [
         [78, 81, 80, 45, 34, 12, 40]
     ];
@@ -846,20 +883,33 @@ function cardChartCtrl3($scope,$cookies,$filter,$http,$location) {
         highlightStroke: 'rgba(47, 132, 71, 0.8)',
         tooltipCornerRadius: 0,
     }];
-
     $scope.$watch(function() {
             return $cookies.selDate;
         }, function(newVal, oldVal) {
             if (typeof(newVal) == 'undefined') {
                 newVal = moment()._d;
             }
-            console.log("The date has changed from " + oldVal + " to " + newVal);
 
             unparsedDate = newVal;
             parsedDate = $filter('date')(new Date(unparsedDate), 'yyyy-MM-dd');
             $http.get('/api/fitbit/sleep/' + parsedDate+"/"+$location.search().id).success(function(data) {
-                console.log("sleep:" + JSON.stringify(data));
-
+              var labelsArray=[];
+              var graphData=[[]];
+              console.log(JSON.parse(data));
+              data=JSON.parse(data);
+              angular.forEach(data.sleep[0].minuteData, function(datevalue) {
+                graphData[0].push(parseInt(datevalue.value));
+              });
+              var totalTimeInBed=data.summary.totalTimeInBed;
+              var i=1;
+              while(i<=totalTimeInBed){
+                labelsArray.push(i.toString());
+                i++;
+              }
+              console.log(graphData);
+              console.log($scope.data);
+              $scope.data=graphData;
+              $scope.labels=labelsArray;
 
             }).error(function(data) {
                 //what to do on error

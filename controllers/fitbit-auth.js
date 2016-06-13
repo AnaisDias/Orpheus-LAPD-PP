@@ -33,16 +33,18 @@ function(accessToken, refreshToken, profile, done) {
 
   models.User.findOrCreate({
 		where: { auth_id: fitbit_profile.id}, // we search for this user
-		defaults: {fullname: fitbit_profile._json.user.fullName, avatar: fitbit_profile._json.user.avatar, displayName: fitbit_profile._json.user.displayName, gender: fitbit_profile._json.user.gender, age: fitbit_profile._json.user.age}});
+		defaults: {fullname: fitbit_profile._json.user.fullName, avatar: fitbit_profile._json.user.avatar, displayName: fitbit_profile._json.user.displayName, gender: fitbit_profile._json.user.gender, age: fitbit_profile._json.user.age}}).then(function(user){
+      console.log("auth id: "+fitbit_profile.id);
+      console.log(JSON.stringify(fitbit_profile._json.user.displayName));
+      done(null, {
+        accessToken: accessToken,
+        refreshToken: refreshToken,
+        profile: profile
+      });
+    });
 
 
 
-	console.log("auth id: "+fitbit_profile.id);
-  console.log(JSON.stringify(fitbit_profile._json.user.displayName));
-  done(null, {
-    accessToken: accessToken,
-    refreshToken: refreshToken,
-    profile: profile
-  });
+
 }
 ));

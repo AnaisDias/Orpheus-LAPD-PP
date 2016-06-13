@@ -27,7 +27,8 @@ angular
         'pascalprecht.translate',
         'ncy-angular-breadcrumb',
         'angular-loading-bar',
-        'ngCookies'
+        'ngCookies',
+        'percentage'
     ])
     .config(['cfpLoadingBarProvider', function(cfpLoadingBarProvider) {
         cfpLoadingBarProvider.includeSpinner = false;
