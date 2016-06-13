@@ -29,15 +29,15 @@
     module.exports = function(app) {
         var models = app.get('models');
         var id = null;
-        app.get('/api/registerdate/:id', function(req, res) {
-            var userid = req.params.id;
-            models.User.find({
-                where: {
-                    id: userid
-                }
-            }).then(function(user) {
-                res.json(user.createdAt)
-            });
+        app.get('/api/registerdate/:id',function(req,res){
+          var userid = req.params.id;
+          models.User.find({
+              where: {
+                  id: userid
+              }
+          }).then(function(user) {
+              res.json(user.createdAt)
+          });
         });
         app.get('/api/username', function(req, res) {
 
@@ -52,7 +52,7 @@
 
         var upload = require('../controllers/upload');
         app.route('/fileupload')
-            .post(upload.file);
+           .post(upload.file);
 
         app.get('/api/getUserById/:userid', function(req, res) {
 
@@ -75,11 +75,11 @@
                     date: req.params.date
                 }
             }).then(function(activity) {
-                res.json(activity.content);
+                    res.json(activity.content);
             }).catch(function(error) {
-                console.log("user id on activity request: " + req.params.id);
-                console.log("date on activity request: " + req.params.date);
-                console.log(error.message);
+              console.log("user id on activity request: "+req.params.id);
+              console.log("date on activity request: "+req.params.date);
+              console.log(error.message);
                 return res.send({
                     message: "Error retrieving activity."
                 });
@@ -91,21 +91,21 @@
 
 
         app.get('/api/fitbit/sleep/:date/:id', function(req, res) {
-            console.log("Sending sleep request!");
-            models.Sleep.find({
-                where: {
-                    UserId: req.params.id,
-                    date: req.params.date
-                }
-            }).then(function(sleep) {
-                res.json(sleep.content);
-            }).catch(function(error) {
-                console.log("user id on sleep request: " + req.params.id);
-                console.log("date on sleep request: " + req.params.date);
-                console.log(error.message);
-                return res.send({
-                    message: "Error retrieving sleep log."
-                });
+          console.log("Sending sleep request!");
+          models.Sleep.find({
+              where: {
+                  UserId: req.params.id,
+                  date: req.params.date
+              }
+          }).then(function(sleep) {
+                  res.json(sleep.content);
+          }).catch(function(error) {
+            console.log("user id on sleep request: "+req.params.id);
+            console.log("date on sleep request: "+req.params.date);
+            console.log(error.message);
+              return res.send({
+                  message: "Error retrieving sleep log."
+              });
             });
 
         });
@@ -118,6 +118,40 @@
             res.redirect('/#/login');
 
         });
+
+        app.get('/api/sentimentalanalysis/:id/:date', function(req, res) {
+
+                    var tweets = ['I hate my life', "I want to die", "The new album by Kasabian is great"];
+                    var counterPos = 0;
+                    var counterNeg = 0;
+
+                    var itemsProcessed = 0;
+                    tweets.forEach(function(tweet){
+                        unirest.post("https://twinword-sentiment-analysis.p.mashape.com/analyze/")
+                            .header("X-Mashape-Key", "huDuunzqEXmshFHOpfPv3vaO9RdYp1K9sc0jsnMkFVRl4DlqEq")
+                            .header("Content-Type", "application/x-www-form-urlencoded")
+                            .header("Accept", "application/json")
+                            .send("text=" + tweet)
+                            .end(function(result) {
+                                if (result.body.type == "positive") {
+                                    counterPos++;
+                                } else if (result.body.type == "negative") {
+                                    counterNeg++;
+                                }
+                                itemsProcessed++;
+                                if (itemsProcessed === tweets.length) {
+                                  var response = {
+                                      'positive': counterPos,
+                                      'negative': counterNeg
+                                  };
+                                  res.send(response);
+                                }
+
+                            });
+
+
+                    });
+                });
 
         var toCheck = function(thisdate, userid, auth_id, accessToken) {
                 models.Activity.count({
@@ -161,13 +195,13 @@
                         };
                         request(optionsSleep, function(error, response, body) {
 
-                            models.Sleep.create({
-                                date: thisdate,
-                                UserId: userid,
-                                content: body
-                            }).catch(function(error) {
-                                console.log("Erro ao gravar sleep log: " + error.message);
-                            });
+                          models.Sleep.create({
+                              date: thisdate,
+                              UserId: userid,
+                              content: body
+                          }).catch(function(error){
+                            console.log("Erro ao gravar sleep log: "+error.message);
+                          });
                         });
                     }
                 });
@@ -180,16 +214,16 @@
             function(req, res) {
                 // If this function gets called, authentication was successful.
                 // `req.user` contains the authenticated user.
-                models.User.findById(id).then(function(user) {
+                models.User.findById(id).then(function (user){
                     models.User.update({
                         auth_id: req.user.profile.id,
-                        avatar: req.user.profile._json.user.avatar,
-                        displayName: req.user.profile._json.user.displayName,
-                        gender: req.user.profile._json.user.gender,
-                        age: req.user.profile._json.user.age
+                        avatar : req.user.profile._json.user.avatar,
+                        displayName : req.user.profile._json.user.displayName,
+                        gender : req.user.profile._json.user.gender,
+                        age : req.user.profile._json.user.age
                     }, {
                         where: {
-                            id: user.id
+                            id : user.id
                         }
                     });
                 });
@@ -216,42 +250,8 @@
 
             });
 
-        app.get('/api/sentimentalanalysis/:id/:date', function(req, res) {
-
-            var tweets = ['I hate my life', "I want to die", "The new album by Kasabian is great"];
-            var counterPos = 0;
-            var counterNeg = 0;
-
-            var itemsProcessed = 0;
-            tweets.forEach(function(tweet) {
-                unirest.post("https://twinword-sentiment-analysis.p.mashape.com/analyze/")
-                    .header("X-Mashape-Key", "huDuunzqEXmshFHOpfPv3vaO9RdYp1K9sc0jsnMkFVRl4DlqEq")
-                    .header("Content-Type", "application/x-www-form-urlencoded")
-                    .header("Accept", "application/json")
-                    .send("text=" + tweet)
-                    .end(function(result) {
-                        if (result.body.type == "positive") {
-                            counterPos++;
-                        } else if (result.body.type == "negative") {
-                            counterNeg++;
-                        }
-                        itemsProcessed++;
-                        if (itemsProcessed === tweets.length) {
-                            var response = {
-                                'positive': counterPos,
-                                'negative': counterNeg
-                            };
-                            res.send(response);
-                        }
-
-                    });
-
-
-            });
-        });
-
         app.get('/auth/twitter', passport.authenticate('twitter'));
-        app.get('/auth/twitter/callback', passport.authenticate('twitter', {
+        app.get( '/auth/twitter/callback', passport.authenticate( 'twitter', {
             successRedirect: '/auth/fitbit',
             failureRedirect: '/api/logout'
         }));
@@ -259,9 +259,9 @@
         //login in our application
         //login in our application
 
-        app.post('/api/login', function(req, res, next) {
+        app.post('/api/login', function (req, res, next) {
 
-            passport.authenticate('user-local', function(err, user, info) {
+            passport.authenticate('user-local', function (err, user, info) {
 
                 var error = err || info;
                 if (error) {
@@ -269,12 +269,12 @@
                     return res.status(401).json(error);
                 }
 
-                req.logIn(user, function(err) {
+                req.logIn(user, function (err) {
                     console.log(err);
                     console.log("Success");
                     if (err) return res.send(err);
                     var json_data = {
-                        success: true,
+                        success:  true,
                         fullname: req.user.fullname,
                         username: req.user.username,
                         id: req.user.id
@@ -286,26 +286,25 @@
             })(req, res, next);
         });
 
-        app.post('/api/register', function(req, res) {
+        app.post('/api/register', function (req, res) {
 
             var nusername = req.body.username;
             var name = req.body.fullname;
             var nemail = req.body.email;
             var npassword = req.body.password;
             var rPassword = req.body.rPassword;
+            var ntype = req.body.type;
 
 
-            if (npassword == rPassword) {
+            if(npassword == rPassword){
                 var hashPass = bcrypt.hashSync(npassword, bcrypt.genSaltSync(8), null);
                 console.log(hashPass);
-                models.User.find({
-                    where: {
-                        $or: [{
-                            username: nusername
-                        }, {
-                            email: nemail
-                        }]
-                    }
+                models.User.find({where: {
+                    $or: [
+                        {username: nusername},
+                        {email: nemail}
+                    ]
+                }
                 }).then(function(user) {
                         console.log(user);
                         if (user != null) {
@@ -315,37 +314,31 @@
                             };
                             console.log("not null");
                             res.json(json_data);
-                        } else {
-                            models.User.create({
-                                username: nusername,
-                                email: nemail,
-                                fullname: name,
-                                password: hashPass,
-                                type: 0
-                            }, {
-                                fields: ['username', 'email', 'fullname', 'password', 'type']
-                            }).then(function(user) {
+                        }else {
+                            models.User.create({ username: nusername, email: nemail, fullname: name, password: hashPass, type : ntype},
+                                { fields: [ 'username' , 'email', 'fullname', 'password', 'type'] }).then(function(user) {
                                 console.log(user.get({
                                     plain: true
                                 }));
                                 var json_data = {
-                                    success: true
+                                    success : true
                                 };
-                                res.json(json_data); // => { username: 'barfooz', isAdmin: false }
+                                res.json(json_data);// => { username: 'barfooz', isAdmin: false }
                             });
                         }
                     },
-                    function(err) {
+                    function (err) {
                         var json_data = {
-                            success: false
+                            success : false
                         };
                         res.json(json_data);
                     });
 
-            } else {
+            }
+            else{
 
                 var json_data = {
-                    success: false
+                    success : false
                 };
                 res.json(json_data);
             }
@@ -353,8 +346,8 @@
         });
 
 
-        var util = require('util');
-        app.get('/api/situationData/:date', function(req, res) {
+var util = require('util');
+        app.get('/api/situationData/:date', function(req,res){
 
             var date = req.params.date;
             var dbdate = moment(date, "DD-MM-YYYY").date();
@@ -371,55 +364,52 @@
                 where: {
                     auth_id: req.user.profile.id
                 }
-            }).then(function(user) {
-                models.sequelize.query('SELECT situations FROM public."SituationData" WHERE extract(year from date) = ? AND extract(month from date) = ? AND extract(day from date) = ? AND "SituationData"."UserId" = ? ', {
-                        replacements: [dbyear, dbmonth, dbdate, user.id],
-                        type: sequelize.QueryTypes.SELECT
-                    })
-                    .then(function(users) {
-                        console.log(users);
-                        results = users;
-                        for (var r in results) {
-                            for (var situations in results[r]) {
-                                for (var l in results[r][situations]) {
-                                    if (results[r][situations][l].name != undefined) {
-                                        for (var names in situ) {
-                                            if (results[r][situations][l].name == situ[names].name) {
-                                                situ[names].count += 1;
-                                                totalcount += 1;
-                                                found = true;
-                                                break;
-                                            }
-                                        }
-
-                                        if (!found) {
-                                            situ[size] = [];
-                                            situ[size].name = results[r][situations][l].name;
-                                            situ[size].count = 0;
-                                            size += 1;
-                                        }
+            }).then(function(user){
+                models.sequelize.query('SELECT situations FROM public."SituationData" WHERE extract(year from date) = ? AND extract(month from date) = ? AND extract(day from date) = ? AND "SituationData"."UserId" = ? ', { replacements: [dbyear, dbmonth, dbdate, user.id], type: sequelize.QueryTypes.SELECT})
+                  .then(function(users) {
+                    console.log(users);
+                    results = users;
+                    for(var r in results){
+                        for(var situations in results[r]){
+                            for(var l in results[r][situations]){
+                               if(results[r][situations][l].name != undefined){
+                                for(var names in situ){
+                                   if(results[r][situations][l].name == situ[names].name){
+                                        situ[names].count+=1;
+                                        totalcount +=1;
+                                        found = true;
+                                        break;
                                     }
                                 }
-                            }
 
+                                if(!found){
+                                    situ[size] = [];
+                                    situ[size].name = results[r][situations][l].name;
+                                situ[size].count = 0;
+                                size +=1;
+                            }
+                               }
+                            }
                         }
 
-                        for (var x in situ) {
-                            var percentage = Math.round((situ[x].count / totalcount) * 100 * 10) / 10;
-                            data += '\"' + situ[x].name + '\": ' + '\"' + percentage + '\"';
-                            if (x < situ.length - 1) {
-                                data += ',\n';
-                            }
+                    }
+
+                    for(var x in situ){
+                        var percentage = Math.round((situ[x].count/totalcount)*100*10)/10;
+                        data += '\"' + situ[x].name + '\": ' + '\"' + percentage + '\"';
+                        if(x < situ.length-1){
+                            data += ',\n';
                         }
-                        data += '\n}';
-                        data = JSON.parse(data);
-                        res.json(data);
-                    }).catch(function(err) {
-                        console.log("ERRO: " + err.message);
-                    });
+                    }
+                    data += '\n}';
+                    data = JSON.parse(data);
+                    res.json(data);
+                    }).catch(function(err){
+                    console.log("ERRO: "+err.message);
+                });
 
             });
-        });
+         });
 
 
         app.get('*', function(req, res) {
