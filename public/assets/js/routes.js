@@ -91,7 +91,7 @@ angular
                 },
                 //page subtitle goes here
                 params: {
-                    subtitle: 'Welcome to e-Health'
+                    subtitle: 'Welcome back to e-Health'
                 },
                 resolve: {
                     loadPlugin: ['$ocLazyLoad', function($ocLazyLoad) {

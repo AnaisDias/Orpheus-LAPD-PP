@@ -1,10 +1,10 @@
 // Genesis App configuration
-var appName = 'Root';
+var appName = 'E-Health';
 var breadcrumbPrefix = true;
-var breadcrumbPrefixName = 'Root';
+var breadcrumbPrefixName = 'E-Health';
 
 // General
-var headTitle = 'Root Admin';
+var headTitle = 'E-Health';
 
 //Default colours
 var brandPrimary =  '#20a8d8';
