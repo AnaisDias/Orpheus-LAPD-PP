@@ -118,7 +118,7 @@
                     console.log(user.dataValues.id);
                     console.log(user.dataValues.fullname);
                     array.usersArr.push({ "username" : user.dataValues.username,
-                        "id" : user.dataValues.id , "fullname": user.dataValues.fullname});
+                        "id" : user.dataValues.id , "fullname": user.dataValues.fullname,"img":user.dataValues.avatar});
 
                 });
                 console.log(array.toString());
@@ -471,7 +471,7 @@ var util = require('util');
                     console.log("ERRO: "+err.message);
                 });
 
-          
+
          });
 
         app.get('/api/logout', function(req, res) {

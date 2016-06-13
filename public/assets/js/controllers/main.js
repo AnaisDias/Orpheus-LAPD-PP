@@ -18,12 +18,25 @@ angular
     .controller('cardChartCtrl4', cardChartCtrl4)
     .controller('twitterCtrl', twitterCtrl)
     .controller('situmanCtrl', situmanCtrl)
+    .controller('therapistCtrl',therapistCtrl)
     .filter('secondsToDateTime', [function() {
         return function(seconds) {
             return new Date(1970, 0, 1).setMilliseconds(seconds);
         };
     }])
 
+
+    therapistCtrl.inject=['$scope','$http','$location'];
+
+    function therapistCtrl($scope,$http,$location){
+      $http.get('/api/patient/list/' + $location.search().id).success(function(data) {
+        console.log(data);
+        $scope.patients=data.usersArr;
+        console.log($scope.patients[0].fullname);
+      }).error(function(data) {
+          console.log("erro ao ir buscar pacientes");
+      });
+    }
 
     twitterCtrl.$inject = ['$scope', '$http','$location','$cookies','$filter'];
 
