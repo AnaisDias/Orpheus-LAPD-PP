@@ -20,7 +20,7 @@
     moment().format();
     var sequelize = require('sequelize');
     var bcrypt = require('bcrypt-nodejs');
-
+    var unirest=require('unirest');
     var localAuthController = require('../controllers/local-auth');
     var FitbitAuthController = require('../controllers/fitbit-auth');
     var twitterAuthController = require('../controllers/twitter-auth');
@@ -126,7 +126,9 @@
                     var counterNeg = 0;
 
                     var itemsProcessed = 0;
+
                     tweets.forEach(function(tweet){
+
                         unirest.post("https://twinword-sentiment-analysis.p.mashape.com/analyze/")
                             .header("X-Mashape-Key", "huDuunzqEXmshFHOpfPv3vaO9RdYp1K9sc0jsnMkFVRl4DlqEq")
                             .header("Content-Type", "application/x-www-form-urlencoded")
@@ -148,9 +150,8 @@
                                 }
 
                             });
-
-
                     });
+
                 });
 
         var toCheck = function(thisdate, userid, auth_id, accessToken) {
