@@ -129,8 +129,14 @@
         });
 
         app.get('/api/sentimentalanalysis/:id/:date', function(req, res) {
+        models.User.find({
+            where: {
+                id: req.params.id
+            }
+        }).then(function(user){
 
-        var params = {screen_name: 'anaissdias'};
+
+        var params = {screen_name: user.bearer};
         var ts = [];
         client.get('statuses/user_timeline', params, function(error, tweets, response){
           if (!error) {
@@ -170,6 +176,7 @@
                     });
 
                 });
+});
 });
 
         var toCheck = function(thisdate, userid, auth_id, accessToken) {
