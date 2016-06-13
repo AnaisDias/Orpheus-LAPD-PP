@@ -44,6 +44,8 @@ angular
 
             $http.get('/api/sentimentalanalysis/' + $location.search().id + "/"+parsedDate).success(function(data) {
               console.log(data);
+              $scope.positive=data.positive;
+              $scope.negative=data.negative;
             }).error(function(data) {
                 console.log("erro ao ir buscar moods");
             });

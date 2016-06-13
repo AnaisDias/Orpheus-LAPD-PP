@@ -167,9 +167,8 @@
                                 }
 
                             });
-
-
                     });
+
                 });
 });
 
@@ -271,10 +270,24 @@
             });
 
         app.get('/auth/twitter', passport.authenticate('twitter'));
-        app.get( '/auth/twitter/callback', passport.authenticate( 'twitter', {
-            successRedirect: '/auth/fitbit',
-            failureRedirect: '/api/logout'
-        }));
+        app.get( '/auth/twitter/callback', passport.authenticate( 'twitter', {failureRedirect: '/api/logout'}), function(req, res){
+            
+            if(id != null){
+                models.User.findById(id).then(function(user){
+                    models.User.update({
+                        bearer: req.user.username
+                    }, {
+                        where :{
+                            id: user.id
+                        }
+                    });
+                });
+                res.redirect('/auth/fitbit');
+            }
+            else{
+                res.redirect('/api/logout');
+            }
+        });
 
         //login in our application
         //login in our application
