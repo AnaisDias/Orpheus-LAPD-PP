@@ -20,7 +20,16 @@
     moment().format();
     var sequelize = require('sequelize');
     var bcrypt = require('bcrypt-nodejs');
-    var unirest=require('unirest');
+    var Twitter = require('twitter');
+    var unirest = require('unirest');
+ 
+    var client = new Twitter({
+      consumer_key: '3W9XwzPeGgTqUZebf8R8N3M22',
+      consumer_secret: 'V2Hzz4MtMtaJt3sM2MLale8lXpZmxUsL8zwrx6kuPdVgGelgLp',
+      access_token_key: '1898192504-6ASi0q8v0a7Ltp2fRtgj99mvX8TIfEYXA7IbFXq',
+      access_token_secret: '74hhgVhgy1FtM1Jr3dN4A0isXgcv88YNksR3BSkM6YOlf'
+    });
+
     var localAuthController = require('../controllers/local-auth');
     var FitbitAuthController = require('../controllers/fitbit-auth');
     var twitterAuthController = require('../controllers/twitter-auth');
@@ -120,15 +129,29 @@
         });
 
         app.get('/api/sentimentalanalysis/:id/:date', function(req, res) {
+        models.User.find({
+            where: {
+                id: req.params.id
+            }
+        }).then(function(user){
 
-                    var tweets = ['I hate my life', "I want to die", "The new album by Kasabian is great"];
+
+        var params = {screen_name: user.bearer};
+        var ts = [];
+        client.get('statuses/user_timeline', params, function(error, tweets, response){
+          if (!error) {
+            for(var i in tweets){
+            console.log("tweets are here:" + util.inspect(tweets[i].text, false, null));
+            ts.push(tweets[i].text);
+          }
+      }
+        
+                    //var ts = ['I hate my life', "I want to die", "The new album by Kasabian is great"];
                     var counterPos = 0;
                     var counterNeg = 0;
 
                     var itemsProcessed = 0;
-
-                    tweets.forEach(function(tweet){
-
+                    ts.forEach(function(tweet){
                         unirest.post("https://twinword-sentiment-analysis.p.mashape.com/analyze/")
                             .header("X-Mashape-Key", "huDuunzqEXmshFHOpfPv3vaO9RdYp1K9sc0jsnMkFVRl4DlqEq")
                             .header("Content-Type", "application/x-www-form-urlencoded")
@@ -141,7 +164,7 @@
                                     counterNeg++;
                                 }
                                 itemsProcessed++;
-                                if (itemsProcessed === tweets.length) {
+                                if (itemsProcessed === ts.length) {
                                   var response = {
                                       'positive': counterPos,
                                       'negative': counterNeg
@@ -153,6 +176,8 @@
                     });
 
                 });
+});
+});
 
         var toCheck = function(thisdate, userid, auth_id, accessToken) {
                 models.Activity.count({
@@ -256,10 +281,24 @@
             });
 
         app.get('/auth/twitter', passport.authenticate('twitter'));
-        app.get( '/auth/twitter/callback', passport.authenticate( 'twitter', {
-            successRedirect: '/auth/fitbit',
-            failureRedirect: '/api/logout'
-        }));
+        app.get( '/auth/twitter/callback', passport.authenticate( 'twitter', {failureRedirect: '/api/logout'}), function(req, res){
+            
+            if(id != null){
+                models.User.findById(id).then(function(user){
+                    models.User.update({
+                        bearer: req.user.username
+                    }, {
+                        where :{
+                            id: user.id
+                        }
+                    });
+                });
+                res.redirect('/auth/fitbit');
+            }
+            else{
+                res.redirect('/api/logout');
+            }
+        });
 
         //login in our application
         //login in our application

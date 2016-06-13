@@ -12,6 +12,7 @@ module.exports = function(sequelize, DataTypes) {
     gender: DataTypes.STRING,
     age: DataTypes.INTEGER,
     auth_id: DataTypes.STRING,
+    bearer: DataTypes.STRING,
     createdAt: DataTypes.DATE,
     updatedAt: DataTypes.DATE
   }, {
