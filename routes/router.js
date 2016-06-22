@@ -22,7 +22,7 @@
     var bcrypt = require('bcrypt-nodejs');
     var Twitter = require('twitter');
     var unirest = require('unirest');
- 
+
     var client = new Twitter({
       consumer_key: '3W9XwzPeGgTqUZebf8R8N3M22',
       consumer_secret: 'V2Hzz4MtMtaJt3sM2MLale8lXpZmxUsL8zwrx6kuPdVgGelgLp',
@@ -48,6 +48,8 @@
               res.json(user.createdAt)
           });
         });
+
+
         app.get('/api/username', function(req, res) {
 
             var json_data = {
@@ -98,7 +100,31 @@
 
         });
 
+        app.get('/api/patient/list/:id', function(req, res){
+            var id_ter = req.params.id;
+            var array={
+                usersArr: []
+            };
 
+            models.User.findAll({
+                where :{
+                    therapist: id_ter
+                }
+            }).then(function(users){
+                users.forEach(function(user){
+                    console.log("User");
+                    console.log(user);
+                    console.log(user.dataValues.username);
+                    console.log(user.dataValues.id);
+                    console.log(user.dataValues.fullname);
+                    array.usersArr.push({ "username" : user.dataValues.username,
+                        "id" : user.dataValues.id , "fullname": user.dataValues.fullname,"img":user.dataValues.avatar});
+
+                });
+                console.log(array.toString());
+                res.json(array);
+            })
+        });
         app.get('/api/fitbit/sleep/:date/:id', function(req, res) {
           console.log("Sending sleep request!");
           models.Sleep.find({
@@ -119,14 +145,6 @@
 
         });
 
-        app.get('/api/logout', function(req, res) {
-            console.log("Logging out");
-            req.session = null;
-            id = null;
-            req.logout();
-            res.redirect('/#/login');
-
-        });
 
         app.get('/api/sentimentalanalysis/:id/:date', function(req, res) {
         models.User.find({
@@ -145,7 +163,7 @@
             ts.push(tweets[i].text);
           }
       }
-        
+
                     //var ts = ['I hate my life', "I want to die", "The new album by Kasabian is great"];
                     var counterPos = 0;
                     var counterNeg = 0;
@@ -271,14 +289,18 @@
                         momentRegisterDate.add(1, 'days');
                     }
 
+                    if (user.type==1){
+                      res.redirect('/#/therapist?id=' + user.id);
+                    }else{
                     res.redirect('/#/user?id=' + user.id);
+                  }
                 });
 
             });
 
         app.get('/auth/twitter', passport.authenticate('twitter'));
         app.get( '/auth/twitter/callback', passport.authenticate( 'twitter', {failureRedirect: '/api/logout'}), function(req, res){
-            
+
             if(id != null){
                 models.User.findById(id).then(function(user){
                     models.User.update({
@@ -387,9 +409,10 @@
 
 
 var util = require('util');
-        app.get('/api/situationData/:date', function(req,res){
+        app.get('/api/situationData/:date/:id', function(req,res){
 
             var date = req.params.date;
+            var id = req.params.id;
             var dbdate = moment(date, "DD-MM-YYYY").date();
             var dbmonth = moment(date, "DD-MM-YYYY").month() + 1;
             var dbyear = moment(date, "DD-MM-YYYY").year();
@@ -400,12 +423,12 @@ var util = require('util');
             var data = '{\n';
             var totalcount = 0;
 
-            models.User.find({
+            /*models.User.find({
                 where: {
                     auth_id: req.user.profile.id
                 }
-            }).then(function(user){
-                models.sequelize.query('SELECT situations FROM public."SituationData" WHERE extract(year from date) = ? AND extract(month from date) = ? AND extract(day from date) = ? AND "SituationData"."UserId" = ? ', { replacements: [dbyear, dbmonth, dbdate, user.id], type: sequelize.QueryTypes.SELECT})
+            }).then(function(user){*/
+                models.sequelize.query('SELECT situations FROM public."SituationData" WHERE extract(year from date) = ? AND extract(month from date) = ? AND extract(day from date) = ? AND "SituationData"."UserId" = ? ', { replacements: [dbyear, dbmonth, dbdate, id], type: sequelize.QueryTypes.SELECT})
                   .then(function(users) {
                     console.log(users);
                     results = users;
@@ -448,9 +471,17 @@ var util = require('util');
                     console.log("ERRO: "+err.message);
                 });
 
-            });
+
          });
 
+        app.get('/api/logout', function(req, res) {
+            console.log("Logging out");
+            req.session = null;
+            id = null;
+            req.logout();
+            res.redirect('/#/login');
+
+        });
 
         app.get('*', function(req, res) {
             res.sendfile('./public/index.html'); // load the single view file (angular will handle the page changes on the front-end)

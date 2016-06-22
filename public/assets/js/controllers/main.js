@@ -18,12 +18,25 @@ angular
     .controller('cardChartCtrl4', cardChartCtrl4)
     .controller('twitterCtrl', twitterCtrl)
     .controller('situmanCtrl', situmanCtrl)
+    .controller('therapistCtrl',therapistCtrl)
     .filter('secondsToDateTime', [function() {
         return function(seconds) {
             return new Date(1970, 0, 1).setMilliseconds(seconds);
         };
     }])
 
+
+    therapistCtrl.inject=['$scope','$http','$location'];
+
+    function therapistCtrl($scope,$http,$location){
+      $http.get('/api/patient/list/' + $location.search().id).success(function(data) {
+        console.log(data);
+        $scope.patients=data.usersArr;
+        console.log($scope.patients[0].fullname);
+      }).error(function(data) {
+          console.log("erro ao ir buscar pacientes");
+      });
+    }
 
     twitterCtrl.$inject = ['$scope', '$http','$location','$cookies','$filter'];
 
@@ -403,9 +416,9 @@ function activityCtrl($scope, $cookies, $window, $http, $filter, $location) {
 
 }
 //change to take situations from database,
-situmanCtrl.$inject = ['$scope', '$cookies', '$window', '$http', '$filter'];
+situmanCtrl.$inject = ['$scope', '$cookies', '$window', '$http', '$filter','$location'];
 
-function situmanCtrl($scope, $cookies, $window, $http, $filter) {
+function situmanCtrl($scope, $cookies, $window, $http, $filter,$location) {
 
 
 
@@ -421,7 +434,7 @@ function situmanCtrl($scope, $cookies, $window, $http, $filter) {
         var size = 0;
         $scope.situations = [];
         parsedDate = $filter('date')(new Date(unparsedDate), 'dd-MM-yyyy');
-        $http.get('/api/situationData/' + parsedDate).success(function(data) {
+        $http.get('/api/situationData/' + parsedDate+"/"+$location.search().id).success(function(data) {
             console.debug(data);
             //jsonD = JSON.parse(JSONdata);
             for(var i in data){

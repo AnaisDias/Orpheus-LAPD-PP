@@ -2,17 +2,17 @@
     <h1> </h1>
 </div>
 
-<div class="card">
+<div class="card" ng-controller="therapistCtrl">
     <div class="card-block">
 
         <ul class="icons-list">
-            <li>
+            <li ng-repeat="patient in patients">
               <div class="avatar pull-xs-left">
-                  <img src="assets/img/avatars/7.jpg" class="img-avatar" alt="admin@bootstrapmaster.com">
+                  <img src="{{patient.img}}" class="img-avatar" alt="admin@bootstrapmaster.com">
               </div>
                 <div class="desc">
-                    <div class="title">Lorem ipsum</div>
-                    <small>Lorem ipsum dolor sit amet</small>
+                    <a href="/#/user?id={{patient.id}}" ><div class="title">{{patient.fullname}}</div></a>
+                    <small>{{patient.username}}</small>
                 </div>
                 <div class="value">
                     <div class="small text-muted">Mood points</div>
@@ -20,93 +20,7 @@
                 </div>
 
             </li>
-            <li>
-              <div class="avatar pull-xs-left">
-                  <img src="assets/img/avatars/7.jpg" class="img-avatar" alt="admin@bootstrapmaster.com">
-              </div>
-                <div class="desc">
-                    <div class="title">Lorem ipsum</div>
-                    <small>Lorem ipsum dolor sit amet</small>
-                </div>
-                <div class="value">
-                    <div class="small text-muted">Mood points</div>
-                    <strong>1924</strong>
-                </div>
 
-            </li>
-            <li>
-              <div class="avatar pull-xs-left">
-                  <img src="assets/img/avatars/7.jpg" class="img-avatar" alt="admin@bootstrapmaster.com">
-              </div>
-                <div class="desc">
-                    <div class="title">Lorem ipsum</div>
-                    <small>Lorem ipsum dolor sit amet</small>
-                </div>
-                <div class="value">
-                    <div class="small text-muted">Mood points</div>
-                    <strong>1924</strong>
-                </div>
-
-            </li>
-            <li>
-              <div class="avatar pull-xs-left">
-                  <img src="assets/img/avatars/7.jpg" class="img-avatar" alt="admin@bootstrapmaster.com">
-              </div>
-                <div class="desc">
-                    <div class="title">Lorem ipsum</div>
-                    <small>Lorem ipsum dolor sit amet</small>
-                </div>
-                <div class="value">
-                    <div class="small text-muted">Mood points</div>
-                    <strong>1924</strong>
-                </div>
-
-            </li>
-            <li>
-              <div class="avatar pull-xs-left">
-                  <img src="assets/img/avatars/7.jpg" class="img-avatar" alt="admin@bootstrapmaster.com">
-              </div>
-                <div class="desc">
-                    <div class="title">Lorem ipsum</div>
-                    <small>Lorem ipsum dolor sit amet</small>
-                </div>
-                <div class="value">
-                    <div class="small text-muted">Mood points</div>
-                    <strong>1924</strong>
-                </div>
-
-            </li>
-            <li>
-              <div class="avatar pull-xs-left">
-                  <img src="assets/img/avatars/7.jpg" class="img-avatar" alt="admin@bootstrapmaster.com">
-              </div>
-                <div class="desc">
-                    <div class="title">Lorem ipsum</div>
-                    <small>Lorem ipsum dolor sit amet</small>
-                </div>
-                <div class="value">
-                    <div class="small text-muted">Mood points</div>
-                    <strong>1924</strong>
-                </div>
-
-            </li>
-            <li>
-              <div class="avatar pull-xs-left">
-                  <img src="assets/img/avatars/7.jpg" class="img-avatar" alt="admin@bootstrapmaster.com">
-              </div>
-                <div class="desc">
-                    <div class="title">Lorem ipsum</div>
-                    <small>Lorem ipsum dolor sit amet</small>
-                </div>
-                <div class="value">
-                    <div class="small text-muted">Mood points</div>
-                    <strong>1924</strong>
-                </div>
-
-            </li>
-            <li class="divider text-xs-center">
-                <button type="button" class="btn btn-sm btn-link text-muted" data-toggle="tooltip" data-placement="top" title="show more"><i class="icon-options"></i></button>
-            </li>
         </ul>
     </div>
     <!--/.col-->
