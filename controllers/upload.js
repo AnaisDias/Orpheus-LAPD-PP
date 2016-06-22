@@ -7,7 +7,7 @@ var moment = require('moment');
 exports.file = function(req, res) {
     req.pipe(req.busboy);
     req.busboy.on('file', function(fieldname, file, filename) {
-        var fstream = fs.createWriteStream('./public/situman/' + filename);
+        //var fstream = fs.createWriteStream('./public/situman/' + filename);
         var fileData = '';
         file.on('data', function(buffer) {
 	      fileData += buffer;
@@ -15,12 +15,8 @@ exports.file = function(req, res) {
 
 	    file.on('end', function(){
 	    	parseSitumanData(fileData, req);
+	    	res.redirect('/');
 	    });
-
-        fstream.on('close', function () {
-            res.redirect('/#/user?id=' + user.id);
-
-        });
 
     });
     
@@ -45,14 +41,8 @@ function parseSitumanData(data, req){
 	   		ssdate = JSON.stringify(obj[myKey][key].time);
 	   		dbdate = moment(ssdate, "DD-MM-YYYY HH:mm:ss").format();
 	   		
-	   		for(var t in obj[myKey][key][k]){
-	   			//situations with numbers and timestamp
-	   			//situations += obj[myKey][key][k][t];
-	   		}
 	   	}
-	   	console.log("this is situations: " + situations);
 	   		var situationss = JSON.parse(situations);
-	   		console.log("this is req.user: "+ JSON.stringify(req.user));
 	   		situmanDatabaseInsert(situationss, req, dbdate);
 
 	   }
