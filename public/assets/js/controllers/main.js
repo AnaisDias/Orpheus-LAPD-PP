@@ -158,7 +158,7 @@ function moodDemoCtrl($scope) {
 DatePickerCtrl.$inject = ['$scope', '$cookies', '$http', '$location', '$filter'];
 
 function DatePickerCtrl($scope, $cookies, $http, $location, $filter) {
-    $scope.registerdate;
+
     $http.get('/api/registerdate/' + $location.search().id).success(function(data) {
         var thisdate = moment(data);
         month = thisdate.month() + 1;
@@ -168,8 +168,19 @@ function DatePickerCtrl($scope, $cookies, $http, $location, $filter) {
             $scope.registerdate = thisdate.year() + "-" + month + "-" + thisdate.date();
         }
 
+        $scope.opts = {
 
-        console.log("register date " + $scope.registerdate);
+            singleDatePicker: true,
+            showDropdowns: true,
+            drops: 'down',
+            opens: 'left',
+            minDate:   $scope.registerdate
+
+        };
+
+
+
+
     }).error(function(data) {
         //what to do on error
     });
@@ -181,20 +192,6 @@ function DatePickerCtrl($scope, $cookies, $http, $location, $filter) {
 
     $cookies.selDate = moment()._d;
 
-    $scope.opts = {
-
-        singleDatePicker: true,
-        showDropdowns: true,
-        drops: 'down',
-        opens: 'left',
-        ranges: {
-            'Today': [moment(), moment()],
-            'Yesterday': [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
-            'Last 7 days': [moment().subtract(7, 'days'), moment()],
-            'Last 30 days': [moment().subtract(30, 'days'), moment()],
-            'This month': [moment().startOf('month'), moment().endOf('month')]
-        }
-    };
 
     //Watch for date changes
     $scope.$watch('date', function(newDate) {
