@@ -167,7 +167,7 @@ function DatePickerCtrl($scope, $cookies, $http, $location, $filter) {
         } else {
             $scope.registerdate = thisdate.year() + "-" + month + "-" + thisdate.date();
         }
-
+        console.log("register date = "+$scope.registerdate);
         $scope.opts = {
 
             singleDatePicker: true,

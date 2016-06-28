@@ -10,12 +10,10 @@
     var passport = require('passport');
     var OAuth = require('oauth');
     var FitbitStrategy = require('passport-fitbit-oauth2').FitbitOAuth2Strategy;
-    var mysql = require("mysql");
     var path = require('path');
     var favicon = require('serve-favicon');
     var logger = require('morgan');
     var request = require("request");
-    var models1 = require('../models');
     var moment = require('moment');
     moment().format();
     var sequelize = require('sequelize');
@@ -33,20 +31,21 @@
     var localAuthController = require('../controllers/local-auth');
     var FitbitAuthController = require('../controllers/fitbit-auth');
     var twitterAuthController = require('../controllers/twitter-auth');
+    var dbFunctions = require('../controllers/util.js');
+    var upload = require('../controllers/upload');
 
 
     module.exports = function(app) {
         var models = app.get('models');
+
         var id = null;
+
         app.get('/api/registerdate/:id', function(req, res) {
             var userid = req.params.id;
-            models.User.find({
-                where: {
-                    id: userid
-                }
-            }).then(function(user) {
-                res.json(user.createdAt)
+            dbFunctions.findUserById(userid).then(function(user){
+              res.json(user.createdAt);
             });
+
         });
 
 
@@ -61,20 +60,15 @@
 
         });
 
-        var upload = require('../controllers/upload');
+
         app.route('/fileupload')
             .post(upload.file);
 
         app.get('/api/getUserById/:userid', function(req, res) {
 
             var userid = req.params.userid;
-            models.User.find({
-                where: {
-                    id: userid
-                }
-            }).then(function(user) {
-
-                res.json(user)
+            dbFunctions.findUserById(userid).then(function(user){
+              res.json(user);
             });
         });
 
@@ -340,6 +334,7 @@
             });
 
         app.get('/auth/twitter', passport.authenticate('twitter'));
+
         app.get('/auth/twitter/callback', passport.authenticate('twitter', {
             failureRedirect: '/api/logout'
         }), function(req, res) {
