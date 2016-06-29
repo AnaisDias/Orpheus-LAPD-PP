@@ -69,6 +69,8 @@ function ModalInstanceCtrl($scope, $uibModalInstance, items) {
 
     $scope.ok = function() {
         $uibModalInstance.close($scope.selected.item);
+        
+
     };
             var id = null;
     $scope.cancel = function() {

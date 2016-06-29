@@ -42,8 +42,8 @@
 
         app.get('/api/registerdate/:id', function(req, res) {
             var userid = req.params.id;
-            dbFunctions.findUserById(userid).then(function(user){
-              res.json(user.createdAt);
+            dbFunctions.findUserById(userid).then(function(user) {
+                res.json(user.createdAt);
             });
 
         });
@@ -51,12 +51,12 @@
 
         app.get('/api/username', function(req, res) {
             var json_data = null;
-            if(req.user.profile == undefined){
+            if (req.user.profile == undefined) {
                 json_data = {
                     username: req.user.username,
                     avatar: "http://www.fitbit.com/images/profile/defaultProfile_100_male.gif"
                 }
-            }//fazer verificação de paciente ou cliente)
+            } //fazer verificação de paciente ou cliente)
             else {
                 json_data = {
                     username: req.user.profile.displayName,
@@ -75,9 +75,20 @@
         app.get('/api/getUserById/:userid', function(req, res) {
 
             var userid = req.params.userid;
-            dbFunctions.findUserById(userid).then(function(user){
-              res.json(user);
+            dbFunctions.findUserById(userid).then(function(user) {
+                res.json(user);
             });
+        });
+
+        app.post('/api/insertMood', function(req, res) {
+            mood = req.body.mood;
+            userid = req.body.userid;
+            thisdate = req.body.date;
+
+            dbFunctions.insertMood(userid, mood, thisdate).then(function(moodDay) {
+                res.json(moodDay);
+            });
+
         });
 
         app.get('/api/fitbit/activity/:date/:id', function(req, res) {
@@ -465,20 +476,19 @@
 
         });
 
-        app.get('/api/checkLogin', function (req, res){
+        app.get('/api/checkLogin', function(req, res) {
 
             console.log(req);
-            if(req.isAuthenticated()){
+            if (req.isAuthenticated()) {
                 models.User.find({
-                    where :{
-                        auth_id : req.user.profile.id
+                    where: {
+                        auth_id: req.user.profile.id
                     }
-                }).then(function (user){
+                }).then(function(user) {
                     id = user.id;
                 });
                 res.send(id);
-            }
-            else{
+            } else {
                 res.send('undefined');
             }
         });
