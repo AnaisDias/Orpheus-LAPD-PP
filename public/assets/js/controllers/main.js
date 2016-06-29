@@ -18,7 +18,8 @@ angular
     .controller('cardChartCtrl4', cardChartCtrl4)
     .controller('twitterCtrl', twitterCtrl)
     .controller('situmanCtrl', situmanCtrl)
-    .controller('therapistCtrl',therapistCtrl)
+    .controller('therapistCtrl', therapistCtrl)
+    .controller('ModalInstanceCtrl', ModalInstanceCtrl)
     .filter('secondsToDateTime', [function() {
         return function(seconds) {
             return new Date(1970, 0, 1).setMilliseconds(seconds);
@@ -26,47 +27,64 @@ angular
     }])
 
 
-    therapistCtrl.inject=['$scope','$http','$location'];
+therapistCtrl.inject = ['$scope', '$http', '$location'];
 
-    function therapistCtrl($scope,$http,$location){
-      $http.get('/api/patient/list/' + $location.search().id).success(function(data) {
+function therapistCtrl($scope, $http, $location) {
+    $http.get('/api/patient/list/' + $location.search().id).success(function(data) {
         console.log(data);
-        $scope.patients=data.usersArr;
+        $scope.patients = data.usersArr;
         console.log($scope.patients[0].fullname);
-      }).error(function(data) {
-          console.log("erro ao ir buscar pacientes");
-      });
-    }
+    }).error(function(data) {
+        console.log("erro ao ir buscar pacientes");
+    });
+}
 
-    twitterCtrl.$inject = ['$scope', '$http','$location','$cookies','$filter'];
+ModalInstanceCtrl.inject = ['$scope', '$uibModalInstance', 'items'];
 
-    function twitterCtrl($scope, $http,$location,$cookies,$filter) {
+function ModalInstanceCtrl($scope, $uibModalInstance, items) {
+    $scope.items = items;
+    $scope.selected = {
+        item: $scope.items[0]
+    };
 
-        $scope.$watch(function() {
-            return $cookies.selDate;
-        }, function(newVal, oldVal) {
-            if (typeof(newVal) == 'undefined') {
-                newVal = moment()._d;
-            }
+    $scope.ok = function() {
+        $uibModalInstance.close($scope.selected.item);
+    };
 
-            unparsedDate = newVal;
-            parsedDate = $filter('date')(new Date(unparsedDate), 'yyyy-MM-dd');
+    $scope.cancel = function() {
+        $uibModalInstance.dismiss('cancel');
+    };
+}
 
-            console.log("user id: "+$location.search().id);
-            console.log("parsed date: " + parsedDate);
+twitterCtrl.$inject = ['$scope', '$http', '$location', '$cookies', '$filter'];
 
-            $http.get('/api/sentimentalanalysis/' + $location.search().id + "/"+parsedDate).success(function(data) {
-              console.log(data);
-              $scope.positive=data.positive;
-              $scope.negative=data.negative;
-            }).error(function(data) {
-                console.log("erro ao ir buscar moods");
-            });
+function twitterCtrl($scope, $http, $location, $cookies, $filter) {
+
+    $scope.$watch(function() {
+        return $cookies.selDate;
+    }, function(newVal, oldVal) {
+        if (typeof(newVal) == 'undefined') {
+            newVal = moment()._d;
+        }
+
+        unparsedDate = newVal;
+        parsedDate = $filter('date')(new Date(unparsedDate), 'yyyy-MM-dd');
+
+        console.log("user id: " + $location.search().id);
+        console.log("parsed date: " + parsedDate);
+
+        $http.get('/api/sentimentalanalysis/' + $location.search().id + "/" + parsedDate).success(function(data) {
+            console.log(data);
+            $scope.positive = data.positive;
+            $scope.negative = data.negative;
+        }).error(function(data) {
+            console.log("erro ao ir buscar moods");
+        });
 
 
-        }, true);
+    }, true);
 
-    }
+}
 navbarCtrl.$inject = ['$scope', '$http', '$window'];
 
 function navbarCtrl($scope, $http, $window) {
@@ -155,9 +173,9 @@ function moodDemoCtrl($scope) {
     }
 }
 
-DatePickerCtrl.$inject = ['$scope', '$cookies', '$http', '$location', '$filter'];
+DatePickerCtrl.$inject = ['$scope', '$cookies', '$http', '$location', '$filter', '$uibModal'];
 
-function DatePickerCtrl($scope, $cookies, $http, $location, $filter) {
+function DatePickerCtrl($scope, $cookies, $http, $location, $filter, $uibModal) {
 
     $http.get('/api/registerdate/' + $location.search().id).success(function(data) {
         var thisdate = moment(data);
@@ -167,14 +185,14 @@ function DatePickerCtrl($scope, $cookies, $http, $location, $filter) {
         } else {
             $scope.registerdate = thisdate.year() + "-" + month + "-" + thisdate.date();
         }
-        console.log("register date = "+$scope.registerdate);
+        console.log("register date = " + $scope.registerdate);
         $scope.opts = {
 
             singleDatePicker: true,
             showDropdowns: true,
             drops: 'down',
             opens: 'left',
-            minDate:   $scope.registerdate
+            minDate: $scope.registerdate
 
         };
 
@@ -203,6 +221,53 @@ function DatePickerCtrl($scope, $cookies, $http, $location, $filter) {
     function gd(year, month, day) {
         return new Date(year, month - 1, day).getTime();
     }
+
+    $scope.items = [{
+        mood : 'Awesome',
+        icon : 'moodawesome.svg'
+    }, {
+        mood : 'Good',
+        icon : 'moodgood.svg'
+    }, {
+        mood : 'Meh',
+        icon : 'moodmeh.svg'
+    }, {
+        mood : 'Fugly',
+        icon : 'moodfugly.svg'
+    }, {
+        mood : 'Awful',
+        icon : 'moodawful.svg'
+    }];
+
+  
+    $scope.animationsEnabled = true;
+
+    $scope.open = function(size) {
+
+        var modalInstance = $uibModal.open({
+            animation: $scope.animationsEnabled,
+            templateUrl: 'myModalContent.html',
+            controller: 'ModalInstanceCtrl',
+            size: size,
+            resolve: {
+                items: function() {
+                    return $scope.items;
+                }
+            }
+        });
+
+        modalInstance.result.then(function(selectedItem) {
+            $scope.selected = selectedItem;
+        }, function() {
+            $log.info('Modal dismissed at: ' + new Date());
+        });
+    };
+
+    $scope.toggleAnimation = function() {
+        $scope.animationsEnabled = !$scope.animationsEnabled;
+    };
+
+
 }
 
 socialBoxCtrl.$inject = ['$scope'];
@@ -413,9 +478,9 @@ function activityCtrl($scope, $cookies, $window, $http, $filter, $location) {
 
 }
 //change to take situations from database,
-situmanCtrl.$inject = ['$scope', '$cookies', '$window', '$http', '$filter','$location'];
+situmanCtrl.$inject = ['$scope', '$cookies', '$window', '$http', '$filter', '$location'];
 
-function situmanCtrl($scope, $cookies, $window, $http, $filter,$location) {
+function situmanCtrl($scope, $cookies, $window, $http, $filter, $location) {
 
 
 
@@ -431,14 +496,14 @@ function situmanCtrl($scope, $cookies, $window, $http, $filter,$location) {
         var size = 0;
         $scope.situations = [];
         parsedDate = $filter('date')(new Date(unparsedDate), 'dd-MM-yyyy');
-        $http.get('/api/situationData/' + parsedDate+"/"+$location.search().id).success(function(data) {
+        $http.get('/api/situationData/' + parsedDate + "/" + $location.search().id).success(function(data) {
             console.debug(data);
             //jsonD = JSON.parse(JSONdata);
-            for(var i in data){
+            for (var i in data) {
                 $scope.situations[size] = [];
                 $scope.situations[size].name = i;
                 $scope.situations[size].count = data[i];
-                size +=1;
+                size += 1;
             }
             console.log("situations:" + $scope.situations[0].name);
             //$scope.situations = jsonD.situations;

@@ -2,26 +2,53 @@
     <h1> </h1>
 </div>
 
+
+
 <div class="row">
     <div class="col-md-12">
         <div class="card card-inverse ">
             <div class="card-block">
-                <div class="row">
+                <div class="row " ng-controller="DatePickerCtrl">
 
                     <div class="col-sm-6">
 
                         <div class="col-sm-6 col-sm-offset-9">
 
-                            <fieldset class="form-group " ng-controller="DatePickerCtrl">
+                            <fieldset class="form-group " >
 
                                 <div class="input-group input-group-sm ">
                                     <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
-                                    <input date-range-picker  class="form-control date-picker" type="text" ng-model="date" options="opts" value="{{selDate}}"  />
+                                    <input date-range-picker class="form-control date-picker" type="text" ng-model="date" options="opts" value="{{selDate}}" />
                                 </div>
+
+                                <script type="text/ng-template" id="myModalContent.html">
+                                    <div class="modal-header">
+                                        <h3 class="modal-title">How did you feel today?</h3>
+                                    </div>
+                                    <div class="modal-body">
+                                        <ul>
+                                            <li ng-repeat="item in items">
+                                                <a href="#" ng-click="$event.preventDefault(); selected.item = item"><img src="assets/img/{{item.icon}}" class="img-mood"></a>
+                                            </li>
+                                        </ul>
+                                        Selected: <b>{{ selected.item.mood }}</b>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button class="btn btn-primary" type="button" ng-click="ok()">OK</button>
+                                        <button class="btn btn-warning" type="button" ng-click="cancel()">Cancel</button>
+                                    </div>
+                                </script>
+
+
+
+                                <div ng-show="selected">Selection from a modal: {{ selected }}</div>
                             </fieldset>
+                            <button type="button" class="btn btn-default" ng-click="open('lg')">Large modal</button>
                         </div>
                     </div>
+
                 </div>
+
             </div>
         </div>
     </div>
@@ -68,7 +95,7 @@
     </div>
 
     <!--/.col-->
-    <div class="col-sm-6 col-lg-3" >
+    <div class="col-sm-6 col-lg-3">
         <div class="social-box twitter" ng-controller="twitterCtrl">
             <i class="fa fa-twitter"></i>
             <div class="chart-wrapper">
@@ -147,25 +174,25 @@
                     </div>
                     <!--/.col-->
 
-                    <div class="col-sm-6 col-md-4"  ng-show="!activities.length">
+                    <div class="col-sm-6 col-md-4" ng-show="!activities.length">
                         <div class="card card-inverse card-danger text-xs-center">
                             <div class="card-block">
                                 <blockquote class="card-blockquote">
                                     <p>No physical activities today yet.</p>
                                     <footer>Physical activity may help with endorphines release and self-esteem improvement!
-                                      <p>
-                                        <cite >Try going for a run</cite>
-                                      </p>
+                                        <p>
+                                            <cite>Try going for a run</cite>
+                                        </p>
                                     </footer>
                                 </blockquote>
                             </div>
                         </div>
                     </div>
                     <!--/col-->
-                    <div class="col-sm-6 col-lg-6" >
+                    <div class="col-sm-6 col-lg-6">
 
 
-                        <ul class="horizontal-bars type-2" >
+                        <ul class="horizontal-bars type-2">
 
                             <li class="divider"></li>
                             <li ng-repeat="row in source">
@@ -173,7 +200,7 @@
                                 <span class="title">{{ row.title }}</span>
                                 <span class="value">{{ row.value | number }}
                                       <span class="text-muted small" ng-show="!row.greaterthan">({{ row.percent | number : 2 }}%)</span>
-                                      <span class="text-muted small" ng-show="row.greaterthan">({{ 1 | number : 2 }}%)</span>
+                                <span class="text-muted small" ng-show="row.greaterthan">({{ 1 | number : 2 }}%)</span>
                                 <!-- percentage steps/stepsgoal -->
                                 </span>
                                 <div class="bars">
@@ -229,7 +256,11 @@
                                     <tr ng-repeat="situation in situations">
                                         <td>{{ situation.name }}</td>
                                         <td>{{ situation.count }}</td>
-                                        <td><button type="button" class="btn btn-primary">Good</button><button type="button" class="btn btn-warning">Neutral</button><button type="button" class="btn btn-danger">Bad</button></td>
+                                        <td>
+                                            <button type="button" class="btn btn-primary">Good</button>
+                                            <button type="button" class="btn btn-warning">Neutral</button>
+                                            <button type="button" class="btn btn-danger">Bad</button>
+                                        </td>
                                     </tr>
 
                                 </tbody>
@@ -240,7 +271,7 @@
                     </div>
                     <!--/.col-->
 
-                    <div class="col-sm-6 col-md-4"  ng-show="!situations.length">
+                    <div class="col-sm-6 col-md-4" ng-show="!situations.length">
                         <div class="card card-inverse card-danger text-xs-center">
                             <div class="card-block">
                                 <form method="post" enctype="multipart/form-data" action="/fileupload">
