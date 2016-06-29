@@ -9,8 +9,9 @@
                     <div class="card-block">
                         <h1>Login</h1>
                         <p class="text-muted">Sign In to your account</p>
-                        <p class="text-muted">{{ statusMsg }}</p>
                         <form id="loginForm" ng-submit="submit()" ng-controller="loginCtrl">
+
+                            <p class="text-muted">{{statusMsg}}</p>
                             <div class="input-group m-b-1">
                                 <span class="input-group-addon"><i class="icon-user"></i></span>
                                 <input type="text" class="form-control" ng-model="user" placeholder="Username">

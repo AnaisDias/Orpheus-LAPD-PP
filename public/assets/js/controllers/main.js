@@ -27,17 +27,37 @@ angular
     }])
 
 
-therapistCtrl.inject = ['$scope', '$http', '$location'];
-
-function therapistCtrl($scope, $http, $location) {
-    $http.get('/api/patient/list/' + $location.search().id).success(function(data) {
-        console.log(data);
-        $scope.patients = data.usersArr;
-        console.log($scope.patients[0].fullname);
-    }).error(function(data) {
-        console.log("erro ao ir buscar pacientes");
-    });
-}
+    therapistCtrl.inject=['$scope','$http','$location', '$window'];
+    function therapistCtrl($scope,$http,$location, $window){
+        if ($location.search().id != undefined) {
+            $http.get('/api/patient/list/' + $location.search().id).success(function (data) {
+                console.log(data);
+                $scope.patients = data.usersArr;
+            }).error(function (data) {
+                console.log("erro ao ir buscar pacientes");
+            });
+        }
+        else {
+            var id = null;
+            $http.get('api/checkLogin').success(function (data){
+                id = data.id;
+                if(data.type == 1){
+                    $http.get('/api/patient/list/' + id).success(function (data) {
+                        console.log(data);
+                        $scope.patients = data.usersArr;
+                        console.log($scope.patients[0].fullname);
+                    }).error(function (data) {
+                        console.log("erro ao ir buscar pacientes");
+                    });
+                }
+                else{
+                    $window.location.href = '/#/user?id=' + id;
+                }
+            }).error(function (data) {
+                console.log("erro ao ir buscar pacientes");
+            });
+        }
+    }
 
 ModalInstanceCtrl.inject = ['$scope', '$uibModalInstance', 'items'];
 
@@ -50,16 +70,14 @@ function ModalInstanceCtrl($scope, $uibModalInstance, items) {
     $scope.ok = function() {
         $uibModalInstance.close($scope.selected.item);
     };
-
+            var id = null;
     $scope.cancel = function() {
         $uibModalInstance.dismiss('cancel');
     };
 }
 
 twitterCtrl.$inject = ['$scope', '$http', '$location', '$cookies', '$filter'];
-
 function twitterCtrl($scope, $http, $location, $cookies, $filter) {
-
     $scope.$watch(function() {
         return $cookies.selDate;
     }, function(newVal, oldVal) {
@@ -69,18 +87,28 @@ function twitterCtrl($scope, $http, $location, $cookies, $filter) {
 
         unparsedDate = newVal;
         parsedDate = $filter('date')(new Date(unparsedDate), 'yyyy-MM-dd');
-
-        console.log("user id: " + $location.search().id);
+        if($location.search().id == undefined){
+            $http.get('api/checkLogin').success(function (data){
+                id = data.id;
+            }).error(function (data) {
+                console.log("erro ao ir buscar id");
+            });
+        }
+        else {
+            id = $location.search().id;
+        }
+        console.log("user id: " + id);
         console.log("parsed date: " + parsedDate);
 
-        $http.get('/api/sentimentalanalysis/' + $location.search().id + "/" + parsedDate).success(function(data) {
-            console.log(data);
-            $scope.positive = data.positive;
-            $scope.negative = data.negative;
-        }).error(function(data) {
-            console.log("erro ao ir buscar moods");
-        });
-
+        if(id != null) {
+            $http.get('/api/sentimentalanalysis/' + id + "/" + parsedDate).success(function (data) {
+                console.log(data);
+                $scope.positive = data.positive;
+                $scope.negative = data.negative;
+            }).error(function (data) {
+                console.log("erro ao ir buscar moods");
+            });
+        }
 
     }, true);
 

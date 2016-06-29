@@ -50,11 +50,19 @@
 
 
         app.get('/api/username', function(req, res) {
-
-            var json_data = {
-                username: req.user.profile.displayName,
-                avatar: req.user.profile._json.user.avatar
-            };
+            var json_data = null;
+            if(req.user.profile == undefined){
+                json_data = {
+                    username: req.user.username,
+                    avatar: "http://www.fitbit.com/images/profile/defaultProfile_100_male.gif"
+                }
+            }//fazer verificação de paciente ou cliente)
+            else {
+                json_data = {
+                    username: req.user.profile.displayName,
+                    avatar: req.user.profile._json.user.avatar
+                };
+            }
             res.json(json_data);
             //console.log(JSON.stringify(req.user));
 
@@ -365,18 +373,23 @@
                 var error = err || info;
                 if (error) {
                     console.log("Error");
-                    return res.status(401).json(error);
+                    var json_data = {
+                        success: false
+                    };
+                    return res.send(json_data);
                 }
 
                 req.logIn(user, function(err) {
                     console.log(err);
                     console.log("Success");
+                    console.log(req.user);
                     if (err) return res.send(err);
                     var json_data = {
                         success: true,
                         fullname: req.user.fullname,
                         username: req.user.username,
-                        id: req.user.id
+                        id: req.user.id,
+                        type: req.user.type
                     };
                     id = req.user.id;
                     console.log("\n\n\n\nREQ LOCAL: \n" + id);
@@ -452,6 +465,23 @@
 
         });
 
+        app.get('/api/checkLogin', function (req, res){
+
+            console.log(req);
+            if(req.isAuthenticated()){
+                models.User.find({
+                    where :{
+                        auth_id : req.user.profile.id
+                    }
+                }).then(function (user){
+                    id = user.id;
+                });
+                res.send(id);
+            }
+            else{
+                res.send('undefined');
+            }
+        });
 
         var util = require('util');
         app.get('/api/situationData/:date/:id', function(req, res) {

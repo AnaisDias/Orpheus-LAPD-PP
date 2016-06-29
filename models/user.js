@@ -5,7 +5,7 @@ module.exports = function(sequelize, DataTypes) {
     username: DataTypes.STRING,
     email: DataTypes.STRING,
     password: DataTypes.STRING,
-    type: DataTypes.INTEGER,
+    type: DataTypes.INTEGER, // 1 is therapist, 0 is normal user
     therapist: DataTypes.INTEGER,
     avatar: DataTypes.STRING,
     displayName: DataTypes.STRING,
