@@ -20,6 +20,7 @@ module.exports = function(sequelize, DataTypes) {
       associate: function(models) {
         User.hasMany(models.Activity, {as: 'Activities'});
         User.hasMany(models.Sleep, {as: 'SleepLogs'})
+        User.hasMany(models.MoodDay, {as: 'Moods'})
       }
     }
   });

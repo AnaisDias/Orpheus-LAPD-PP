@@ -223,23 +223,25 @@ function DatePickerCtrl($scope, $cookies, $http, $location, $filter, $uibModal) 
     }
 
     $scope.items = [{
-        mood : 'Awesome',
-        icon : 'moodawesome.svg'
+        mood: 'Awful',
+        icon: 'moodawful.svg'
     }, {
-        mood : 'Good',
-        icon : 'moodgood.svg'
+        mood: 'Fugly',
+        icon: 'moodfugly.svg'
     }, {
-        mood : 'Meh',
-        icon : 'moodmeh.svg'
+        mood: 'Meh',
+        icon: 'moodmeh.svg'
     }, {
-        mood : 'Fugly',
-        icon : 'moodfugly.svg'
+        mood: 'Good',
+        icon: 'moodgood.svg'
     }, {
-        mood : 'Awful',
-        icon : 'moodawful.svg'
+        mood: 'Awesome',
+        icon: 'moodawesome.svg'
     }];
 
-  
+
+
+
     $scope.animationsEnabled = true;
 
     $scope.open = function(size) {

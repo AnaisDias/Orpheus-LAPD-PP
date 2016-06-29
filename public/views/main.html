@@ -14,7 +14,7 @@
 
                         <div class="col-sm-6 col-sm-offset-9">
 
-                            <fieldset class="form-group " >
+                            <fieldset class="form-group ">
 
                                 <div class="input-group input-group-sm ">
                                     <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
@@ -22,21 +22,23 @@
                                 </div>
 
                                 <script type="text/ng-template" id="myModalContent.html">
-                                    <div class="modal-header">
-                                        <h3 class="modal-title">How did you feel today?</h3>
-                                    </div>
-                                    <div class="modal-body">
-                                        <ul>
-                                            <li ng-repeat="item in items">
-                                                <a href="#" ng-click="$event.preventDefault(); selected.item = item"><img src="assets/img/{{item.icon}}" class="img-mood"></a>
-                                            </li>
-                                        </ul>
-                                        Selected: <b>{{ selected.item.mood }}</b>
-                                    </div>
-                                    <div class="modal-footer">
-                                        <button class="btn btn-primary" type="button" ng-click="ok()">OK</button>
-                                        <button class="btn btn-warning" type="button" ng-click="cancel()">Cancel</button>
-                                    </div>
+
+
+                                        <div class="modal-content">
+                                            <div class="modal-header modal-header-info ">
+                                              <button type="button" class="close" data-dismiss="modal" aria-hidden="true" ng-click="cancel()">×</button>
+                                                <h3 class=""> How did you feel today? <h3>
+                                            </div>
+                                        <div class="modal-body">
+                                          <ul>
+                                              <li ng-repeat="item in items">
+                                                  <a href="#" ng-click="$event.preventDefault(); selected.item = item; ok();"><img src="assets/img/{{item.icon}}" class="img-mood"></a>
+                                              </li>
+                                          </ul>
+                                        </div>
+                                  </div>
+
+
                                 </script>
 
 
@@ -129,161 +131,161 @@
                 <div class="row">
                     <div class="col-sm-6">
                         <h3 class="card-title clearfix m-b-0">Fitbit activity</h3>
-                    </div>
+                                            </div>
 
-                </div>
-                <br/>
-
-
-
-                <div class="row">
-                    <div class="col-sm-12 col-lg-6" ng-show="activities.length">
+                                        </div>
+                                        <br/>
 
 
 
-                        <div class="card-block">
-                            <table class="table table-striped">
-                                <thead>
-                                    <tr>
-                                        <th>Name</th>
-                                        <th>Description</th>
-                                        <th>Distance (km)</th>
-                                        <th>Duration</th>
-                                        <th>Start</th>
-                                        <th>Calories</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-
-                                    <tr ng-repeat="activity in activities">
-                                        <td>{{ activity.name }}</td>
-                                        <td>{{ activity.description }}</td>
-                                        <td>{{ activity.distance }}</td>
-                                        <td>
-                                            <span class="label label-success">{{ activity.duration | secondsToDateTime | date:'HH:mm:ss' }}</span>
-                                        </td>
-                                        <td> {{ activity.startTime}} </td>
-                                        <td> - {{ activity.calories}} </td>
-                                    </tr>
-
-                                </tbody>
-                            </table>
-
-                        </div>
-
-                    </div>
-                    <!--/.col-->
-
-                    <div class="col-sm-6 col-md-4" ng-show="!activities.length">
-                        <div class="card card-inverse card-danger text-xs-center">
-                            <div class="card-block">
-                                <blockquote class="card-blockquote">
-                                    <p>No physical activities today yet.</p>
-                                    <footer>Physical activity may help with endorphines release and self-esteem improvement!
-                                        <p>
-                                            <cite>Try going for a run</cite>
-                                        </p>
-                                    </footer>
-                                </blockquote>
-                            </div>
-                        </div>
-                    </div>
-                    <!--/col-->
-                    <div class="col-sm-6 col-lg-6">
+                                        <div class="row">
+                                            <div class="col-sm-12 col-lg-6" ng-show="activities.length">
 
 
-                        <ul class="horizontal-bars type-2">
 
-                            <li class="divider"></li>
-                            <li ng-repeat="row in source">
-                                <i ng-show="{{ row.percent >100}}" ng-class="row.icon"></i>
-                                <span class="title">{{ row.title }}</span>
-                                <span class="value">{{ row.value | number }}
+                                                <div class="card-block">
+                                                    <table class="table table-striped">
+                                                        <thead>
+                                                            <tr>
+                                                                <th>Name</th>
+                                                                <th>Description</th>
+                                                                <th>Distance (km)</th>
+                                                                <th>Duration</th>
+                                                                <th>Start</th>
+                                                                <th>Calories</th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody>
+
+                                                            <tr ng-repeat="activity in activities">
+                                                                <td>{{ activity.name }}</td>
+                                                                <td>{{ activity.description }}</td>
+                                                                <td>{{ activity.distance }}</td>
+                                                                <td>
+                                                                    <span class="label label-success">{{ activity.duration | secondsToDateTime | date:'HH:mm:ss' }}</span>
+                                                                </td>
+                                                                <td> {{ activity.startTime}} </td>
+                                                                <td> - {{ activity.calories}} </td>
+                                                            </tr>
+
+                                                        </tbody>
+                                                    </table>
+
+                                                </div>
+
+                                            </div>
+                                            <!--/.col-->
+
+                                            <div class="col-sm-6 col-md-4" ng-show="!activities.length">
+                                                <div class="card card-inverse card-danger text-xs-center">
+                                                    <div class="card-block">
+                                                        <blockquote class="card-blockquote">
+                                                            <p>No physical activities today yet.</p>
+                                                            <footer>Physical activity may help with endorphines release and self-esteem improvement!
+                                                                <p>
+                                                                    <cite>Try going for a run</cite>
+                                                                </p>
+                                                            </footer>
+                                                        </blockquote>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <!--/col-->
+                                            <div class="col-sm-6 col-lg-6">
+
+
+                                                <ul class="horizontal-bars type-2">
+
+                                                    <li class="divider"></li>
+                                                    <li ng-repeat="row in source">
+                                                        <i ng-show="{{ row.percent >100}}" ng-class="row.icon"></i>
+                                                        <span class="title">{{ row.title }}</span>
+                                                        <span class="value">{{ row.value | number }}
                                       <span class="text-muted small" ng-show="!row.greaterthan">({{ row.percent | number : 2 }}%)</span>
-                                <span class="text-muted small" ng-show="row.greaterthan">({{ 1 | number : 2 }}%)</span>
-                                <!-- percentage steps/stepsgoal -->
-                                </span>
-                                <div class="bars">
-                                    <progress class="progress progress-xs progress-success m-a-0" value="{{ row.percent }}" max="100">{{ row.percent }}%</progress>
-                                </div>
-                            </li>
+                                                        <span class="text-muted small" ng-show="row.greaterthan">({{ 1 | number : 2 }}%)</span>
+                                                        <!-- percentage steps/stepsgoal -->
+                                                        </span>
+                                                        <div class="bars">
+                                                            <progress class="progress progress-xs progress-success m-a-0" value="{{ row.percent }}" max="100">{{ row.percent }}%</progress>
+                                                        </div>
+                                                    </li>
 
-                        </ul>
+                                                </ul>
+                                            </div>
+                                            <!--/.col-->
+
+                                            <!--/.col-->
+                                        </div>
+                                        <!--/.row-->
+                                        <br/>
+                                    </div>
+                        </div>
                     </div>
-                    <!--/.col-->
-
                     <!--/.col-->
                 </div>
                 <!--/.row-->
-                <br/>
-            </div>
-        </div>
-    </div>
-    <!--/.col-->
-</div>
-<!--/.row-->
 
-<div class="row" ng-controller="situmanCtrl">
-    <div class="col-md-12">
-        <div class="card">
-            <div class="card-block">
-                <div class="row">
-                    <div class="col-sm-6">
-                        <h3 class="card-title clearfix m-b-0">Situman activity</h3>
-                    </div>
-
-                </div>
-                <br/>
-
-
-
-                <div class="row">
-                    <div class="col-sm-12 col-lg-8" ng-show="situations.length">
-
-
-
-                        <div class="card-block">
-                            <table class="table table-striped">
-                                <thead>
-                                    <tr>
-                                        <th>Situation</th>
-                                        <th>Percentage of time</th>
-                                        <th>Mood</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-
-                                    <tr ng-repeat="situation in situations">
-                                        <td>{{ situation.name }}</td>
-                                        <td>{{ situation.count }}</td>
-                                        <td>
-                                            <button type="button" class="btn btn-primary">Good</button>
-                                            <button type="button" class="btn btn-warning">Neutral</button>
-                                            <button type="button" class="btn btn-danger">Bad</button>
-                                        </td>
-                                    </tr>
-
-                                </tbody>
-                            </table>
-
-                        </div>
-
-                    </div>
-                    <!--/.col-->
-
-                    <div class="col-sm-6 col-md-4" ng-show="!situations.length">
-                        <div class="card card-inverse card-danger text-xs-center">
+                <div class="row" ng-controller="situmanCtrl">
+                    <div class="col-md-12">
+                        <div class="card">
                             <div class="card-block">
-                                <form method="post" enctype="multipart/form-data" action="/fileupload">
-                                    <fieldset class="form-group">
-                                        <label for="file">You have no situation data for this day</label>
-                                        <input type="file" class="form-control-file" id="file" name="file">
-                                        <small class="text-muted">Please select a Situman summary file</small>
+                                <div class="row">
+                                    <div class="col-sm-6">
+                                        <h3 class="card-title clearfix m-b-0">Situman activity</h3>
+                                    </div>
 
-                                    </fieldset>
-                                    <button type="submit" class="btn btn-primary">Submit</button>
-                                </form>
-                                <!-- <blockquote class="card-blockquote">
+                                </div>
+                                <br/>
+
+
+
+                                <div class="row">
+                                    <div class="col-sm-12 col-lg-8" ng-show="situations.length">
+
+
+
+                                        <div class="card-block">
+                                            <table class="table table-striped">
+                                                <thead>
+                                                    <tr>
+                                                        <th>Situation</th>
+                                                        <th>Percentage of time</th>
+                                                        <th>Mood</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+
+                                                    <tr ng-repeat="situation in situations">
+                                                        <td>{{ situation.name }}</td>
+                                                        <td>{{ situation.count }}</td>
+                                                        <td>
+                                                            <button type="button" class="btn btn-primary">Good</button>
+                                                            <button type="button" class="btn btn-warning">Neutral</button>
+                                                            <button type="button" class="btn btn-danger">Bad</button>
+                                                        </td>
+                                                    </tr>
+
+                                                </tbody>
+                                            </table>
+
+                                        </div>
+
+                                    </div>
+                                    <!--/.col-->
+
+                                    <div class="col-sm-6 col-md-4" ng-show="!situations.length">
+                                        <div class="card card-inverse card-danger text-xs-center">
+                                            <div class="card-block">
+                                                <form method="post" enctype="multipart/form-data" action="/fileupload">
+                                                    <fieldset class="form-group">
+                                                        <label for="file">You have no situation data for this day</label>
+                                                        <input type="file" class="form-control-file" id="file" name="file">
+                                                        <small class="text-muted">Please select a Situman summary file</small>
+
+                                                    </fieldset>
+                                                    <button type="submit" class="btn btn-primary">Submit</button>
+                                                </form>
+                                                <!-- <blockquote class="card-blockquote">
                                     <p>No physical activities today yet.</p>
                                     <footer>Physical activity may help with endorphines release and self-esteem improvement!
                                       <p>
@@ -291,51 +293,51 @@
                                       </p>
                                     </footer>
                                 </blockquote> -->
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!--/.col-->
+                                </div>
+                                <!--/.row-->
+                                <br/>
                             </div>
                         </div>
                     </div>
-
                     <!--/.col-->
                 </div>
                 <!--/.row-->
-                <br/>
-            </div>
-        </div>
-    </div>
-    <!--/.col-->
-</div>
-<!--/.row-->
 
-<!--/row-->
-<div class="card" ng-controller="moodDemoCtrl">
-    <div class="card-block">
-        <div class="row">
-            <div class="col-sm-6">
-                <h4 class="card-title m-b-0">Patient mood progress</h4>
-                <div class="small text-muted">April 2016</div>
-            </div>
-            <div class="col-sm-6">
-                <div class="btn-toolbar pull-right" role="toolbar" aria-label="Toolbar with button groups">
-                    <div class="btn-group" data-toggle="buttons" aria-label="First group">
-                        <label class="btn btn-sm btn-secondary-outline">
-                            <input type="radio" name="options" id="option1"> Day
-                        </label>
-                        <label class="btn btn-sm btn-secondary-outline active">
-                            <input type="radio" name="options" id="option2" checked> Month
-                        </label>
-                        <label class="btn btn-sm btn-secondary-outline">
-                            <input type="radio" name="options" id="option3"> Year
-                        </label>
-                    </div>
-                    <div class="btn-group" role="group" aria-label="Second group">
-                        <button type="button" class="btn btn-sm btn-primary"><i class="icon-cloud-download"></i></button>
+                <!--/row-->
+                <div class="card" ng-controller="moodDemoCtrl">
+                    <div class="card-block">
+                        <div class="row">
+                            <div class="col-sm-6">
+                                <h4 class="card-title m-b-0">Patient mood progress</h4>
+                                <div class="small text-muted">April 2016</div>
+                            </div>
+                            <div class="col-sm-6">
+                                <div class="btn-toolbar pull-right" role="toolbar" aria-label="Toolbar with button groups">
+                                    <div class="btn-group" data-toggle="buttons" aria-label="First group">
+                                        <label class="btn btn-sm btn-secondary-outline">
+                                            <input type="radio" name="options" id="option1"> Day
+                                        </label>
+                                        <label class="btn btn-sm btn-secondary-outline active">
+                                            <input type="radio" name="options" id="option2" checked> Month
+                                        </label>
+                                        <label class="btn btn-sm btn-secondary-outline">
+                                            <input type="radio" name="options" id="option3"> Year
+                                        </label>
+                                    </div>
+                                    <div class="btn-group" role="group" aria-label="Second group">
+                                        <button type="button" class="btn btn-sm btn-primary"><i class="icon-cloud-download"></i></button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="chart-wrapper" style="height:300px;margin-top:40px;">
+                            <canvas class="chart chart-line" chart-data="data" chart-labels="labels" chart-legend="false" chart-series="series" chart-click="onClick" chart-options="options" chart-colours="colours" height="300"></canvas>
+                        </div>
                     </div>
                 </div>
-            </div>
-        </div>
-        <div class="chart-wrapper" style="height:300px;margin-top:40px;">
-            <canvas class="chart chart-line" chart-data="data" chart-labels="labels" chart-legend="false" chart-series="series" chart-click="onClick" chart-options="options" chart-colours="colours" height="300"></canvas>
-        </div>
-    </div>
-</div>
-<!--/.card-->
+                <!--/.card-->
