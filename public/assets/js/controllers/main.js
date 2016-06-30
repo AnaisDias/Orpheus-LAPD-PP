@@ -59,19 +59,52 @@ angular
         }
     }
 
-ModalInstanceCtrl.inject = ['$scope', '$uibModalInstance', 'items'];
+ModalInstanceCtrl.inject = ['$scope', '$uibModalInstance', 'items','$cookies','$location','$http','$filter','$window'];
 
-function ModalInstanceCtrl($scope, $uibModalInstance, items) {
+function ModalInstanceCtrl($scope, $uibModalInstance, items,$cookies,$location,$http,$filter,$window) {
     $scope.items = items;
     $scope.selected = {
         item: $scope.items[0]
     };
 
     $scope.ok = function() {
-        $uibModalInstance.close($scope.selected.item);
-        
 
-    };
+      $scope.$watch(function() {
+          return $cookies.selDate;
+      }, function(newVal, oldVal) {
+          if (typeof(newVal) == 'undefined') {
+              newVal = moment()._d;
+          }
+
+          unparsedDate = newVal;
+          parsedDate = $filter('date')(new Date(unparsedDate), 'yyyy-MM-dd');
+
+      var data1 = {
+          method: 'POST',
+          url: '/api/insertMood',
+          data: {
+              'userid': $location.search().id,
+              'mood': $scope.selected.item.score,
+              'date': parsedDate
+          }
+      };
+      $http(data1).then( function(response){
+          if(response.data.success){
+
+          }
+          else if(response.data.exists){
+              $scope.statusMsg = 'Username or e-mail already exists in our database!';
+          }
+      } , function (response) {
+          $scope.statusMsg = 'An error has occurred, try again!';
+
+      });
+        $uibModalInstance.close($scope.selected.item);
+
+
+    }, true);
+
+  }
             var id = null;
     $scope.cancel = function() {
         $uibModalInstance.dismiss('cancel');
@@ -254,19 +287,24 @@ function DatePickerCtrl($scope, $cookies, $http, $location, $filter, $uibModal) 
 
     $scope.items = [{
         mood: 'Awful',
-        icon: 'moodawful.svg'
+        icon: 'moodawful.svg',
+        score: 0
     }, {
         mood: 'Fugly',
-        icon: 'moodfugly.svg'
+        icon: 'moodfugly.svg',
+        score: 2.5
     }, {
         mood: 'Meh',
-        icon: 'moodmeh.svg'
+        icon: 'moodmeh.svg',
+        score: 5
     }, {
         mood: 'Good',
-        icon: 'moodgood.svg'
+        icon: 'moodgood.svg',
+        score: 7.5
     }, {
         mood: 'Awesome',
-        icon: 'moodawesome.svg'
+        icon: 'moodawesome.svg',
+        score: 10
     }];
 
 

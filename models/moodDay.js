@@ -1,7 +1,7 @@
 'use strict';
 module.exports = function(sequelize, DataTypes) {
   var MoodDay = sequelize.define('MoodDay', {
-    date: DataTypes.DATE,
+    date: DataTypes.DATEONLY,
     score: DataTypes.INTEGER,
     updatedAt: DataTypes.DATE
   }, {
