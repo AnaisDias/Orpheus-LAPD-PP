@@ -10,12 +10,10 @@
     var passport = require('passport');
     var OAuth = require('oauth');
     var FitbitStrategy = require('passport-fitbit-oauth2').FitbitOAuth2Strategy;
-    var mysql = require("mysql");
     var path = require('path');
     var favicon = require('serve-favicon');
     var logger = require('morgan');
     var request = require("request");
-    var models1 = require('../models');
     var moment = require('moment');
     moment().format();
     var sequelize = require('sequelize');
@@ -24,58 +22,73 @@
     var unirest = require('unirest');
 
     var client = new Twitter({
-      consumer_key: '3W9XwzPeGgTqUZebf8R8N3M22',
-      consumer_secret: 'V2Hzz4MtMtaJt3sM2MLale8lXpZmxUsL8zwrx6kuPdVgGelgLp',
-      access_token_key: '1898192504-6ASi0q8v0a7Ltp2fRtgj99mvX8TIfEYXA7IbFXq',
-      access_token_secret: '74hhgVhgy1FtM1Jr3dN4A0isXgcv88YNksR3BSkM6YOlf'
+        consumer_key: '3W9XwzPeGgTqUZebf8R8N3M22',
+        consumer_secret: 'V2Hzz4MtMtaJt3sM2MLale8lXpZmxUsL8zwrx6kuPdVgGelgLp',
+        access_token_key: '1898192504-6ASi0q8v0a7Ltp2fRtgj99mvX8TIfEYXA7IbFXq',
+        access_token_secret: '74hhgVhgy1FtM1Jr3dN4A0isXgcv88YNksR3BSkM6YOlf'
     });
 
     var localAuthController = require('../controllers/local-auth');
     var FitbitAuthController = require('../controllers/fitbit-auth');
     var twitterAuthController = require('../controllers/twitter-auth');
+    var dbFunctions = require('../controllers/util.js');
+    var upload = require('../controllers/upload');
 
 
     module.exports = function(app) {
         var models = app.get('models');
+
         var id = null;
-        app.get('/api/registerdate/:id',function(req,res){
-          var userid = req.params.id;
-          models.User.find({
-              where: {
-                  id: userid
-              }
-          }).then(function(user) {
-              res.json(user.createdAt)
-          });
+
+        app.get('/api/registerdate/:id', function(req, res) {
+            var userid = req.params.id;
+            dbFunctions.findUserById(userid).then(function(user) {
+                res.json(user.createdAt);
+            });
+
         });
 
 
         app.get('/api/username', function(req, res) {
-
-            var json_data = {
-                username: req.user.profile.displayName,
-                avatar: req.user.profile._json.user.avatar
-            };
+            var json_data = null;
+            if (req.user.profile == undefined) {
+                json_data = {
+                    username: req.user.username,
+                    avatar: "http://www.fitbit.com/images/profile/defaultProfile_100_male.gif"
+                }
+            } //fazer verificação de paciente ou cliente)
+            else {
+                json_data = {
+                    username: req.user.profile.displayName,
+                    avatar: req.user.profile._json.user.avatar
+                };
+            }
             res.json(json_data);
             //console.log(JSON.stringify(req.user));
 
         });
 
-        var upload = require('../controllers/upload');
+
         app.route('/fileupload')
-           .post(upload.file);
+            .post(upload.file);
 
         app.get('/api/getUserById/:userid', function(req, res) {
 
             var userid = req.params.userid;
-            models.User.find({
-                where: {
-                    id: userid
-                }
-            }).then(function(user) {
-
-                res.json(user)
+            dbFunctions.findUserById(userid).then(function(user) {
+                res.json(user);
             });
+        });
+
+        app.post('/api/insertMood', function(req, res) {
+            mood = req.body.mood;
+            userid = req.body.userid;
+            thisdate = req.body.date;
+
+            dbFunctions.insertMood(userid, mood, thisdate).then(function(moodDay) {
+                res.json(moodDay);
+            });
+
         });
 
         app.get('/api/fitbit/activity/:date/:id', function(req, res) {
@@ -86,11 +99,11 @@
                     date: req.params.date
                 }
             }).then(function(activity) {
-                    res.json(activity.content);
+                res.json(activity.content);
             }).catch(function(error) {
-              console.log("user id on activity request: "+req.params.id);
-              console.log("date on activity request: "+req.params.date);
-              console.log(error.message);
+                console.log("user id on activity request: " + req.params.id);
+                console.log("date on activity request: " + req.params.date);
+                console.log(error.message);
                 return res.send({
                     message: "Error retrieving activity."
                 });
@@ -100,25 +113,29 @@
 
         });
 
-        app.get('/api/patient/list/:id', function(req, res){
+        app.get('/api/patient/list/:id', function(req, res) {
             var id_ter = req.params.id;
-            var array={
+            var array = {
                 usersArr: []
             };
 
             models.User.findAll({
-                where :{
+                where: {
                     therapist: id_ter
                 }
-            }).then(function(users){
-                users.forEach(function(user){
+            }).then(function(users) {
+                users.forEach(function(user) {
                     console.log("User");
                     console.log(user);
                     console.log(user.dataValues.username);
                     console.log(user.dataValues.id);
                     console.log(user.dataValues.fullname);
-                    array.usersArr.push({ "username" : user.dataValues.username,
-                        "id" : user.dataValues.id , "fullname": user.dataValues.fullname,"img":user.dataValues.avatar});
+                    array.usersArr.push({
+                        "username": user.dataValues.username,
+                        "id": user.dataValues.id,
+                        "fullname": user.dataValues.fullname,
+                        "img": user.dataValues.avatar
+                    });
 
                 });
                 console.log(array.toString());
@@ -126,50 +143,52 @@
             })
         });
         app.get('/api/fitbit/sleep/:date/:id', function(req, res) {
-          console.log("Sending sleep request!");
-          models.Sleep.find({
-              where: {
-                  UserId: req.params.id,
-                  date: req.params.date
-              }
-          }).then(function(sleep) {
-                  res.json(sleep.content);
-          }).catch(function(error) {
-            console.log("user id on sleep request: "+req.params.id);
-            console.log("date on sleep request: "+req.params.date);
-            console.log(error.message);
-              return res.send({
-                  message: "Error retrieving sleep log."
-              });
+            console.log("Sending sleep request!");
+            models.Sleep.find({
+                where: {
+                    UserId: req.params.id,
+                    date: req.params.date
+                }
+            }).then(function(sleep) {
+                res.json(sleep.content);
+            }).catch(function(error) {
+                console.log("user id on sleep request: " + req.params.id);
+                console.log("date on sleep request: " + req.params.date);
+                console.log(error.message);
+                return res.send({
+                    message: "Error retrieving sleep log."
+                });
             });
 
         });
 
 
         app.get('/api/sentimentalanalysis/:id/:date', function(req, res) {
-        models.User.find({
-            where: {
-                id: req.params.id
-            }
-        }).then(function(user){
+            models.User.find({
+                where: {
+                    id: req.params.id
+                }
+            }).then(function(user) {
 
 
-        var params = {screen_name: user.bearer};
-        var ts = [];
-        client.get('statuses/user_timeline', params, function(error, tweets, response){
-          if (!error) {
-            for(var i in tweets){
-            console.log("tweets are here:" + util.inspect(tweets[i].text, false, null));
-            ts.push(tweets[i].text);
-          }
-      }
+                var params = {
+                    screen_name: user.bearer
+                };
+                var ts = [];
+                client.get('statuses/user_timeline', params, function(error, tweets, response) {
+                    if (!error) {
+                        for (var i in tweets) {
+                            console.log("tweets are here:" + util.inspect(tweets[i].text, false, null));
+                            ts.push(tweets[i].text);
+                        }
+                    }
 
                     //var ts = ['I hate my life', "I want to die", "The new album by Kasabian is great"];
                     var counterPos = 0;
                     var counterNeg = 0;
 
                     var itemsProcessed = 0;
-                    ts.forEach(function(tweet){
+                    ts.forEach(function(tweet) {
                         unirest.post("https://twinword-sentiment-analysis.p.mashape.com/analyze/")
                             .header("X-Mashape-Key", "huDuunzqEXmshFHOpfPv3vaO9RdYp1K9sc0jsnMkFVRl4DlqEq")
                             .header("Content-Type", "application/x-www-form-urlencoded")
@@ -183,28 +202,30 @@
                                 }
                                 itemsProcessed++;
                                 if (itemsProcessed === ts.length) {
-                                  var response = {
-                                      'positive': counterPos,
-                                      'negative': counterNeg
-                                  };
-                                  res.send(response);
+                                    var response = {
+                                        'positive': counterPos,
+                                        'negative': counterNeg
+                                    };
+                                    res.send(response);
                                 }
 
                             });
                     });
 
                 });
-});
-});
+            });
+        });
 
         var toCheck = function(thisdate, userid, auth_id, accessToken) {
+                var datetoday = moment();
+                var thisdateMoment = moment(thisdate);
                 models.Activity.count({
                     where: {
                         date: thisdate,
                         UserId: userid
                     }
                 }).then(count => {
-                    if (count != 0) {
+                    if (count != 0 && !(thisdateMoment.isSame(datetoday, 'day'))) {
                         console.log("ENONTROOOOOOOOU " + thisdate);
                     } else {
                         console.log("NAAAAAAAAAAAAAAAAOy " + thisdate);
@@ -218,15 +239,48 @@
                                 'Authorization': fitAuth
                             }
                         };
-                        request(optionsAct, function(error, response, body) {
+                        if (thisdateMoment.isSame(datetoday, 'day')) {
+                            models.Activity.findOne({
+                                where: {
+                                    date: thisdate,
+                                    UserId: userid
+                                }
+                            }).then(function(activity) {
+                                request(optionsAct, function(error, response, body) {
+                                    if (!activity) {
+                                        models.Activity.create({
+                                            date: thisdate,
+                                            UserId: userid,
+                                            content: body
+                                        });
+                                    } else {
+                                        models.Activity.update({
+                                            content: body
+                                        }, {
+                                            where: {
+                                                date: thisdate,
+                                                UserId: userid
+                                            }
+                                        }).then(function(activity) {
+                                            return;
+                                        });
+                                    }
+                                });
 
-                            models.Activity.create({
 
-                                date: thisdate,
-                                UserId: userid,
-                                content: body
                             });
-                        });
+
+                        } else {
+                            request(optionsAct, function(error, response, body) {
+
+                                models.Activity.create({
+
+                                    date: thisdate,
+                                    UserId: userid,
+                                    content: body
+                                });
+                            });
+                        }
 
                         console.log("sending sleep request for " + thisdate);
                         var urlSleep = "https://api.fitbit.com/1/user/" + auth_id + "/sleep/date/" + thisdate + ".json";
@@ -239,13 +293,13 @@
                         };
                         request(optionsSleep, function(error, response, body) {
 
-                          models.Sleep.create({
-                              date: thisdate,
-                              UserId: userid,
-                              content: body
-                          }).catch(function(error){
-                            console.log("Erro ao gravar sleep log: "+error.message);
-                          });
+                            models.Sleep.create({
+                                date: thisdate,
+                                UserId: userid,
+                                content: body
+                            }).catch(function(error) {
+                                console.log("Erro ao gravar sleep log: " + error.message);
+                            });
                         });
                     }
                 });
@@ -258,16 +312,16 @@
             function(req, res) {
                 // If this function gets called, authentication was successful.
                 // `req.user` contains the authenticated user.
-                models.User.findById(id).then(function (user){
+                models.User.findById(id).then(function(user) {
                     models.User.update({
                         auth_id: req.user.profile.id,
-                        avatar : req.user.profile._json.user.avatar,
-                        displayName : req.user.profile._json.user.displayName,
-                        gender : req.user.profile._json.user.gender,
-                        age : req.user.profile._json.user.age
+                        avatar: req.user.profile._json.user.avatar,
+                        displayName: req.user.profile._json.user.displayName,
+                        gender: req.user.profile._json.user.gender,
+                        age: req.user.profile._json.user.age
                     }, {
                         where: {
-                            id : user.id
+                            id: user.id
                         }
                     });
                 });
@@ -289,31 +343,33 @@
                         momentRegisterDate.add(1, 'days');
                     }
 
-                    if (user.type==1){
-                      res.redirect('/#/therapist?id=' + user.id);
-                    }else{
-                    res.redirect('/#/user?id=' + user.id);
-                  }
+                    if (user.type == 1) {
+                        res.redirect('/#/therapist?id=' + user.id);
+                    } else {
+                        res.redirect('/#/user?id=' + user.id);
+                    }
                 });
 
             });
 
         app.get('/auth/twitter', passport.authenticate('twitter'));
-        app.get( '/auth/twitter/callback', passport.authenticate( 'twitter', {failureRedirect: '/api/logout'}), function(req, res){
 
-            if(id != null){
-                models.User.findById(id).then(function(user){
+        app.get('/auth/twitter/callback', passport.authenticate('twitter', {
+            failureRedirect: '/api/logout'
+        }), function(req, res) {
+
+            if (id != null) {
+                models.User.findById(id).then(function(user) {
                     models.User.update({
                         bearer: req.user.username
                     }, {
-                        where :{
+                        where: {
                             id: user.id
                         }
                     });
                 });
                 res.redirect('/auth/fitbit');
-            }
-            else{
+            } else {
                 res.redirect('/api/logout');
             }
         });
@@ -321,25 +377,30 @@
         //login in our application
         //login in our application
 
-        app.post('/api/login', function (req, res, next) {
+        app.post('/api/login', function(req, res, next) {
 
-            passport.authenticate('user-local', function (err, user, info) {
+            passport.authenticate('user-local', function(err, user, info) {
 
                 var error = err || info;
                 if (error) {
                     console.log("Error");
-                    return res.status(401).json(error);
+                    var json_data = {
+                        success: false
+                    };
+                    return res.send(json_data);
                 }
 
-                req.logIn(user, function (err) {
+                req.logIn(user, function(err) {
                     console.log(err);
                     console.log("Success");
+                    console.log(req.user);
                     if (err) return res.send(err);
                     var json_data = {
-                        success:  true,
+                        success: true,
                         fullname: req.user.fullname,
                         username: req.user.username,
-                        id: req.user.id
+                        id: req.user.id,
+                        type: req.user.type
                     };
                     id = req.user.id;
                     console.log("\n\n\n\nREQ LOCAL: \n" + id);
@@ -348,7 +409,7 @@
             })(req, res, next);
         });
 
-        app.post('/api/register', function (req, res) {
+        app.post('/api/register', function(req, res) {
 
             var nusername = req.body.username;
             var name = req.body.fullname;
@@ -358,15 +419,17 @@
             var ntype = req.body.type;
 
 
-            if(npassword == rPassword){
+            if (npassword == rPassword) {
                 var hashPass = bcrypt.hashSync(npassword, bcrypt.genSaltSync(8), null);
                 console.log(hashPass);
-                models.User.find({where: {
-                    $or: [
-                        {username: nusername},
-                        {email: nemail}
-                    ]
-                }
+                models.User.find({
+                    where: {
+                        $or: [{
+                            username: nusername
+                        }, {
+                            email: nemail
+                        }]
+                    }
                 }).then(function(user) {
                         console.log(user);
                         if (user != null) {
@@ -376,40 +439,62 @@
                             };
                             console.log("not null");
                             res.json(json_data);
-                        }else {
-                            models.User.create({ username: nusername, email: nemail, fullname: name, password: hashPass, type : ntype},
-                                { fields: [ 'username' , 'email', 'fullname', 'password', 'type'] }).then(function(user) {
+                        } else {
+                            models.User.create({
+                                username: nusername,
+                                email: nemail,
+                                fullname: name,
+                                password: hashPass,
+                                type: ntype
+                            }, {
+                                fields: ['username', 'email', 'fullname', 'password', 'type']
+                            }).then(function(user) {
                                 console.log(user.get({
                                     plain: true
                                 }));
                                 var json_data = {
-                                    success : true
+                                    success: true
                                 };
-                                res.json(json_data);// => { username: 'barfooz', isAdmin: false }
+                                res.json(json_data); // => { username: 'barfooz', isAdmin: false }
                             });
                         }
                     },
-                    function (err) {
+                    function(err) {
                         var json_data = {
-                            success : false
+                            success: false
                         };
                         res.json(json_data);
                     });
 
-            }
-            else{
+            } else {
 
                 var json_data = {
-                    success : false
+                    success: false
                 };
                 res.json(json_data);
             }
 
         });
 
+        app.get('/api/checkLogin', function(req, res) {
 
-var util = require('util');
-        app.get('/api/situationData/:date/:id', function(req,res){
+            console.log(req);
+            if (req.isAuthenticated()) {
+                models.User.find({
+                    where: {
+                        auth_id: req.user.profile.id
+                    }
+                }).then(function(user) {
+                    id = user.id;
+                });
+                res.send(id);
+            } else {
+                res.send('undefined');
+            }
+        });
+
+        var util = require('util');
+        app.get('/api/situationData/:date/:id', function(req, res) {
 
             var date = req.params.date;
             var id = req.params.id;
@@ -428,51 +513,54 @@ var util = require('util');
                     auth_id: req.user.profile.id
                 }
             }).then(function(user){*/
-                models.sequelize.query('SELECT situations FROM public."SituationData" WHERE extract(year from date) = ? AND extract(month from date) = ? AND extract(day from date) = ? AND "SituationData"."UserId" = ? ', { replacements: [dbyear, dbmonth, dbdate, id], type: sequelize.QueryTypes.SELECT})
-                  .then(function(users) {
+            models.sequelize.query('SELECT situations FROM public."SituationData" WHERE extract(year from date) = ? AND extract(month from date) = ? AND extract(day from date) = ? AND "SituationData"."UserId" = ? ', {
+                    replacements: [dbyear, dbmonth, dbdate, id],
+                    type: sequelize.QueryTypes.SELECT
+                })
+                .then(function(users) {
                     console.log(users);
                     results = users;
-                    for(var r in results){
-                        for(var situations in results[r]){
-                            for(var l in results[r][situations]){
-                               if(results[r][situations][l].name != undefined){
-                                for(var names in situ){
-                                   if(results[r][situations][l].name == situ[names].name){
-                                        situ[names].count+=1;
-                                        totalcount +=1;
-                                        found = true;
-                                        break;
+                    for (var r in results) {
+                        for (var situations in results[r]) {
+                            for (var l in results[r][situations]) {
+                                if (results[r][situations][l].name != undefined) {
+                                    for (var names in situ) {
+                                        if (results[r][situations][l].name == situ[names].name) {
+                                            situ[names].count += 1;
+                                            totalcount += 1;
+                                            found = true;
+                                            break;
+                                        }
+                                    }
+
+                                    if (!found) {
+                                        situ[size] = [];
+                                        situ[size].name = results[r][situations][l].name;
+                                        situ[size].count = 0;
+                                        size += 1;
                                     }
                                 }
-
-                                if(!found){
-                                    situ[size] = [];
-                                    situ[size].name = results[r][situations][l].name;
-                                situ[size].count = 0;
-                                size +=1;
-                            }
-                               }
                             }
                         }
 
                     }
 
-                    for(var x in situ){
-                        var percentage = Math.round((situ[x].count/totalcount)*100*10)/10;
+                    for (var x in situ) {
+                        var percentage = Math.round((situ[x].count / totalcount) * 100 * 10) / 10;
                         data += '\"' + situ[x].name + '\": ' + '\"' + percentage + '\"';
-                        if(x < situ.length-1){
+                        if (x < situ.length - 1) {
                             data += ',\n';
                         }
                     }
                     data += '\n}';
                     data = JSON.parse(data);
                     res.json(data);
-                    }).catch(function(err){
-                    console.log("ERRO: "+err.message);
+                }).catch(function(err) {
+                    console.log("ERRO: " + err.message);
                 });
 
 
-         });
+        });
 
         app.get('/api/logout', function(req, res) {
             console.log("Logging out");
