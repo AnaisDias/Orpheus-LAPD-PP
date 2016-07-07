@@ -3,3 +3,4 @@ node_modules/
 *.md
 config/config.json
 models/index.js
+config/config.json
