@@ -581,6 +581,12 @@ function situmanCtrl($scope, $cookies, $window, $http, $filter, $location) {
             console.log("error on situmanCtrl");
         });
 
+        $http.get('/api/moodsituation/' + $location.search().id).success(function(data){
+
+        }).error(function(data){
+            console.log("error on situmanCtrl, mood situation section");
+        });
+
 
     }, true);
 
