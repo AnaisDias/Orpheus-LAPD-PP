@@ -564,6 +564,7 @@
 
 //use in api function and every time moods or situations are updated
         var updateMoodSituation = function(id){
+            
             //get every situation, go through all of them, check the date for moods and add to an array the score of the mood, the count
             //of how many moods and the situation name
             //save to db at the end, associated to the user id
