@@ -323,32 +323,34 @@
                         where: {
                             id: user.id
                         }
-                    });
+                    }).then( function(u) {
+                            models.User.find({
+                                where: {
+                                    auth_id: req.user.profile.id
+                                }
+                            }).then(function (user) {
+                                console.log(user);
+                                parseDate = user.createdAt.setMonth(user.createdAt.getMonth());
+                                var momentRegisterDate = moment(parseDate);
+                                var momentToday = moment();
+
+                                //cycle that requests activity and stores it from registration date untill today, adding one day after each iteration
+                                while (momentRegisterDate.isSameOrBefore(momentToday)) {
+                                    var thisdate = momentRegisterDate.year() + "-" + (momentRegisterDate.month() + 1) + "-" + momentRegisterDate.date();
+                                    toCheck(thisdate, user.id, user.auth_id, req.user.accessToken);
+                                    momentRegisterDate.add(1, 'days');
+                                }
+
+                                if (user.type == 1) {
+                                    res.redirect('/#/therapist?id=' + user.id);
+                                } else {
+                                    res.redirect('/#/user?id=' + user.id);
+                                }
+                            })
+                        }
+                    );
                 });
 
-                models.User.find({
-                    where: {
-                        auth_id: req.user.profile.id
-                    }
-                }).then(function(user) {
-                    parseDate = user.createdAt.setMonth(user.createdAt.getMonth());
-                    var momentRegisterDate = moment(parseDate);
-                    var momentToday = moment();
-
-                    //cycle that requests activity and stores it from registration date untill today, adding one day after each iteration
-                    while (momentRegisterDate.isSameOrBefore(momentToday)) {
-                        var thisdate = momentRegisterDate.year() + "-" + (momentRegisterDate.month() + 1) + "-" + momentRegisterDate.date();
-                        console.log(thisdate);
-                        toCheck(thisdate, user.id, user.auth_id, req.user.accessToken);
-                        momentRegisterDate.add(1, 'days');
-                    }
-
-                    if (user.type == 1) {
-                        res.redirect('/#/therapist?id=' + user.id);
-                    } else {
-                        res.redirect('/#/user?id=' + user.id);
-                    }
-                });
 
             });
 
