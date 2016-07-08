@@ -564,7 +564,9 @@ function situmanCtrl($scope, $cookies, $window, $http, $filter, $location) {
 
         unparsedDate = newVal;
         var size = 0;
+        var sizee = 0;
         $scope.situations = [];
+        $scope.moods= [];
         parsedDate = $filter('date')(new Date(unparsedDate), 'dd-MM-yyyy');
         $http.get('/api/situationData/' + parsedDate + "/" + $location.search().id).success(function(data) {
             console.debug(data);
@@ -575,10 +577,22 @@ function situmanCtrl($scope, $cookies, $window, $http, $filter, $location) {
                 $scope.situations[size].count = data[i];
                 size += 1;
             }
-            console.log("situations:" + $scope.situations[0].name);
-            //$scope.situations = jsonD.situations;
+           // console.log("situations:" + $scope.situations[0].name);
         }).error(function(data) {
             console.log("error on situmanCtrl");
+        });
+
+        $http.get('/api/moodsituation/' + $location.search().id).success(function(data){
+            console.debug(data);
+            var jsond = JSON.parse(data);
+            for(var j in jsond){
+            $scope.moods[sizee] = [];
+            $scope.moods[sizee].situation = jsond[j].situation;
+            $scope.moods[sizee].score = jsond[j].score/jsond[j].moods;
+            sizee+=1;
+        }
+        }).error(function(data){
+            console.log("error on situmanCtrl, mood situation section");
         });
 
 
