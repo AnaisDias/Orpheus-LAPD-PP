@@ -148,7 +148,6 @@ function twitterCtrl($scope, $http, $location, $cookies, $filter) {
         parsedDate = $filter('date')(new Date(unparsedDate), 'yyyy-MM-dd');
         if ($location.search().id == undefined) {
             $http.get('api/checkLogin').success(function(data) {
-                console.log("O id é:" + data.id );
                 id = data.id;
             }).error(function(data) {
                 console.log("erro ao ir buscar id");
@@ -156,12 +155,8 @@ function twitterCtrl($scope, $http, $location, $cookies, $filter) {
         } else {
             id = $location.search().id;
         }
-        console.log("user id: " + id);
-        console.log("parsed date: " + parsedDate);
-
         if (id != null) {
             $http.get('/api/sentimentalanalysis/' + id + "/" + parsedDate).success(function(data) {
-                console.log(data);
                 $scope.positive = data.positive;
                 $scope.negative = data.negative;
             }).error(function(data) {

@@ -56,7 +56,6 @@
                     username: req.user.username,
                     avatar: "http://www.fitbit.com/images/profile/defaultProfile_100_male.gif"
                 }
-            } //fazer verificação de paciente ou cliente)
             else {
                 json_data = {
                     username: req.user.profile.displayName,
@@ -64,7 +63,6 @@
                 };
             }
             res.json(json_data);
-            //console.log(JSON.stringify(req.user));
 
         });
 
@@ -95,7 +93,6 @@
         });
 
         app.get('/api/getMood/:id/:date',function(req,res) {
-          console.log("ITYGVSBHIYFGVBHJDIRYFGUBHJ");
 
           userid=req.params.id;
           thisdate=req.params.date;
@@ -440,7 +437,6 @@
 
             if (npassword == rPassword) {
                 var hashPass = bcrypt.hashSync(npassword, bcrypt.genSaltSync(8), null);
-                console.log(hashPass);
                 models.User.find({
                     where: {
                         $or: [{
@@ -450,13 +446,11 @@
                         }]
                     }
                 }).then(function(user) {
-                        console.log(user);
                         if (user != null) {
                             var json_data = {
                                 success: false,
                                 exists: true
                             };
-                            console.log("not null");
                             res.json(json_data);
                         } else {
                             models.User.create({
@@ -468,9 +462,6 @@
                             }, {
                                 fields: ['username', 'email', 'fullname', 'password', 'type']
                             }).then(function(user) {
-                                console.log(user.get({
-                                    plain: true
-                                }));
                                 var json_data = {
                                     success: true
                                 };
@@ -497,7 +488,6 @@
 
         app.get('/api/checkLogin', function(req, res) {
 
-            console.log(req);
             var json_data;
             if (req.isAuthenticated()) {
                 models.User.find({
