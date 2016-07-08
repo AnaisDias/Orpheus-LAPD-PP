@@ -27,41 +27,40 @@ angular
     }])
 
 
-    therapistCtrl.inject=['$scope','$http','$location', '$window'];
-    function therapistCtrl($scope,$http,$location, $window){
-        if ($location.search().id != undefined) {
-            $http.get('/api/patient/list/' + $location.search().id).success(function (data) {
-                console.log(data);
-                $scope.patients = data.usersArr;
-            }).error(function (data) {
-                console.log("erro ao ir buscar pacientes");
-            });
-        }
-        else {
-            var id = null;
-            $http.get('api/checkLogin').success(function (data){
-                id = data.id;
-                if(data.type == 1){
-                    $http.get('/api/patient/list/' + id).success(function (data) {
-                        console.log(data);
-                        $scope.patients = data.usersArr;
-                        console.log($scope.patients[0].fullname);
-                    }).error(function (data) {
-                        console.log("erro ao ir buscar pacientes");
-                    });
-                }
-                else{
-                    $window.location.href = '/#/user?id=' + id;
-                }
-            }).error(function (data) {
-                console.log("erro ao ir buscar pacientes");
-            });
-        }
+therapistCtrl.inject = ['$scope', '$http', '$location', '$window'];
+
+function therapistCtrl($scope, $http, $location, $window) {
+    if ($location.search().id != undefined) {
+        $http.get('/api/patient/list/' + $location.search().id).success(function(data) {
+            console.log(data);
+            $scope.patients = data.usersArr;
+        }).error(function(data) {
+            console.log("erro ao ir buscar pacientes");
+        });
+    } else {
+        var id = null;
+        $http.get('api/checkLogin').success(function(data) {
+            id = data.id;
+            if (data.type == 1) {
+                $http.get('/api/patient/list/' + id).success(function(data) {
+                    console.log(data);
+                    $scope.patients = data.usersArr;
+                    console.log($scope.patients[0].fullname);
+                }).error(function(data) {
+                    console.log("erro ao ir buscar pacientes");
+                });
+            } else {
+                $window.location.href = '/#/user?id=' + id;
+            }
+        }).error(function(data) {
+            console.log("erro ao ir buscar pacientes");
+        });
     }
+}
 
-ModalInstanceCtrl.inject = ['$scope', '$uibModalInstance', 'items','$cookies','$location','$http','$filter','$window'];
+ModalInstanceCtrl.inject = ['$scope', '$uibModalInstance', 'items', '$cookies', '$location', '$http', '$filter', '$window'];
 
-function ModalInstanceCtrl($scope, $uibModalInstance, items,$cookies,$location,$http,$filter,$window) {
+function ModalInstanceCtrl($scope, $uibModalInstance, items, $cookies, $location, $http, $filter, $window) {
     $scope.items = items;
     $scope.selected = {
         item: $scope.items[0]
@@ -69,49 +68,47 @@ function ModalInstanceCtrl($scope, $uibModalInstance, items,$cookies,$location,$
 
     $scope.ok = function() {
 
-      $scope.$watch(function() {
-          return $cookies.selDate;
-      }, function(newVal, oldVal) {
-          if (typeof(newVal) == 'undefined') {
-              newVal = moment()._d;
-          }
+        $scope.$watch(function() {
+            return $cookies.selDate;
+        }, function(newVal, oldVal) {
+            if (typeof(newVal) == 'undefined') {
+                newVal = moment()._d;
+            }
 
-          unparsedDate = newVal;
-          parsedDate = $filter('date')(new Date(unparsedDate), 'yyyy-MM-dd');
+            unparsedDate = newVal;
+            parsedDate = $filter('date')(new Date(unparsedDate), 'yyyy-MM-dd');
 
-      var data1 = {
-          method: 'POST',
-          url: '/api/insertMood',
-          data: {
-              'userid': $location.search().id,
-              'mood': $scope.selected.item.score,
-              'date': parsedDate
-          }
-      };
-      $http(data1).then( function(response){
-          if(response.data.success){
+            var data1 = {
+                method: 'POST',
+                url: '/api/insertMood',
+                data: {
+                    'userid': $location.search().id,
+                    'mood': $scope.selected.item.score,
+                    'date': parsedDate
+                }
+            };
+            $http(data1).then(function(response) {
+                if (response.data.success) {
 
-          }
-          else if(response.data.exists){
-              $scope.statusMsg = 'Username or e-mail already exists in our database!';
-          }
-      } , function (response) {
-          $scope.statusMsg = 'An error has occurred, try again!';
+                }
+            }, function(response) {
+                $scope.statusMsg = 'An error has occurred, try again!';
 
-      });
-        $uibModalInstance.close($scope.selected.item);
+            });
+            $uibModalInstance.close($scope.selected.item);
 
 
-    }, true);
+        }, true);
 
-  }
-            var id = null;
+    }
+    var id = null;
     $scope.cancel = function() {
         $uibModalInstance.dismiss('cancel');
     };
 }
 
 twitterCtrl.$inject = ['$scope', '$http', '$location', '$cookies', '$filter'];
+
 function twitterCtrl($scope, $http, $location, $cookies, $filter) {
     $scope.$watch(function() {
         return $cookies.selDate;
@@ -122,25 +119,24 @@ function twitterCtrl($scope, $http, $location, $cookies, $filter) {
 
         unparsedDate = newVal;
         parsedDate = $filter('date')(new Date(unparsedDate), 'yyyy-MM-dd');
-        if($location.search().id == undefined){
-            $http.get('api/checkLogin').success(function (data){
+        if ($location.search().id == undefined) {
+            $http.get('api/checkLogin').success(function(data) {
                 id = data.id;
-            }).error(function (data) {
+            }).error(function(data) {
                 console.log("erro ao ir buscar id");
             });
-        }
-        else {
+        } else {
             id = $location.search().id;
         }
         console.log("user id: " + id);
         console.log("parsed date: " + parsedDate);
 
-        if(id != null) {
-            $http.get('/api/sentimentalanalysis/' + id + "/" + parsedDate).success(function (data) {
+        if (id != null) {
+            $http.get('/api/sentimentalanalysis/' + id + "/" + parsedDate).success(function(data) {
                 console.log(data);
                 $scope.positive = data.positive;
                 $scope.negative = data.negative;
-            }).error(function (data) {
+            }).error(function(data) {
                 console.log("erro ao ir buscar moods");
             });
         }
@@ -239,6 +235,10 @@ function moodDemoCtrl($scope) {
 DatePickerCtrl.$inject = ['$scope', '$cookies', '$http', '$location', '$filter', '$uibModal'];
 
 function DatePickerCtrl($scope, $cookies, $http, $location, $filter, $uibModal) {
+    $cookies.selDate = moment()._d;
+
+    $scope.selDate = $filter('date')(new Date(moment()._d), 'yyyy-MM-dd');
+
 
     $http.get('/api/registerdate/' + $location.search().id).success(function(data) {
         var thisdate = moment(data);
@@ -256,8 +256,11 @@ function DatePickerCtrl($scope, $cookies, $http, $location, $filter, $uibModal) 
             drops: 'down',
             opens: 'left',
             minDate: $scope.registerdate
-
         };
+
+
+
+
 
 
 
@@ -265,13 +268,7 @@ function DatePickerCtrl($scope, $cookies, $http, $location, $filter, $uibModal) 
     }).error(function(data) {
         //what to do on error
     });
-    $scope.date = {
-        startDate: moment()
 
-
-    };
-
-    $cookies.selDate = moment()._d;
 
 
     //Watch for date changes
@@ -279,11 +276,17 @@ function DatePickerCtrl($scope, $cookies, $http, $location, $filter, $uibModal) 
         var selectedDate = newDate._d;
 
         $cookies.selDate = selectedDate;
+
+
+
+
+
     }, false);
 
     function gd(year, month, day) {
         return new Date(year, month - 1, day).getTime();
     }
+
 
     $scope.items = [{
         mood: 'Awful',
@@ -306,6 +309,31 @@ function DatePickerCtrl($scope, $cookies, $http, $location, $filter, $uibModal) 
         icon: 'moodawesome.svg',
         score: 10
     }];
+
+    $scope.$watch(function() {
+        return $cookies.selDate;
+    }, function(newVal, oldVal) {
+        if (typeof(newVal) == 'undefined') {
+            newVal = moment()._d;
+        }
+
+        unparsedDate = newVal;
+        parsedDate = $filter('date')(new Date(unparsedDate), 'yyyy-MM-dd');
+
+        $http.get('/api/getMood/' + $location.search().id + "/" + parsedDate).success(function(data) {
+
+            $scope.todaysmood = data.score;
+            console.log("MOOD DE HOJE : " + $scope.todaysmood)
+            $scope.todaysmoodimg = $scope.items[$scope.todaysmood].icon;
+            console.log("mod img = "+$scope.todaysmoodimg);
+        }).error(function(data) {});
+
+    }, true);
+
+
+
+
+
 
 
 
@@ -575,7 +603,6 @@ function situmanCtrl($scope, $cookies, $window, $http, $filter, $location) {
                 $scope.situations[size].count = data[i];
                 size += 1;
             }
-            console.log("situations:" + $scope.situations[0].name);
             //$scope.situations = jsonD.situations;
         }).error(function(data) {
             console.log("error on situmanCtrl");
@@ -1068,9 +1095,11 @@ function sleepCtrl($scope, $cookies, $filter, $http, $location) {
             ];
             console.log(JSON.parse(data));
             data = JSON.parse(data);
-            angular.forEach(data.sleep[0].minuteData, function(datevalue) {
-                graphData[0].push(parseInt(datevalue.value));
-            });
+            if (data.sleep) {
+                angular.forEach(data.sleep[0].minuteData, function(datevalue) {
+                    graphData[0].push(parseInt(datevalue.value));
+                });
+            }
             var totalTimeInBed = data.summary.totalTimeInBed;
             var i = 1;
             while (i <= totalTimeInBed) {

@@ -91,6 +91,20 @@
 
         });
 
+        app.get('/api/getMood/:id/:date',function(req,res) {
+          console.log("ITYGVSBHIYFGVBHJDIRYFGUBHJ");
+
+          userid=req.params.id;
+          thisdate=req.params.date;
+
+          dbFunctions.getMood(userid, thisdate).then(function(moodDay) {
+              res.json(moodDay);
+          });
+
+
+
+        });
+
         app.get('/api/fitbit/activity/:date/:id', function(req, res) {
             console.log("Sending activity request!");
             models.Activity.find({

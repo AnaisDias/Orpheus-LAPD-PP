@@ -55,5 +55,20 @@
         });
     }
 
+      exports.getMood = function(userid, thisdate) {
+          return new Promise(function(resolve, reject) {
+
+            models.MoodDay.find({
+                where: {
+                    UserId: userid,
+                    date: thisdate
+                }
+            }).then(function(moodDay){
+              console.log("MOOOOD                                     "+moodDay.score);
+              resolve(moodDay);
+            });
+          });
+      }
+
 
 }());
