@@ -45,10 +45,14 @@
                                 <div ng-hide="selected"><img src="assets/img/{{todaysmoodimg}}" class="img-mood-display"></div>
                                 <div ng-show="selected"><img src="assets/img/{{selected.icon}}" class="img-mood-display"></div>
                             </fieldset>
+<<<<<<< HEAD
                             <button type="button" class="btn btn-primary-outline btn-lg btn-block" ng-click="open('lg')">Select mood for this day</button>
                         </div>
 
                         <div class="col-sm-4">
+=======
+                            <button type="button" class="btn btn-default" ng-click="open('lg')">Daily Mood</button>
+>>>>>>> 88427e78d90ed9d98f92a11245310a20ed822ccf
                         </div>
 
                 </div>
@@ -252,7 +256,7 @@
                                                     <tr>
                                                         <th>Situation</th>
                                                         <th>Percentage of time</th>
-                                                        <th>Mood</th>
+                                                        <!-- <th>Mood</th> -->
                                                     </tr>
                                                 </thead>
                                                 <tbody>
@@ -260,11 +264,11 @@
                                                     <tr ng-repeat="situation in situations">
                                                         <td>{{ situation.name }}</td>
                                                         <td>{{ situation.count }}</td>
-                                                        <td>
+                                                        <!-- <td>
                                                             <button type="button" class="btn btn-primary">Good</button>
                                                             <button type="button" class="btn btn-warning">Neutral</button>
                                                             <button type="button" class="btn btn-danger">Bad</button>
-                                                        </td>
+                                                        </td> -->
                                                     </tr>
 
                                                 </tbody>
@@ -287,14 +291,54 @@
                                                     </fieldset>
                                                     <button type="submit" class="btn btn-primary">Submit</button>
                                                 </form>
-                                                <!-- <blockquote class="card-blockquote">
-                                    <p>No physical activities today yet.</p>
-                                    <footer>Physical activity may help with endorphines release and self-esteem improvement!
-                                      <p>
-                                        <cite >Try going for a run</cite>
-                                      </p>
-                                    </footer>
-                                </blockquote> -->
+                                            </div>
+                                        </div>
+                                    </div>
+
+                
+                                    <div class="col-sm-12 col-lg-4" ng-show="moods.length">
+
+
+
+                                        <div class="card-block">
+                                            <table class="table table-striped">
+                                                <thead>
+                                                    <tr>
+                                                        <th>Situation</th>
+                                                        <th>Mood Score</th>
+                                                        <!-- <th>Mood</th> -->
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+
+                                                    <tr ng-repeat="mood in moods">
+                                                        <td>{{ mood.situation }}</td>
+                                                        <td>{{ mood.score }}</td>
+                                                        <!-- <td>
+                                                            <button type="button" class="btn btn-primary">Good</button>
+                                                            <button type="button" class="btn btn-warning">Neutral</button>
+                                                            <button type="button" class="btn btn-danger">Bad</button>
+                                                        </td> -->
+                                                    </tr>
+
+                                                </tbody>
+                                            </table>
+
+                                        </div>
+
+                                    </div>
+
+                                    <div class="col-sm-6 col-md-4" ng-show="!moods.length">
+                                        <div class="card card-inverse card-danger text-xs-center">
+                                            <div class="card-block">
+                                                        <blockquote class="card-blockquote">
+                                                            <p>No mood/situation data</p>
+                                                            <footer>Please select your mood for the day above
+                                                                <p>
+                                                                    <cite>Tracking your situation/mood relation might help you realize which situations bring about the best mood!</cite>
+                                                                </p>
+                                                            </footer>
+                                                        </blockquote>
                                             </div>
                                         </div>
                                     </div>
