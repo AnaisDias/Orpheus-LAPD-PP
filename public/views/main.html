@@ -62,23 +62,10 @@
     <div class="col-sm-6 col-lg-3">
         <div class="card card-inverse card-primary" ng-controller="cardChartCtrl1">
             <div class="card-block p-b-0">
-                <!-- <div class="btn-group pull-right">
-                    <button type="button" class="btn btn-primary-outline active dropdown-toggle p-a-0" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                        <i class="icon-settings"></i>
-                    </button>
-                    <div class="dropdown-menu">
-                        <a class="dropdown-item" href="#">Action</a>
-                        <a class="dropdown-item" href="#">Another action</a>
-                        <a class="dropdown-item" href="#">Something else here</a>
-                        <div class="dropdown-divider"></div>
-                        <a class="dropdown-item" href="#">Separated link</a>
-                    </div>
-                </div> -->
-                <h4 class="m-b-0">Mood Score: 62 (mostly good)</h4>
-                <p>Moods from the last few days</p>
-            </div>
-            <div class="chart-wrapper p-x-1">
-                <canvas class="chart chart-line" chart-data="data" chart-labels="labels" chart-legend="false" chart-series="series" chart-options="options" chart-colours="colours" height="70"></canvas>
+                <h4 class="m-b-0">Daily Score: {{overallResult}}/10</h4>
+                <p>See how well you've done today</p>
+                <div><a tabindex="0" class="btn btn-sm btn-danger" role="button" data-toggle="popover" data-trigger="focus" title="How is my score calculated?" data-content="This score is a result of all the information you've provided and how many steps you're taking towards improving your mood. If your score seems low, try adding more information, or maybe exercising and sleeping better! :)">How is my score calculated?</a></div>
+                <br>
             </div>
         </div>
     </div>
@@ -381,3 +368,5 @@
                     </div>
                 </div>
                 <!--/.card-->
+
+

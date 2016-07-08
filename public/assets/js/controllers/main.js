@@ -111,8 +111,8 @@ function ModalInstanceCtrl($scope, $uibModalInstance, items,$cookies,$location,$
     };
 }
 
-twitterCtrl.$inject = ['$scope', '$http', '$location', '$cookies', '$filter'];
-function twitterCtrl($scope, $http, $location, $cookies, $filter) {
+twitterCtrl.$inject = ['$scope', '$rootScope', '$http', '$location', '$cookies', '$filter'];
+function twitterCtrl($scope, $rootScope, $http, $location, $cookies, $filter, Score) {
     $scope.$watch(function() {
         return $cookies.selDate;
     }, function(newVal, oldVal) {
@@ -140,6 +140,13 @@ function twitterCtrl($scope, $http, $location, $cookies, $filter) {
                 console.log(data);
                 $scope.positive = data.positive;
                 $scope.negative = data.negative;
+                console.debug($rootScope.overallScore);
+
+                $rootScope.overallScore += (data.positive/(data.positive+data.negative)) * 10;
+                console.log("Result:"+$rootScope.overallResult);
+                $rootScope.overallSum +=1;
+                $rootScope.overallResult = Math.ceil($rootScope.overallScore / $rootScope.overallSum);
+                console.log("Result:"+$rootScope.overallResult);
             }).error(function (data) {
                 console.log("erro ao ir buscar moods");
             });
@@ -437,9 +444,9 @@ function sparklineChartCtrl($scope) {
     }];
 }
 
-activityCtrl.$inject = ['$scope', '$cookies', '$window', '$http', '$filter', '$location'];
+activityCtrl.$inject = ['$scope', '$rootScope', '$cookies', '$window', '$http', '$filter', '$location'];
 
-function activityCtrl($scope, $cookies, $window, $http, $filter, $location) {
+function activityCtrl($scope, $rootScope, $cookies, $window, $http, $filter, $location) {
 
 
 
@@ -454,6 +461,11 @@ function activityCtrl($scope, $cookies, $window, $http, $filter, $location) {
         parsedDate = $filter('date')(new Date(unparsedDate), 'yyyy-MM-dd');
         $http.get('/api/fitbit/activity/' + parsedDate + "/" + $location.search().id).success(function(data) {
             console.log(data);
+            if(data.message == "Error retrieving activity."){
+                $rootScope.overallScore += 1;
+                $rootScope.overallSum += 1;
+                $rootScope.overallResult = Math.ceil($rootScope.overallScore / $rootScope.overallSum);
+            }
             data = JSON.parse(data);
             $scope.activities = data.activities;
             $scope.goals = data.goals;
@@ -465,16 +477,33 @@ function activityCtrl($scope, $cookies, $window, $http, $filter, $location) {
 
             $scope.caloriesVSGoals = ($scope.summary.caloriesOut / $scope.goals.caloriesOut);
 
+
             if ($scope.caloriesVSGoals >= 1) {
                 $scope.calgreaterthanone = true;
+                $rootScope.overallScore += 10;
+                $rootScope.overallSum += 1;
+                $rootScope.overallResult = Math.ceil($rootScope.overallScore / $rootScope.overallSum);
+                console.log("Result:"+$rootScope.overallResult);
             } else {
                 $scope.calgreaterthanone = false;
+                $rootScope.overallScore += $scope.caloriesVSGoals * 10;
+                $rootScope.overallSum += 1;
+                $rootScope.overallResult = Math.ceil($rootScope.overallScore / $rootScope.overallSum);
+                console.log("Result:"+$rootScope.overallResult);
             }
 
-            if ($scope.stepsoriesVSGoals >= 1) {
+            if ($scope.stepsVSGoals >= 1) {
                 $scope.stepsgreaterthanone = true;
+                $rootScope.overallScore += 10;
+                $rootScope.overallSum += 1;
+                $rootScope.overallResult = Math.ceil($rootScope.overallScore / $rootScope.overallSum);
+                console.log("Result:"+$rootScope.overallResult);
             } else {
                 $scope.calgreaterthanone = false;
+                $rootScope.overallScore += $scope.stepsVSGoals * 10;
+                $rootScope.overallSum += 1;
+                $rootScope.overallResult = Math.ceil($rootScope.overallScore / $rootScope.overallSum);
+                console.log("Result:"+$rootScope.overallResult);
 
             }
             console.log("caloriesVSGoals: " + $scope.caloriesVSGoals);
@@ -538,7 +567,7 @@ function activityCtrl($scope, $cookies, $window, $http, $filter, $location) {
 
 
         }).error(function(data) {
-            //what to do on error
+            console.log("error if no activities");
         });
 
 
@@ -983,9 +1012,10 @@ function gaugeJSDemoCtrl($scope, $timeout) {
     }
 }
 
-cardChartCtrl1.$inject = ['$scope'];
+cardChartCtrl1.$inject = ['$scope', '$rootScope'];
 
-function cardChartCtrl1($scope) {
+function cardChartCtrl1($scope, $rootScope) {
+
 
     $scope.labels = ['April 22', 'April 23', 'April 24', 'April 25', 'April 26', 'Yesterday', 'Today'];
     $scope.data = [
@@ -1040,9 +1070,9 @@ function cardChartCtrl2($scope) {
     }];
 }
 
-sleepCtrl.$inject = ['$scope', '$cookies', '$filter', '$http', '$location'];
+sleepCtrl.$inject = ['$scope', '$rootScope', '$cookies', '$filter', '$http', '$location'];
 
-function sleepCtrl($scope, $cookies, $filter, $http, $location) {
+function sleepCtrl($scope, $rootScope, $cookies, $filter, $http, $location) {
     $scope.labels = ['January', 'February', 'March', 'April', 'May', 'June', 'July'];
     $scope.data = [
         [78, 81, 80, 45, 34, 12, 40]
@@ -1080,7 +1110,12 @@ function sleepCtrl($scope, $cookies, $filter, $http, $location) {
             var graphData = [
                 []
             ];
-            console.log(JSON.parse(data));
+            console.debug(data);
+            if(data.message == "Error retrieving sleep log."){
+                $rootScope.overallScore += 1;
+                $rootScope.overallSum += 1;
+                $rootScope.overallResult = Math.ceil($rootScope.overallScore / $rootScope.overallSum);
+            }
             data = JSON.parse(data);
             angular.forEach(data.sleep[0].minuteData, function(datevalue) {
                 graphData[0].push(parseInt(datevalue.value));
@@ -1095,6 +1130,30 @@ function sleepCtrl($scope, $cookies, $filter, $http, $location) {
             console.log($scope.data);
             $scope.data = graphData;
             $scope.labels = labelsArray;
+
+            var sevenhours = 7 * 60;
+            var twohours = 2 * 60;
+            if(totalTimeInBed < sevenhours){
+                if(totalTimeInBed > twohours){
+                    $rootScope.overallScore += totalTimeInBed/60 - 2;
+                    $rootScope.overallSum += 1;
+                    $rootScope.overallResult = Math.ceil($rootScope.overallScore / $rootScope.overallSum);
+                    console.log("Result:"+$rootScope.overallResult);
+
+                }
+                else {
+                    $rootScope.overallScore += 1;
+                    $rootScope.overallSum += 1;
+                    $rootScope.overallResult = Math.ceil($rootScope.overallScore / $rootScope.overallSum);
+                    console.log("Result:"+$rootScope.overallResult);
+                }
+            }
+            else if(totalTimeInBed > sevenhours){
+                $rootScope.overallScore += 10;
+                $rootScope.overallSum += 1;
+                $rootScope.overallResult = Math.ceil($rootScope.overallScore / $rootScope.overallSum);
+                console.log("Result:"+$rootScope.overallResult);
+            }
 
         }).error(function(data) {
             //what to do on error
