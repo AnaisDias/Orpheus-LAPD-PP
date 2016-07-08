@@ -648,11 +648,13 @@
 
             var id = req.params.id;
             var data = '';
+            var counter = 1;
 
             models.MoodSituation.findAll({
                 where: {
                     UserId: id
-                }
+                },
+                order: [['moodpoints','DESC']]
             }).then(function(moodsituation){
                 data = '{ ';
                 if(moodsituation.length==0){
@@ -660,7 +662,8 @@
                     updateMoodSituation(id);
                 }
                 moodsituation.forEach(function(i){
-                    data += '' + i + ': {\n situation: ' + i.dataValues.situation + ',\nscore: ' + i.dataValues.moodpoints + '\n}';
+                    data += '' + counter + ': {\n situation: ' + i.dataValues.situation + ',\nscore: ' + i.dataValues.moodpoints + '\n}';
+                    counter += 1;
                     if(i<moodsituation.size - 1){
                         data += ',\n';
                     }
