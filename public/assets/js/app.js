@@ -40,5 +40,16 @@ angular
             document.body.scrollTop = document.documentElement.scrollTop = 0;
         });
         $rootScope.$state = $state;
+        $rootScope.overallScore = 0;
+    $rootScope.overallSum = 0;
+    $rootScope.overallResult = 0;
         return $rootScope.$stateParams = $stateParams;
-    }]);
+    }])
+    .factory('Score', function() {
+        var Score = {
+    overallScore: 0,
+    overallSum: 0,
+    overallResult: 0
+  };
+  return Service;
+});
