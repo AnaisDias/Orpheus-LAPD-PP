@@ -18,7 +18,7 @@
 
     exports.insertMood = function(userid, mood, thisdate) {
 
-      console.log("DATA ECEBIIIIDA                   "+thisdate);
+        console.log("DATA ECEBIIIIDA                   " + thisdate);
         return new Promise(function(resolve, reject) {
             models.MoodDay.count({
                 where: {
@@ -27,7 +27,7 @@
                 }
             }).then(count => {
                 if (count != 0) {
-                  console.log("encontrou um mood para este dia e user já.");
+                    console.log("encontrou um mood para este dia e user já.");
                     models.MoodDay.update({
                         score: mood
                     }, {
@@ -51,6 +51,25 @@
 
                 }
 
+            });
+        });
+    }
+
+    exports.getMood = function(userid, thisdate) {
+        return new Promise(function(resolve, reject) {
+
+            models.MoodDay.find({
+                where: {
+                    UserId: userid,
+                    date: thisdate
+                }
+            }).then(function(moodDay) {
+                if (moodDay) {
+                    console.log("MOOOOD " + moodDay.score);
+                    resolve(moodDay);
+                } else {
+                    return false;
+                }
             });
         });
     }

@@ -1,4 +1,6 @@
-<div class="animated fadeIn">
+<div ng-controller="userAccessCtrl">
+
+    <div class="animated fadeIn">
     <h1> </h1>
 </div>
 
@@ -6,13 +8,13 @@
 
 <div class="row">
     <div class="col-md-12">
-        <div class="card card-inverse ">
-            <div class="card-block">
+        <div class="card card-inverse  ">
+            <div class="card-block datepickercard">
                 <div class="row " ng-controller="DatePickerCtrl">
 
-                    <div class="col-sm-6">
-
-                        <div class="col-sm-6 col-sm-offset-9">
+                  <div class="col-sm-4">
+                  </div>
+                        <div class="col-sm-4">
 
                             <fieldset class="form-group ">
 
@@ -42,12 +44,13 @@
                                 </script>
 
 
-
-                                <div ng-show="selected">Selection from a modal: {{ selected }}</div>
+                                <div ng-show="!selected && todaysmoodimg"><img src="assets/img/{{todaysmoodimg}}" class="img-mood-display"></div>
+                                <div ng-show="selected"><img src="assets/img/{{selected.icon}}" class="img-mood-display"></div>
                             </fieldset>
-                            <button type="button" class="btn btn-default" ng-click="open('lg')">Daily Mood</button>
+                            <button type="button" class="btn btn-primary-outline btn-lg btn-block" ng-click="open('lg')">Select mood for this day</button>
                         </div>
-                    </div>
+
+
 
                 </div>
 
@@ -276,7 +279,7 @@
                                         </div>
                                     </div>
 
-                
+
                                     <div class="col-sm-12 col-lg-4" ng-show="moods.length">
 
 
@@ -369,4 +372,4 @@
                 </div>
                 <!--/.card-->
 
-
+</div>

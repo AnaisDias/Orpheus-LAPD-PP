@@ -10,6 +10,15 @@ function registerCtrl($scope, $http, $window) {
         if(this.fullname == "" || this.username == "" || this.email == "" || this.password == ""){
             $scope.statusMsg = "Some data is missing. Make sure you fill everything!";
         }
+        else if(this.fullname.length < 3 || this.fullname.length > 50){
+            $scope.statusMsg = "Full name length must be between 4 and 50";
+        }
+        else if(this.username.length < 3 || this.username.length > 50){
+            $scope.statusMsg = "Username length must be between 4 and 50";
+        }
+        else if(this.password.length < 3 || this.password.length > 50){
+            $scope.statusMsg = "Password length must be between 4 and 50";
+        }
         else if(this.password == this.rPassword) {
             var ntype = 0;
             if (this.typeOf == "therapist"){

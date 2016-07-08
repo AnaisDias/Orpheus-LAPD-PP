@@ -2,7 +2,7 @@
 module.exports = function(sequelize, DataTypes) {
   var MoodDay = sequelize.define('MoodDay', {
     date: DataTypes.DATEONLY,
-    score: DataTypes.INTEGER,
+    score: DataTypes.FLOAT,
     updatedAt: DataTypes.DATE
   }, {
     classMethods: {

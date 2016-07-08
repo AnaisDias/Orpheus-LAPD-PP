@@ -21,6 +21,20 @@ body {
 article, aside, details, figcaption, figure, footer, header, hgroup, main, menu, nav, section, summary {
     display: block;
 }
+
+.form-group .input-group{
+
+	box-shadow: 0 1px 3px #252525;
+  padding: 0;
+	font-weight: normal;
+	font-size: 11px;
+
+}
+.input-group-sm{
+}
+
+.datepickercard{
+}
 .img-mood {
     height: 44px;
     margin-top: -2px;
@@ -29,6 +43,21 @@ article, aside, details, figcaption, figure, footer, header, hgroup, main, menu,
     height: 55px;
     margin: 0 10px;
 }
+
+.img-mood-display{
+
+    font-size: 5.5em;
+    text-align: center;
+    vertical-align: middle;
+    width:70%;
+    padding-top:50px;
+    padding-left:100px;
+}
+
+
+
+
+
 
 .modal-body {
   position: fixed;
