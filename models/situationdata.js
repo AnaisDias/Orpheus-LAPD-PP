@@ -1,7 +1,7 @@
 'use strict';
 module.exports = function(sequelize, DataTypes) {
   var SituationData = sequelize.define('SituationData', {
-    date: DataTypes.DATE,
+    date: DataTypes.DATEONLY,
     situations: DataTypes.JSONB
   }, {
     classMethods: {
