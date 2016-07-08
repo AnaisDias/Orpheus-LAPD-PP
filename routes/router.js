@@ -498,15 +498,24 @@
         app.get('/api/checkLogin', function(req, res) {
 
             console.log(req);
+            var json_data;
             if (req.isAuthenticated()) {
                 models.User.find({
                     where: {
                         auth_id: req.user.profile.id
                     }
-                }).then(function(user) {
-                    id = user.id;
+                }).then(function (user) {
+                    json_data = {
+                        'id' : user.id,
+                        'type' : user.type
+                    }
+                    if(id == null || id != user.id) {
+                        id = user.id
+                    }
+                    res.send(json_data);
                 });
-                res.send(id);
+
+
             } else {
                 res.send('undefined');
             }

@@ -19,6 +19,7 @@ angular
     .controller('twitterCtrl', twitterCtrl)
     .controller('situmanCtrl', situmanCtrl)
     .controller('therapistCtrl', therapistCtrl)
+    .controller('userAccessCtrl', userAccessCtrl)
     .controller('ModalInstanceCtrl', ModalInstanceCtrl)
     .filter('secondsToDateTime', [function() {
         return function(seconds) {
@@ -26,37 +27,51 @@ angular
         };
     }])
 
-
-therapistCtrl.inject = ['$scope', '$http', '$location', '$window'];
-
-function therapistCtrl($scope, $http, $location, $window) {
-    if ($location.search().id != undefined) {
-        $http.get('/api/patient/list/' + $location.search().id).success(function(data) {
-            console.log(data);
-            $scope.patients = data.usersArr;
-        }).error(function(data) {
-            console.log("erro ao ir buscar pacientes");
+    userAccessCtrl.inject=['$scope','$http', '$location', '$window'];
+    function userAccessCtrl($scope,$http,$location, $window){
+        $http.get('api/checkLogin').success(function (data){
+           if($location.search().id != undefined && data != 'undefined'){
+               if(data.type != 1){
+                   if($location.search().id != data.id){
+                       $window.location.href = '/#/user';
+                       $window.location.reload();
+                   }
+               }
+           }
         });
-    } else {
+    }
+
+    therapistCtrl.inject=['$scope','$http','$location', '$window'];
+    function therapistCtrl($scope,$http,$location, $window){
         var id = null;
-        $http.get('api/checkLogin').success(function(data) {
-            id = data.id;
-            if (data.type == 1) {
-                $http.get('/api/patient/list/' + id).success(function(data) {
-                    console.log(data);
-                    $scope.patients = data.usersArr;
-                    console.log($scope.patients[0].fullname);
-                }).error(function(data) {
-                    console.log("erro ao ir buscar pacientes");
-                });
-            } else {
-                $window.location.href = '/#/user?id=' + id;
+        $http.get('api/checkLogin').success(function (data){
+            if(data != 'undefined') {
+                if ($location.search().id == undefined) {
+                    id = data.id;
+                } else {
+                    id = $location.search().id;
+                }
+                if (data.type == 1) {
+                    $http.get('/api/patient/list/' + id).success(function (data) {
+                        $scope.patients = data.usersArr;
+                        console.log($scope.patients[0].fullname);
+                    }).error(function (data) {
+                        console.log("erro ao ir buscar pacientes");
+                    });
+                }
+                else {
+                    $window.location.href = '/#/user?id=' + id;
+                }
             }
-        }).error(function(data) {
+            else {
+                $window.location.href = '/#/login';
+
+            }
+        }).error(function (data) {
             console.log("erro ao ir buscar pacientes");
         });
     }
-}
+
 
 ModalInstanceCtrl.inject = ['$scope', '$uibModalInstance', 'items', '$cookies', '$location', '$http', '$filter', '$window'];
 
@@ -65,6 +80,18 @@ function ModalInstanceCtrl($scope, $uibModalInstance, items, $cookies, $location
     $scope.selected = {
         item: $scope.items[0]
     };
+    var id = null;
+
+    if($location.search().id == undefined){
+        $http.get('api/checkLogin').success(function (data){
+            id = data.id;
+        }).error(function (data) {
+            console.log("erro ao ir buscar id");
+        });
+    }
+    else {
+        id = $location.search().id;
+    }
 
     $scope.ok = function() {
 
@@ -78,17 +105,17 @@ function ModalInstanceCtrl($scope, $uibModalInstance, items, $cookies, $location
             unparsedDate = newVal;
             parsedDate = $filter('date')(new Date(unparsedDate), 'yyyy-MM-dd');
 
-            var data1 = {
-                method: 'POST',
-                url: '/api/insertMood',
-                data: {
-                    'userid': $location.search().id,
-                    'mood': $scope.selected.item.score,
-                    'date': parsedDate
-                }
-            };
-            $http(data1).then(function(response) {
-                if (response.data.success) {
+      var data1 = {
+          method: 'POST',
+          url: '/api/insertMood',
+          data: {
+              'userid': id,
+              'mood': $scope.selected.item.score,
+              'date': parsedDate
+          }
+      };
+      $http(data1).then( function(response){
+          if(response.data.success){
 
                 }
             }, function(response) {
@@ -116,11 +143,12 @@ function twitterCtrl($scope, $http, $location, $cookies, $filter) {
         if (typeof(newVal) == 'undefined') {
             newVal = moment()._d;
         }
-
+        var id = null;
         unparsedDate = newVal;
         parsedDate = $filter('date')(new Date(unparsedDate), 'yyyy-MM-dd');
         if ($location.search().id == undefined) {
             $http.get('api/checkLogin').success(function(data) {
+                console.log("O id é:" + data.id );
                 id = data.id;
             }).error(function(data) {
                 console.log("erro ao ir buscar id");
@@ -235,12 +263,25 @@ function moodDemoCtrl($scope) {
 DatePickerCtrl.$inject = ['$scope', '$cookies', '$http', '$location', '$filter', '$uibModal'];
 
 function DatePickerCtrl($scope, $cookies, $http, $location, $filter, $uibModal) {
+
+    var id = null;
     $cookies.selDate = moment()._d;
+    if($location.search().id == undefined){
+        $http.get('api/checkLogin').success(function (data){
+            console.log("O id é:" + data.id );
+            id = data.id;
+        }).error(function (data) {
+            console.log("erro ao ir buscar id");
+        });
+    }
+    else {
+        id = $location.search().id;
+    }
 
     $scope.selDate = $filter('date')(new Date(moment()._d), 'yyyy-MM-dd');
 
 
-    $http.get('/api/registerdate/' + $location.search().id).success(function(data) {
+    $http.get('/api/registerdate/' + id).success(function(data) {
         var thisdate = moment(data);
         month = thisdate.month() + 1;
         if (month < 10) {
@@ -469,6 +510,18 @@ activityCtrl.$inject = ['$scope', '$cookies', '$window', '$http', '$filter', '$l
 
 function activityCtrl($scope, $cookies, $window, $http, $filter, $location) {
 
+    var id = null;
+    if($location.search().id == undefined){
+        $http.get('api/checkLogin').success(function (data){
+            console.log("O id é:" + data.id );
+            id = data.id;
+        }).error(function (data) {
+            console.log("erro ao ir buscar id");
+        });
+    }
+    else {
+        id = $location.search().id;
+    }
 
 
     $scope.$watch(function() {
@@ -480,7 +533,7 @@ function activityCtrl($scope, $cookies, $window, $http, $filter, $location) {
 
         unparsedDate = newVal;
         parsedDate = $filter('date')(new Date(unparsedDate), 'yyyy-MM-dd');
-        $http.get('/api/fitbit/activity/' + parsedDate + "/" + $location.search().id).success(function(data) {
+        $http.get('/api/fitbit/activity/' + parsedDate + "/" + id).success(function(data) {
             console.log(data);
             data = JSON.parse(data);
             $scope.activities = data.activities;
@@ -580,7 +633,18 @@ situmanCtrl.$inject = ['$scope', '$cookies', '$window', '$http', '$filter', '$lo
 
 function situmanCtrl($scope, $cookies, $window, $http, $filter, $location) {
 
-
+    var id = null;
+    if($location.search().id == undefined){
+        $http.get('api/checkLogin').success(function (data){
+            console.log("O id é:" + data.id );
+            id = data.id;
+        }).error(function (data) {
+            console.log("erro ao ir buscar id");
+        });
+    }
+    else {
+        id = $location.search().id;
+    }
 
     $scope.$watch(function() {
         return $cookies.selDate;
@@ -596,7 +660,7 @@ function situmanCtrl($scope, $cookies, $window, $http, $filter, $location) {
         $scope.situations = [];
         $scope.moods= [];
         parsedDate = $filter('date')(new Date(unparsedDate), 'dd-MM-yyyy');
-        $http.get('/api/situationData/' + parsedDate + "/" + $location.search().id).success(function(data) {
+        $http.get('/api/situationData/' + parsedDate + "/" + id).success(function(data) {
             console.debug(data);
             //jsonD = JSON.parse(JSONdata);
             for (var i in data) {
@@ -612,7 +676,7 @@ function situmanCtrl($scope, $cookies, $window, $http, $filter, $location) {
             console.log("error on situmanCtrl");
         });
 
-        $http.get('/api/moodsituation/' + $location.search().id).success(function(data){
+        $http.get('/api/moodsituation/' + id).success(function(data){
             console.debug(data);
             var jsond = JSON.parse(data);
             for(var j in jsond){
@@ -1073,6 +1137,20 @@ function cardChartCtrl2($scope) {
 sleepCtrl.$inject = ['$scope', '$cookies', '$filter', '$http', '$location'];
 
 function sleepCtrl($scope, $cookies, $filter, $http, $location) {
+
+    var id = null;
+    if($location.search().id == undefined){
+        $http.get('api/checkLogin').success(function (data){
+            console.log("O id é:" + data.id );
+            id = data.id;
+        }).error(function (data) {
+            console.log("erro ao ir buscar id");
+        });
+    }
+    else {
+        id = $location.search().id;
+    }
+
     $scope.labels = ['January', 'February', 'March', 'April', 'May', 'June', 'July'];
     $scope.data = [
         [78, 81, 80, 45, 34, 12, 40]
@@ -1105,7 +1183,7 @@ function sleepCtrl($scope, $cookies, $filter, $http, $location) {
 
         unparsedDate = newVal;
         parsedDate = $filter('date')(new Date(unparsedDate), 'yyyy-MM-dd');
-        $http.get('/api/fitbit/sleep/' + parsedDate + "/" + $location.search().id).success(function(data) {
+        $http.get('/api/fitbit/sleep/' + parsedDate + "/" + id).success(function(data) {
             var labelsArray = [];
             var graphData = [
                 []
