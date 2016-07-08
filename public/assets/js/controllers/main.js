@@ -27,50 +27,50 @@ angular
         };
     }])
 
-    userAccessCtrl.inject=['$scope','$http', '$location', '$window'];
-    function userAccessCtrl($scope,$http,$location, $window){
-        $http.get('api/checkLogin').success(function (data){
-           if($location.search().id != undefined && data != 'undefined'){
-               if(data.type != 1){
-                   if($location.search().id != data.id){
-                       $window.location.href = '/#/user';
-                       $window.location.reload();
-                   }
-               }
-           }
-        });
-    }
+userAccessCtrl.inject = ['$scope', '$http', '$location', '$window'];
 
-    therapistCtrl.inject=['$scope','$http','$location', '$window'];
-    function therapistCtrl($scope,$http,$location, $window){
-        var id = null;
-        $http.get('api/checkLogin').success(function (data){
-            if(data != 'undefined') {
-                if ($location.search().id == undefined) {
-                    id = data.id;
-                } else {
-                    id = $location.search().id;
-                }
-                if (data.type == 1) {
-                    $http.get('/api/patient/list/' + id).success(function (data) {
-                        $scope.patients = data.usersArr;
-                        console.log($scope.patients[0].fullname);
-                    }).error(function (data) {
-                        console.log("erro ao ir buscar pacientes");
-                    });
-                }
-                else {
-                    $window.location.href = '/#/user?id=' + id;
+function userAccessCtrl($scope, $http, $location, $window) {
+    $http.get('api/checkLogin').success(function(data) {
+        if ($location.search().id != undefined && data != 'undefined') {
+            if (data.type != 1) {
+                if ($location.search().id != data.id) {
+                    $window.location.href = '/#/user';
+                    $window.location.reload();
                 }
             }
-            else {
-                $window.location.href = '/#/login';
+        }
+    });
+}
 
+therapistCtrl.inject = ['$scope', '$http', '$location', '$window'];
+
+function therapistCtrl($scope, $http, $location, $window) {
+    var id = null;
+    $http.get('api/checkLogin').success(function(data) {
+        if (data != 'undefined') {
+            if ($location.search().id == undefined) {
+                id = data.id;
+            } else {
+                id = $location.search().id;
             }
-        }).error(function (data) {
-            console.log("erro ao ir buscar pacientes");
-        });
-    }
+            if (data.type == 1) {
+                $http.get('/api/patient/list/' + id).success(function(data) {
+                    $scope.patients = data.usersArr;
+                    console.log($scope.patients[0].fullname);
+                }).error(function(data) {
+                    console.log("erro ao ir buscar pacientes");
+                });
+            } else {
+                $window.location.href = '/#/user?id=' + id;
+            }
+        } else {
+            $window.location.href = '/#/login';
+
+        }
+    }).error(function(data) {
+        console.log("erro ao ir buscar pacientes");
+    });
+}
 
 
 ModalInstanceCtrl.inject = ['$scope', '$uibModalInstance', 'items', '$cookies', '$location', '$http', '$filter', '$window'];
@@ -82,14 +82,13 @@ function ModalInstanceCtrl($scope, $uibModalInstance, items, $cookies, $location
     };
     var id = null;
 
-    if($location.search().id == undefined){
-        $http.get('api/checkLogin').success(function (data){
+    if ($location.search().id == undefined) {
+        $http.get('api/checkLogin').success(function(data) {
             id = data.id;
-        }).error(function (data) {
+        }).error(function(data) {
             console.log("erro ao ir buscar id");
         });
-    }
-    else {
+    } else {
         id = $location.search().id;
     }
 
@@ -105,17 +104,17 @@ function ModalInstanceCtrl($scope, $uibModalInstance, items, $cookies, $location
             unparsedDate = newVal;
             parsedDate = $filter('date')(new Date(unparsedDate), 'yyyy-MM-dd');
 
-      var data1 = {
-          method: 'POST',
-          url: '/api/insertMood',
-          data: {
-              'userid': id,
-              'mood': $scope.selected.item.score,
-              'date': parsedDate
-          }
-      };
-      $http(data1).then( function(response){
-          if(response.data.success){
+            var data1 = {
+                method: 'POST',
+                url: '/api/insertMood',
+                data: {
+                    'userid': $location.search().id,
+                    'mood': $scope.selected.item.score,
+                    'date': parsedDate
+                }
+            };
+            $http(data1).then(function(response) {
+                if (response.data.success) {
 
                 }
             }, function(response) {
@@ -261,15 +260,14 @@ function DatePickerCtrl($scope, $cookies, $http, $location, $filter, $uibModal) 
 
     var id = null;
     $cookies.selDate = moment()._d;
-    if($location.search().id == undefined){
-        $http.get('api/checkLogin').success(function (data){
-            console.log("O id é:" + data.id );
+    if ($location.search().id == undefined) {
+        $http.get('api/checkLogin').success(function(data) {
+            console.log("O id é:" + data.id);
             id = data.id;
-        }).error(function (data) {
+        }).error(function(data) {
             console.log("erro ao ir buscar id");
         });
-    }
-    else {
+    } else {
         id = $location.search().id;
     }
 
@@ -357,11 +355,12 @@ function DatePickerCtrl($scope, $cookies, $http, $location, $filter, $uibModal) 
         parsedDate = $filter('date')(new Date(unparsedDate), 'yyyy-MM-dd');
 
         $http.get('/api/getMood/' + $location.search().id + "/" + parsedDate).success(function(data) {
-
-            $scope.todaysmood = data.score;
-            console.log("MOOD DE HOJE : " + $scope.todaysmood)
-            $scope.todaysmoodimg = $scope.items[$scope.todaysmood].icon;
-            console.log("mod img = "+$scope.todaysmoodimg);
+            if (!data.message) {
+                $scope.todaysmood = data.score;
+                console.log("MOOD DE HOJE : " + $scope.todaysmood)
+                $scope.todaysmoodimg = $scope.items[$scope.todaysmood / 2.5].icon;
+                console.log("mod img = " + $scope.todaysmoodimg);
+            }
         }).error(function(data) {});
 
     }, true);
@@ -506,15 +505,14 @@ activityCtrl.$inject = ['$scope', '$cookies', '$window', '$http', '$filter', '$l
 function activityCtrl($scope, $cookies, $window, $http, $filter, $location) {
 
     var id = null;
-    if($location.search().id == undefined){
-        $http.get('api/checkLogin').success(function (data){
-            console.log("O id é:" + data.id );
+    if ($location.search().id == undefined) {
+        $http.get('api/checkLogin').success(function(data) {
+            console.log("O id é:" + data.id);
             id = data.id;
-        }).error(function (data) {
+        }).error(function(data) {
             console.log("erro ao ir buscar id");
         });
-    }
-    else {
+    } else {
         id = $location.search().id;
     }
 
@@ -629,15 +627,14 @@ situmanCtrl.$inject = ['$scope', '$cookies', '$window', '$http', '$filter', '$lo
 function situmanCtrl($scope, $cookies, $window, $http, $filter, $location) {
 
     var id = null;
-    if($location.search().id == undefined){
-        $http.get('api/checkLogin').success(function (data){
-            console.log("O id é:" + data.id );
+    if ($location.search().id == undefined) {
+        $http.get('api/checkLogin').success(function(data) {
+            console.log("O id é:" + data.id);
             id = data.id;
-        }).error(function (data) {
+        }).error(function(data) {
             console.log("erro ao ir buscar id");
         });
-    }
-    else {
+    } else {
         id = $location.search().id;
     }
 
@@ -653,7 +650,7 @@ function situmanCtrl($scope, $cookies, $window, $http, $filter, $location) {
         var size = 0;
         var sizee = 0;
         $scope.situations = [];
-        $scope.moods= [];
+        $scope.moods = [];
         parsedDate = $filter('date')(new Date(unparsedDate), 'dd-MM-yyyy');
         $http.get('/api/situationData/' + parsedDate + "/" + id).success(function(data) {
             console.debug(data);
@@ -666,21 +663,21 @@ function situmanCtrl($scope, $cookies, $window, $http, $filter, $location) {
             }
 
             //$scope.situations = jsonD.situations;
-           // console.log("situations:" + $scope.situations[0].name);
+            // console.log("situations:" + $scope.situations[0].name);
         }).error(function(data) {
             console.log("error on situmanCtrl");
         });
 
-        $http.get('/api/moodsituation/' + id).success(function(data){
+        $http.get('/api/moodsituation/' + id).success(function(data) {
             console.debug(data);
             var jsond = JSON.parse(data);
-            for(var j in jsond){
-            $scope.moods[sizee] = [];
-            $scope.moods[sizee].situation = jsond[j].situation;
-            $scope.moods[sizee].score = jsond[j].score/jsond[j].moods;
-            sizee+=1;
-        }
-        }).error(function(data){
+            for (var j in jsond) {
+                $scope.moods[sizee] = [];
+                $scope.moods[sizee].situation = jsond[j].situation;
+                $scope.moods[sizee].score = jsond[j].score / jsond[j].moods;
+                sizee += 1;
+            }
+        }).error(function(data) {
             console.log("error on situmanCtrl, mood situation section");
         });
 
@@ -1134,15 +1131,14 @@ sleepCtrl.$inject = ['$scope', '$cookies', '$filter', '$http', '$location'];
 function sleepCtrl($scope, $cookies, $filter, $http, $location) {
 
     var id = null;
-    if($location.search().id == undefined){
-        $http.get('api/checkLogin').success(function (data){
-            console.log("O id é:" + data.id );
+    if ($location.search().id == undefined) {
+        $http.get('api/checkLogin').success(function(data) {
+            console.log("O id é:" + data.id);
             id = data.id;
-        }).error(function (data) {
+        }).error(function(data) {
             console.log("erro ao ir buscar id");
         });
-    }
-    else {
+    } else {
         id = $location.search().id;
     }
 

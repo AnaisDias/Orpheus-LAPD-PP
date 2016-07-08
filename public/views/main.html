@@ -44,7 +44,7 @@
                                 </script>
 
 
-                                <div ng-hide="selected"><img src="assets/img/{{todaysmoodimg}}" class="img-mood-display"></div>
+                                <div ng-show="!selected && todaysmoodimg"><img src="assets/img/{{todaysmoodimg}}" class="img-mood-display"></div>
                                 <div ng-show="selected"><img src="assets/img/{{selected.icon}}" class="img-mood-display"></div>
                             </fieldset>
 <<<<<<< HEAD
@@ -297,7 +297,7 @@
                                         </div>
                                     </div>
 
-                
+
                                     <div class="col-sm-12 col-lg-4" ng-show="moods.length">
 
 

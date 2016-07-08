@@ -56,7 +56,7 @@
                     username: req.user.username,
                     avatar: "http://www.fitbit.com/images/profile/defaultProfile_100_male.gif"
                 }
-            else {
+            } else {
                 json_data = {
                     username: req.user.profile.displayName,
                     avatar: req.user.profile._json.user.avatar
@@ -68,7 +68,7 @@
 
 
         app.route('/fileupload')
-            .post(upload.file, function(req,res){
+            .post(upload.file, function(req, res) {
                 updateMoodSituation(req.body.userid);
             });
 
@@ -92,14 +92,21 @@
 
         });
 
-        app.get('/api/getMood/:id/:date',function(req,res) {
+        app.get('/api/getMood/:id/:date', function(req, res) {
 
-          userid=req.params.id;
-          thisdate=req.params.date;
+            userid = req.params.id;
+            thisdate = req.params.date;
 
-          dbFunctions.getMood(userid, thisdate).then(function(moodDay) {
-              res.json(moodDay);
-          });
+            dbFunctions.getMood(userid, thisdate).then(function(moodDay) {
+                if (moodDay != false) {
+                    res.json(moodDay);
+                }
+                else{
+                  res.json({
+                    message : "Mood for this day not found"
+                  });
+                }
+            });
 
 
 
@@ -337,32 +344,31 @@
                         where: {
                             id: user.id
                         }
-                    }).then( function(u) {
-                            models.User.find({
-                                where: {
-                                    auth_id: req.user.profile.id
-                                }
-                            }).then(function (user) {
-                                console.log(user);
-                                parseDate = user.createdAt.setMonth(user.createdAt.getMonth());
-                                var momentRegisterDate = moment(parseDate);
-                                var momentToday = moment();
+                    }).then(function(u) {
+                        models.User.find({
+                            where: {
+                                auth_id: req.user.profile.id
+                            }
+                        }).then(function(user) {
+                            console.log(user);
+                            parseDate = user.createdAt.setMonth(user.createdAt.getMonth());
+                            var momentRegisterDate = moment(parseDate);
+                            var momentToday = moment();
 
-                                //cycle that requests activity and stores it from registration date untill today, adding one day after each iteration
-                                while (momentRegisterDate.isSameOrBefore(momentToday)) {
-                                    var thisdate = momentRegisterDate.year() + "-" + (momentRegisterDate.month() + 1) + "-" + momentRegisterDate.date();
-                                    toCheck(thisdate, user.id, user.auth_id, req.user.accessToken);
-                                    momentRegisterDate.add(1, 'days');
-                                }
+                            //cycle that requests activity and stores it from registration date untill today, adding one day after each iteration
+                            while (momentRegisterDate.isSameOrBefore(momentToday)) {
+                                var thisdate = momentRegisterDate.year() + "-" + (momentRegisterDate.month() + 1) + "-" + momentRegisterDate.date();
+                                toCheck(thisdate, user.id, user.auth_id, req.user.accessToken);
+                                momentRegisterDate.add(1, 'days');
+                            }
 
-                                if (user.type == 1) {
-                                    res.redirect('/#/therapist?id=' + user.id);
-                                } else {
-                                    res.redirect('/#/user?id=' + user.id);
-                                }
-                            })
-                        }
-                    );
+                            if (user.type == 1) {
+                                res.redirect('/#/therapist?id=' + user.id);
+                            } else {
+                                res.redirect('/#/user?id=' + user.id);
+                            }
+                        })
+                    });
                 });
 
 
@@ -494,12 +500,12 @@
                     where: {
                         auth_id: req.user.profile.id
                     }
-                }).then(function (user) {
+                }).then(function(user) {
                     json_data = {
-                        'id' : user.id,
-                        'type' : user.type
+                        'id': user.id,
+                        'type': user.type
                     }
-                    if(id == null || id != user.id) {
+                    if (id == null || id != user.id) {
                         id = user.id
                     }
                     res.send(json_data);
@@ -555,7 +561,7 @@
                                         situ[size] = [];
                                         situ[size].name = results[r][situations][l].name;
                                         situ[size].count = 1;
-                                        totalcount+=1;
+                                        totalcount += 1;
                                         size += 1;
                                     }
                                 }
@@ -582,9 +588,9 @@
 
         });
 
-//use in api function and every time moods or situations are updated
-        var updateMoodSituation = function(id){
-            var size=0;
+        //use in api function and every time moods or situations are updated
+        var updateMoodSituation = function(id) {
+            var size = 0;
             var situ = [];
             var dates = [];
 
@@ -592,101 +598,101 @@
                 where: {
                     UserId: id
                 }
-            }).then(function(sits){
-                sits.forEach(function(r){
-                    console.log("Results: "+ util.inspect(r.dataValues, false, null));
+            }).then(function(sits) {
+                sits.forEach(function(r) {
+                    console.log("Results: " + util.inspect(r.dataValues, false, null));
                     var date = r.dataValues.date;
                     var moodscore = 0;
                     var situations = r.dataValues.situations;
                     var found = false;
 
-                    if(dates.indexOf(date)==-1){
+                    if (dates.indexOf(date) == -1) {
                         dates.push(date);
-                    models.MoodDay.find({
-                        attributes: ['score'],
-                        where: {
-                            date: date
-                        }
-                    }).then(function(moods){
-                        if (moods!= null){
-                        moodscore = moods.score;
-                        console.log('Moodscore: ' + moodscore);
-                        for(var s in situations){
-                                console.log("SITUATIONS: "+ util.inspect(situations, false, null));
+                        models.MoodDay.find({
+                            attributes: ['score'],
+                            where: {
+                                date: date
+                            }
+                        }).then(function(moods) {
+                            if (moods != null) {
+                                moodscore = moods.score;
+                                console.log('Moodscore: ' + moodscore);
+                                for (var s in situations) {
+                                    console.log("SITUATIONS: " + util.inspect(situations, false, null));
 
-                                if (situations[s].name != undefined) {
+                                    if (situations[s].name != undefined) {
 
-                                    found = false;
-                                    for (var names in situ) {
-                                        if (situations[s].name == situ[names].name) {
-                                            situ[names].moodscore += moodscore;
-                                            situ[names].moods += 1;
-                                            found = true;
-                                            break;
+                                        found = false;
+                                        for (var names in situ) {
+                                            if (situations[s].name == situ[names].name) {
+                                                situ[names].moodscore += moodscore;
+                                                situ[names].moods += 1;
+                                                found = true;
+                                                break;
+                                            }
                                         }
-                                    }
 
-                                    if (!found) {
-                                        situ[size] = [];
-                                        situ[size].name = situations[s].name;
-                                        situ[size].moodscore = moodscore;
-                                        situ[size].moods = 1;
-                                        size += 1;
+                                        if (!found) {
+                                            situ[size] = [];
+                                            situ[size].name = situations[s].name;
+                                            situ[size].moodscore = moodscore;
+                                            situ[size].moods = 1;
+                                            size += 1;
+                                        }
+                                        console.log("SITU: " + util.inspect(situ, false, null));
                                     }
-                                    console.log("SITU: "+ util.inspect(situ, false, null));
                                 }
-                    }
-                    //save results to db
-                    for(var i in situ){
-                        var name = situ[i].name;
-                        var score = situ[i].moodscore;
-                        var moods = situ[i].moods;
-                        console.log("Situation: "+ name + " Score: "+ score);
+                                //save results to db
+                                for (var i in situ) {
+                                    var name = situ[i].name;
+                                    var score = situ[i].moodscore;
+                                    var moods = situ[i].moods;
+                                    console.log("Situation: " + name + " Score: " + score);
 
-                        models.MoodSituation.find({
-                where: {
-                    UserId: id,
-                    situation: name
-                }
-            }).then(function(moodsit){
-                if (moodsit != null) {
-                  console.log("encontrou um mood situation para este dia e user já.");
-                  moodsit.increment('counter');
-                  var oldscore = moodsit.dataValues.moodpoints;
-                  var newscore = oldscore + score;
-                    models.MoodSituation.update({
-                        moodpoints: newscore
-                    }, {
-                        where: {
-                            situation: name,
-                            UserId: id
-                        }
-                    });
-                } else {
-                    models.MoodSituation.create({
+                                    models.MoodSituation.find({
+                                        where: {
+                                            UserId: id,
+                                            situation: name
+                                        }
+                                    }).then(function(moodsit) {
+                                        if (moodsit != null) {
+                                            console.log("encontrou um mood situation para este dia e user já.");
+                                            moodsit.increment('counter');
+                                            var oldscore = moodsit.dataValues.moodpoints;
+                                            var newscore = oldscore + score;
+                                            models.MoodSituation.update({
+                                                moodpoints: newscore
+                                            }, {
+                                                where: {
+                                                    situation: name,
+                                                    UserId: id
+                                                }
+                                            });
+                                        } else {
+                                            models.MoodSituation.create({
 
-                        situation: name,
-                        UserId: id,
-                        moodpoints: score,
-                        counter: moods
-                    });
+                                                situation: name,
+                                                UserId: id,
+                                                moodpoints: score,
+                                                counter: moods
+                                            });
 
 
-                }
-            });
-        }
-    }
+                                        }
+                                    });
+                                }
+                            }
 
-            }).catch(function(err){
-                        console.log("ERROR getting moods: "+ err);
+                        }).catch(function(err) {
+                            console.log("ERROR getting moods: " + err);
 
-                    });
+                        });
 
                     }
                 });
 
-            }).catch(function(err){
-                console.log("ERROR getting situations: "+ err);
+            }).catch(function(err) {
+                console.log("ERROR getting situations: " + err);
             });
         }
 
@@ -700,29 +706,30 @@
                 where: {
                     UserId: id
                 },
-                order: [['moodpoints','DESC']]
-            }).then(function(moodsituation){
+                order: [
+                    ['moodpoints', 'DESC']
+                ]
+            }).then(function(moodsituation) {
                 data = '{ ';
-                if(moodsituation.length==0){
+                if (moodsituation.length == 0) {
                     updateMoodSituation(id);
                 }
-                moodsituation.forEach(function(i){
-                    data += '"' + counter + '": {\n "situation": "' + i.dataValues.situation + '",\n"score": "' + i.dataValues.moodpoints + '",\n"moods": "'+ i.dataValues.counter + '"\n}';
-                    
-                    if(counter<moodsituation.length){
+                moodsituation.forEach(function(i) {
+                    data += '"' + counter + '": {\n "situation": "' + i.dataValues.situation + '",\n"score": "' + i.dataValues.moodpoints + '",\n"moods": "' + i.dataValues.counter + '"\n}';
+
+                    if (counter < moodsituation.length) {
                         data += ',\n';
-                    }
-                    else {
+                    } else {
                         data += '\n}';
                     }
                     counter += 1;
-                
+
                 });
-                
-                
+
+
                 //data = JSON.parse(data);
                 res.json(data);
-            }).catch(function(err){
+            }).catch(function(err) {
                 console.log("ERROR getting mood situations: " + err);
                 updateMoodSituation(id);
                 data = {
