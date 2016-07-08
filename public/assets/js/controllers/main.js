@@ -577,8 +577,7 @@ function situmanCtrl($scope, $cookies, $window, $http, $filter, $location) {
                 $scope.situations[size].count = data[i];
                 size += 1;
             }
-            console.log("situations:" + $scope.situations[0].name);
-            //$scope.situations = jsonD.situations;
+           // console.log("situations:" + $scope.situations[0].name);
         }).error(function(data) {
             console.log("error on situmanCtrl");
         });
