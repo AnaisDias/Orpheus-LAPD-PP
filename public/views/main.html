@@ -45,7 +45,7 @@
 
                                 <div ng-show="selected">Selection from a modal: {{ selected }}</div>
                             </fieldset>
-                            <button type="button" class="btn btn-default" ng-click="open('lg')">Large modal</button>
+                            <button type="button" class="btn btn-default" ng-click="open('lg')">Daily Mood</button>
                         </div>
                     </div>
 
@@ -287,6 +287,39 @@
                                                 </form>
                                             </div>
                                         </div>
+                                    </div>
+
+                
+                                    <div class="col-sm-12 col-lg-4" ng-show="moods.length">
+
+
+
+                                        <div class="card-block">
+                                            <table class="table table-striped">
+                                                <thead>
+                                                    <tr>
+                                                        <th>Situation</th>
+                                                        <th>Mood Score</th>
+                                                        <!-- <th>Mood</th> -->
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+
+                                                    <tr ng-repeat="mood in moods">
+                                                        <td>{{ mood.situation }}</td>
+                                                        <td>{{ mood.score }}</td>
+                                                        <!-- <td>
+                                                            <button type="button" class="btn btn-primary">Good</button>
+                                                            <button type="button" class="btn btn-warning">Neutral</button>
+                                                            <button type="button" class="btn btn-danger">Bad</button>
+                                                        </td> -->
+                                                    </tr>
+
+                                                </tbody>
+                                            </table>
+
+                                        </div>
+
                                     </div>
 
                                     <div class="col-sm-6 col-md-4" ng-show="!moods.length">

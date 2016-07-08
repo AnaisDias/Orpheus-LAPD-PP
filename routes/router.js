@@ -70,7 +70,9 @@
 
 
         app.route('/fileupload')
-            .post(upload.file);
+            .post(upload.file, function(req,res){
+                updateMoodSituation(req.body.userid);
+            });
 
         app.get('/api/getUserById/:userid', function(req, res) {
 
@@ -86,6 +88,7 @@
             thisdate = req.body.date;
 
             dbFunctions.insertMood(userid, mood, thisdate).then(function(moodDay) {
+                updateMoodSituation(req.body.userid);
                 res.json(moodDay);
             });
 
@@ -536,7 +539,8 @@
                                     if (!found) {
                                         situ[size] = [];
                                         situ[size].name = results[r][situations][l].name;
-                                        situ[size].count = 0;
+                                        situ[size].count = 1;
+                                        totalcount+=1;
                                         size += 1;
                                     }
                                 }
@@ -546,6 +550,7 @@
                     }
 
                     for (var x in situ) {
+
                         var percentage = Math.round((situ[x].count / totalcount) * 100 * 10) / 10;
                         data += '\"' + situ[x].name + '\": ' + '\"' + percentage + '\"';
                         if (x < situ.length - 1) {
@@ -588,12 +593,11 @@
                             date: date
                         }
                     }).then(function(moods){
+                        if (moods!= null){
                         moodscore = moods.score;
                         console.log('Moodscore: ' + moodscore);
                         for(var s in situations){
-                        for (var t in situations[s]) {
-                            for (var l in situations[s][t]) {
-                                console.log("SITUATIONS: "+ util.inspect(situations[s], false, null));
+                                console.log("SITUATIONS: "+ util.inspect(situations, false, null));
 
                                 if (situations[s].name != undefined) {
 
@@ -616,25 +620,52 @@
                                     }
                                     console.log("SITU: "+ util.inspect(situ, false, null));
                                 }
-                            }
-                        }
                     }
                     //save results to db
                     for(var i in situ){
                         var name = situ[i].name;
-                        var score = situ[i].moodscore / situ[i].moods;
+                        var score = situ[i].moodscore;
+                        var moods = situ[i].moods;
                         console.log("Situation: "+ name + " Score: "+ score);
-                        models.MoodSituation.create({
-                            UserId: id,
+
+                        models.MoodSituation.find({
+                where: {
+                    UserId: id,
+                    situation: name
+                }
+            }).then(function(moodsit){
+                if (moodsit != null) {
+                  console.log("encontrou um mood situation para este dia e user já.");
+                  moodsit.increment('counter');
+                  var oldscore = moodsit.dataValues.moodpoints;
+                  var newscore = oldscore + score;
+                    models.MoodSituation.update({
+                        moodpoints: newscore
+                    }, {
+                        where: {
                             situation: name,
-                            moodpoints: score
-                        });
-                    }
-                    }).catch(function(err){
+                            UserId: id
+                        }
+                    });
+                } else {
+                    models.MoodSituation.create({
+
+                        situation: name,
+                        UserId: id,
+                        moodpoints: score,
+                        counter: moods
+                    });
+
+
+                }
+            });
+        }
+    }
+
+            }).catch(function(err){
                         console.log("ERROR getting moods: "+ err);
 
                     });
-                    
 
                     }
                 });
@@ -658,18 +689,18 @@
             }).then(function(moodsituation){
                 data = '{ ';
                 if(moodsituation.length==0){
-                    console.log("I GOT HERE");
                     updateMoodSituation(id);
                 }
                 moodsituation.forEach(function(i){
-                    data += '' + counter + ': {\n situation: ' + i.dataValues.situation + ',\nscore: ' + i.dataValues.moodpoints + '\n}';
-                    counter += 1;
-                    if(i<moodsituation.size - 1){
+                    data += '"' + counter + '": {\n "situation": "' + i.dataValues.situation + '",\n"score": "' + i.dataValues.moodpoints + '",\n"moods": "'+ i.dataValues.counter + '"\n}';
+                    
+                    if(counter<moodsituation.length){
                         data += ',\n';
                     }
                     else {
                         data += '\n}';
                     }
+                    counter += 1;
                 
                 });
                 
