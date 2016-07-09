@@ -100,9 +100,15 @@
             dbFunctions.getMood(userid, thisdate).then(function(moodDay) {
                     res.json(moodDay);
             });
+        });
 
+        app.get('/api/getLastMoods/:id', function(req, res) {
 
+            userid = req.params.id;
 
+            dbFunctions.lastMoods(userid).then(function(moodDays) {
+                    res.json(moodDays);
+            });
         });
 
         app.get('/api/fitbit/activity/:date/:id', function(req, res) {

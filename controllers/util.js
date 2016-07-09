@@ -16,6 +16,23 @@
         });
     }
 
+    exports.lastMoods = function(userid) {
+        return new Promise(function(resolve, reject) {
+            models.MoodDay.findAll({
+                limit: 27,
+                order: '"date" ASC',
+                where: {
+                    UserId: userid
+                }
+
+
+            }).then(function(moodDays) {
+                resolve(moodDays);
+
+            });
+        });
+    }
+
     exports.insertMood = function(userid, mood, thisdate) {
 
         console.log("DATA ECEBIIIIDA                   " + thisdate);

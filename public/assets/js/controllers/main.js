@@ -133,9 +133,9 @@ function ModalInstanceCtrl($scope, $uibModalInstance, items, $cookies, $location
     };
 }
 
-twitterCtrl.$inject = ['$scope', '$http', '$location', '$cookies', '$filter'];
+twitterCtrl.$inject = ['$scope', '$http', '$location', '$cookies', '$filter', '$rootScope'];
 
-function twitterCtrl($scope, $http, $location, $cookies, $filter) {
+function twitterCtrl($scope, $http, $location, $cookies, $filter, $rootScope) {
     $scope.$watch(function() {
         return $cookies.selDate;
     }, function(newVal, oldVal) {
@@ -207,9 +207,9 @@ function convertHex(hex, opacity) {
 }
 
 
-moodDemoCtrl.$inject = ['$scope'];
+moodDemoCtrl.$inject = ['$scope', '$http', '$location'];
 
-function moodDemoCtrl($scope) {
+function moodDemoCtrl($scope, $http, $location) {
 
     function random(min, max) {
         return Math.floor(Math.random() * (max - min + 1) + min);
@@ -217,18 +217,42 @@ function moodDemoCtrl($scope) {
 
     var elements = 27;
     var data1 = [];
-    var data2 = [];
-    var data3 = [];
+    var data1tmp = [];
+    $scope.labels = [];
 
-    for (var i = 0; i <= elements; i++) {
-        data1.push(random(50, 200));
-        data2.push(random(80, 100));
-        data3.push(65);
-    }
+    console.log("AI NSSA SENHORA QUERO DORMIR.");
 
-    $scope.labels = ['M', 'T', 'W', 'T', 'F', 'S', 'S', 'M', 'T', 'W', 'T', 'F', 'S', 'S', 'M', 'T', 'W', 'T', 'F', 'S', 'S', 'M', 'T', 'W', 'T', 'F', 'S', 'S'];
-    $scope.series = ['Current', 'Previous', 'BEP'];
-    $scope.data = [data1, data2, data3];
+    $http.get('/api/getLastMoods/' + $location.search().id).success(function(data) {
+        if (!data.message) {
+            data1tmp = data;
+            var found = false;
+            for (var i = 27; i != 0; i--) {
+                $scope.labels.push(moment().subtract(i, 'days').format('MMM Do'));
+                found = false;
+                angular.forEach(data1tmp, function(tmp) {
+                  console.log("entrou");
+                    if (moment(tmp.date).isSame(moment().subtract(i, 'days'),'day')) {
+                        data1.push(tmp.score);
+                        found = true;
+                    }
+                });
+                if (!found) {
+                    data1.push(0);
+                }
+
+            }
+            console.log(data1);
+
+
+
+            $scope.series = ['Current', 'Previous', 'BEP'];
+            $scope.data = [data1];
+
+        }
+    }).error(function(data) {
+        console.log("erro ao ir buscar moods");
+    });
+
     $scope.colours = [{
         fillColor: convertHex(brandInfo, 10),
         strokeColor: brandInfo,
@@ -254,7 +278,7 @@ function moodDemoCtrl($scope) {
         scaleShowVerticalLines: false,
         scaleOverride: true,
         scaleSteps: 5,
-        scaleStepWidth: Math.round(250 / 5),
+        scaleStepWidth: Math.round(2),
         //bezierCurve : false,
         scaleStartValue: 0,
         pointDot: false,
@@ -513,9 +537,9 @@ function sparklineChartCtrl($scope) {
     }];
 }
 
-activityCtrl.$inject = ['$scope', '$cookies', '$window', '$http', '$filter', '$location'];
+activityCtrl.$inject = ['$scope', '$cookies', '$window', '$http', '$filter', '$location', '$rootScope'];
 
-function activityCtrl($scope, $cookies, $window, $http, $filter, $location) {
+function activityCtrl($scope, $cookies, $window, $http, $filter, $location, $rootScope) {
 
     var id = null;
     if ($location.search().id == undefined) {
@@ -1156,9 +1180,9 @@ function cardChartCtrl2($scope) {
     }];
 }
 
-sleepCtrl.$inject = ['$scope', '$cookies', '$filter', '$http', '$location'];
+sleepCtrl.$inject = ['$scope', '$cookies', '$filter', '$http', '$location', '$rootScope'];
 
-function sleepCtrl($scope, $cookies, $filter, $http, $location) {
+function sleepCtrl($scope, $cookies, $filter, $http, $location, $rootScope) {
 
     var id = null;
     if ($location.search().id == undefined) {
@@ -1196,79 +1220,79 @@ function sleepCtrl($scope, $cookies, $filter, $http, $location) {
         tooltipCornerRadius: 0,
     }];
     $scope.$watch(function() {
-            return $cookies.selDate;
-        }, function(newVal, oldVal) {
-            if (typeof(newVal) == 'undefined') {
-                newVal = moment()._d;
+        return $cookies.selDate;
+    }, function(newVal, oldVal) {
+        if (typeof(newVal) == 'undefined') {
+            newVal = moment()._d;
+        }
+
+        unparsedDate = newVal;
+        parsedDate = $filter('date')(new Date(unparsedDate), 'yyyy-MM-dd');
+        $http.get('/api/fitbit/sleep/' + parsedDate + "/" + id).success(function(data) {
+
+
+
+
+            var labelsArray = [];
+            var graphData = [
+                []
+            ];
+            console.debug(data);
+            if (data.message == "Error retrieving sleep log.") {
+                $rootScope.overallScore += 1;
+                $rootScope.overallSum += 1;
+                $rootScope.overallResult = Math.round($rootScope.overallScore / $rootScope.overallSum);
             }
+            if (!data.message) {
 
-            unparsedDate = newVal;
-            parsedDate = $filter('date')(new Date(unparsedDate), 'yyyy-MM-dd');
-            $http.get('/api/fitbit/sleep/' + parsedDate + "/" + id).success(function(data) {
+                console.log(JSON.parse(data));
+                data = JSON.parse(data);
+                if (data.sleep) {
+                    angular.forEach(data.sleep[0].minuteData, function(datevalue) {
+                        graphData[0].push(parseInt(datevalue.value));
+                    });
+                }
+                var totalTimeInBed = data.summary.totalTimeInBed;
+                var i = 1;
+                while (i <= totalTimeInBed) {
+                    labelsArray.push(i.toString());
+                    i++;
+                }
+                console.log(graphData);
+                console.log($scope.data);
+                $scope.data = graphData;
+                $scope.labels = labelsArray;
 
+                var sevenhours = 7 * 60;
+                var twohours = 2 * 60;
+                if (totalTimeInBed < sevenhours) {
+                    if (totalTimeInBed > twohours) {
+                        $rootScope.overallScore += totalTimeInBed / 60 - 2;
+                        $rootScope.overallSum += 1;
+                        $rootScope.overallResult = Math.round($rootScope.overallScore / $rootScope.overallSum);
+                        console.log("Result:" + $rootScope.overallResult);
 
-
-
-                    var labelsArray = [];
-                    var graphData = [
-                        []
-                    ];
-                    console.debug(data);
-                    if (data.message == "Error retrieving sleep log.") {
+                    } else {
                         $rootScope.overallScore += 1;
                         $rootScope.overallSum += 1;
                         $rootScope.overallResult = Math.round($rootScope.overallScore / $rootScope.overallSum);
+                        console.log("Result:" + $rootScope.overallResult);
                     }
-                    if (!data.message) {
-
-                        console.log(JSON.parse(data));
-                        data = JSON.parse(data);
-                        if (data.sleep) {
-                            angular.forEach(data.sleep[0].minuteData, function(datevalue) {
-                                graphData[0].push(parseInt(datevalue.value));
-                            });
-                        }
-                        var totalTimeInBed = data.summary.totalTimeInBed;
-                        var i = 1;
-                        while (i <= totalTimeInBed) {
-                            labelsArray.push(i.toString());
-                            i++;
-                        }
-                        console.log(graphData);
-                        console.log($scope.data);
-                        $scope.data = graphData;
-                        $scope.labels = labelsArray;
-
-                        var sevenhours = 7 * 60;
-                        var twohours = 2 * 60;
-                        if (totalTimeInBed < sevenhours) {
-                            if (totalTimeInBed > twohours) {
-                                $rootScope.overallScore += totalTimeInBed / 60 - 2;
-                                $rootScope.overallSum += 1;
-                                $rootScope.overallResult = Math.round($rootScope.overallScore / $rootScope.overallSum);
-                                console.log("Result:" + $rootScope.overallResult);
-
-                            } else {
-                                $rootScope.overallScore += 1;
-                                $rootScope.overallSum += 1;
-                                $rootScope.overallResult = Math.round($rootScope.overallScore / $rootScope.overallSum);
-                                console.log("Result:" + $rootScope.overallResult);
-                            }
-                            console.log(graphData);
-                            console.log($scope.data);
-                            $scope.data = graphData;
-                            $scope.labels = labelsArray;
-                        } else if (totalTimeInBed > sevenhours) {
-                            $rootScope.overallScore += 10;
-                            $rootScope.overallSum += 1;
-                            $rootScope.overallResult = Math.round($rootScope.overallScore / $rootScope.overallSum);
-                            console.log("Result:" + $rootScope.overallResult);
-                        }
-                    }
-                
+                    console.log(graphData);
+                    console.log($scope.data);
+                    $scope.data = graphData;
+                    $scope.labels = labelsArray;
+                } else if (totalTimeInBed > sevenhours) {
+                    $rootScope.overallScore += 10;
+                    $rootScope.overallSum += 1;
+                    $rootScope.overallResult = Math.round($rootScope.overallScore / $rootScope.overallSum);
+                    console.log("Result:" + $rootScope.overallResult);
+                }
+            }
 
 
-            }).error(function(data) {
+
+        }).error(function(data) {
             //what to do on error
         });
     }, true);
