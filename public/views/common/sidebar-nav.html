@@ -23,7 +23,6 @@
                     <div class="dropdown-header text-xs-center">
                         <strong>{{ 'ACCOUNT' | translate }}</strong>
                     </div>
-                    <a class="dropdown-item" href="#"><i class="fa fa-user"></i> {{ 'PROFILE' | translate }}</a>
                     <a class="dropdown-item" href="#" ng-click="log.call()"><i class="fa fa-lock"></i> {{ 'LOGOUT' | translate }}</a>
                 </div>
             </div>
@@ -37,6 +36,37 @@
             <li class="nav-item">
                 <a class="nav-link" ui-sref-active="active" ui-sref="app.main"><i class="icon-speedometer"></i> {{ 'DASHBOARD' | translate }} <!-- <span class="label label-info">NEW</span> --></a>
             </li>
+            <li class="nav-item">
+                <a class="nav-link" ui-sref-active="inactive" ui-sref="app.main" data-toggle="modal" data-target="#myModal"><i class="icon-heart"></i> MOOD TIPS <!-- <span class="label label-info">NEW</span> --></a>
+            </li>
         </ul>
     </nav>
+</div>
+
+<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+                <h4 class="modal-title" id="myModalLabel">Improving your mood</h4>
+            </div>
+            <div class="modal-body">
+                <h4>Tips:</h2>
+                <ol>
+                    <li><strong>Smile</strong> It’s cheesy, but apparently it’s true: The act of smiling really can turn a frown upside down.</li>
+                    <li><strong>Sniff certain scents.</strong> Inhaling the scent of orange (or essential orange oil) or lavender can reduce anxiety and improve mood.</li>
+                    <li><strong>Eat some chocolate.</strong> As if we needed a reason other than delicious: Eating chocolate can make us feel happy.</li>
+                    <li><strong>Expose yourself to green.</strong> Color psychologists say green symbolizes happiness—and can create the feeling of it, too. Throw on a green sweater, pick up a green pen, and it’s possible your mood will be over the rainbow.</li>
+                    <li><strong>Do something nice for somebody else.</strong> Yep, being nice can help us feel nicer. Small actions—holding the door for the person behind you, sending a quick love text to a partner or friend, or donating ten bucks to a favorite charity—count, so there’s no excuse not to get your nice on.</li>
+                    <li><strong>Listen to a happy song.</strong> It’s quick; it’s easy; it’s an instant mood-lifter. Sing along (perfect pitch not required) for extra benefit.</li>
+                    <li><strong>Go somewhere quiet.</strong> Even if it’s just the office bathroom, taking a few minutes to sit in a quiet space with no external stimulation can do wonders for a bad mood.</li>
+</ol>
+</div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
 </div>

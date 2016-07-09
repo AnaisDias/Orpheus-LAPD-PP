@@ -158,6 +158,13 @@ function twitterCtrl($scope, $http, $location, $cookies, $filter) {
             $http.get('/api/sentimentalanalysis/' + id + "/" + parsedDate).success(function(data) {
                 $scope.positive = data.positive;
                 $scope.negative = data.negative;
+                console.debug($rootScope.overallScore);
+
+                $rootScope.overallScore += (data.positive / (data.positive + data.negative)) * 10;
+                console.log("Result:" + $rootScope.overallResult);
+                $rootScope.overallSum += 1;
+                $rootScope.overallResult = Math.round($rootScope.overallScore / $rootScope.overallSum);
+                console.log("Result:" + $rootScope.overallResult);
             }).error(function(data) {
                 console.log("erro ao ir buscar moods");
             });
@@ -247,16 +254,16 @@ function moodDemoCtrl($scope) {
         scaleShowVerticalLines: false,
         scaleOverride: true,
         scaleSteps: 5,
-        scaleStepWidth: Math.ceil(250 / 5),
+        scaleStepWidth: Math.round(250 / 5),
         //bezierCurve : false,
         scaleStartValue: 0,
         pointDot: false,
     }
 }
 
-DatePickerCtrl.$inject = ['$scope', '$cookies', '$http', '$location', '$filter', '$uibModal'];
+DatePickerCtrl.$inject = ['$scope', '$rootScope', '$cookies', '$http', '$location', '$filter', '$uibModal'];
 
-function DatePickerCtrl($scope, $cookies, $http, $location, $filter, $uibModal) {
+function DatePickerCtrl($scope, $rootScope, $cookies, $http, $location, $filter, $uibModal) {
 
     var id = null;
     $cookies.selDate = moment()._d;
@@ -351,14 +358,17 @@ function DatePickerCtrl($scope, $cookies, $http, $location, $filter, $uibModal) 
         parsedDate = $filter('date')(new Date(unparsedDate), 'yyyy-MM-dd');
 
         $http.get('/api/getMood/' + $location.search().id + "/" + parsedDate).success(function(data) {
-          console.log("mood for "+parsedDate+" is:");
-          console.log(data);
+            console.log("mood for " + parsedDate + " is:");
+            console.log(data);
             if (!data.message) {
                 $scope.nomood = null;
                 $scope.todaysmood = data.score;
-                console.log("MOOD DE HOJE : " + $scope.todaysmood);
+
+                $rootScope.overallScore += data.score;
+                $rootScope.overallSum += 1;
+                $rootScope.overallResult = Math.round($rootScope.overallScore / $rootScope.overallSum);
+
                 $scope.todaysmoodimg = $scope.items[$scope.todaysmood / 2.5].icon;
-                console.log("mod img = " + $scope.todaysmoodimg);
             } else {
                 $scope.nomood = 1;
             }
@@ -530,29 +540,48 @@ function activityCtrl($scope, $cookies, $window, $http, $filter, $location) {
         unparsedDate = newVal;
         parsedDate = $filter('date')(new Date(unparsedDate), 'yyyy-MM-dd');
         $http.get('/api/fitbit/activity/' + parsedDate + "/" + id).success(function(data) {
+            if (data.message == "Error retrieving activity.") {
+                $rootScope.overallScore += 1;
+                $rootScope.overallSum += 1;
+                $rootScope.overallResult = Math.round($rootScope.overallScore / $rootScope.overallSum);
+            }
             console.log(data);
             if (!data.message) {
                 data = JSON.parse(data);
                 $scope.activities = data.activities;
                 $scope.goals = data.goals;
                 $scope.summary = data.summary;
-
                 $scope.stepsVSGoals = ($scope.summary.steps / $scope.goals.steps);
                 console.log("stepsVSGoals: " + $scope.stepsVSGoals);
                 $scope.activitiesTotal;
-
                 $scope.caloriesVSGoals = ($scope.summary.caloriesOut / $scope.goals.caloriesOut);
 
                 if ($scope.caloriesVSGoals >= 1) {
                     $scope.calgreaterthanone = true;
+                    $rootScope.overallScore += 10;
+                    $rootScope.overallSum += 1;
+                    $rootScope.overallResult = Math.round($rootScope.overallScore / $rootScope.overallSum);
+                    console.log("Result:" + $rootScope.overallResult);
                 } else {
                     $scope.calgreaterthanone = false;
+                    $rootScope.overallScore += $scope.caloriesVSGoals * 10;
+                    $rootScope.overallSum += 1;
+                    $rootScope.overallResult = Math.round($rootScope.overallScore / $rootScope.overallSum);
+                    console.log("Result:" + $rootScope.overallResult);
                 }
 
-                if ($scope.stepsoriesVSGoals >= 1) {
+                if ($scope.stepsVSGoals >= 1) {
                     $scope.stepsgreaterthanone = true;
+                    $rootScope.overallScore += 10;
+                    $rootScope.overallSum += 1;
+                    $rootScope.overallResult = Math.round($rootScope.overallScore / $rootScope.overallSum);
+                    console.log("Result:" + $rootScope.overallResult);
                 } else {
                     $scope.calgreaterthanone = false;
+                    $rootScope.overallScore += $scope.stepsVSGoals * 10;
+                    $rootScope.overallSum += 1;
+                    $rootScope.overallResult = Math.round($rootScope.overallScore / $rootScope.overallSum);
+                    console.log("Result:" + $rootScope.overallResult);
 
                 }
                 console.log("caloriesVSGoals: " + $scope.caloriesVSGoals);
@@ -675,7 +704,7 @@ function situmanCtrl($scope, $cookies, $window, $http, $filter, $location) {
             for (var j in jsond) {
                 $scope.moods[sizee] = [];
                 $scope.moods[sizee].situation = jsond[j].situation;
-                $scope.moods[sizee].score = jsond[j].score / jsond[j].moods;
+                $scope.moods[sizee].score = Math.round(jsond[j].score / jsond[j].moods);
                 sizee += 1;
             }
         }).error(function(data) {
@@ -1167,39 +1196,79 @@ function sleepCtrl($scope, $cookies, $filter, $http, $location) {
         tooltipCornerRadius: 0,
     }];
     $scope.$watch(function() {
-        return $cookies.selDate;
-    }, function(newVal, oldVal) {
-        if (typeof(newVal) == 'undefined') {
-            newVal = moment()._d;
-        }
-
-        unparsedDate = newVal;
-        parsedDate = $filter('date')(new Date(unparsedDate), 'yyyy-MM-dd');
-        $http.get('/api/fitbit/sleep/' + parsedDate + "/" + id).success(function(data) {
-            if (!data.message) {
-                var labelsArray = [];
-                var graphData = [
-                    []
-                ];
-                console.log(JSON.parse(data));
-                data = JSON.parse(data);
-                if (data.sleep) {
-                    angular.forEach(data.sleep[0].minuteData, function(datevalue) {
-                        graphData[0].push(parseInt(datevalue.value));
-                    });
-                }
-                var totalTimeInBed = data.summary.totalTimeInBed;
-                var i = 1;
-                while (i <= totalTimeInBed) {
-                    labelsArray.push(i.toString());
-                    i++;
-                }
-                console.log(graphData);
-                console.log($scope.data);
-                $scope.data = graphData;
-                $scope.labels = labelsArray;
+            return $cookies.selDate;
+        }, function(newVal, oldVal) {
+            if (typeof(newVal) == 'undefined') {
+                newVal = moment()._d;
             }
-        }).error(function(data) {
+
+            unparsedDate = newVal;
+            parsedDate = $filter('date')(new Date(unparsedDate), 'yyyy-MM-dd');
+            $http.get('/api/fitbit/sleep/' + parsedDate + "/" + id).success(function(data) {
+
+
+
+
+                    var labelsArray = [];
+                    var graphData = [
+                        []
+                    ];
+                    console.debug(data);
+                    if (data.message == "Error retrieving sleep log.") {
+                        $rootScope.overallScore += 1;
+                        $rootScope.overallSum += 1;
+                        $rootScope.overallResult = Math.round($rootScope.overallScore / $rootScope.overallSum);
+                    }
+                    if (!data.message) {
+
+                        console.log(JSON.parse(data));
+                        data = JSON.parse(data);
+                        if (data.sleep) {
+                            angular.forEach(data.sleep[0].minuteData, function(datevalue) {
+                                graphData[0].push(parseInt(datevalue.value));
+                            });
+                        }
+                        var totalTimeInBed = data.summary.totalTimeInBed;
+                        var i = 1;
+                        while (i <= totalTimeInBed) {
+                            labelsArray.push(i.toString());
+                            i++;
+                        }
+                        console.log(graphData);
+                        console.log($scope.data);
+                        $scope.data = graphData;
+                        $scope.labels = labelsArray;
+
+                        var sevenhours = 7 * 60;
+                        var twohours = 2 * 60;
+                        if (totalTimeInBed < sevenhours) {
+                            if (totalTimeInBed > twohours) {
+                                $rootScope.overallScore += totalTimeInBed / 60 - 2;
+                                $rootScope.overallSum += 1;
+                                $rootScope.overallResult = Math.round($rootScope.overallScore / $rootScope.overallSum);
+                                console.log("Result:" + $rootScope.overallResult);
+
+                            } else {
+                                $rootScope.overallScore += 1;
+                                $rootScope.overallSum += 1;
+                                $rootScope.overallResult = Math.round($rootScope.overallScore / $rootScope.overallSum);
+                                console.log("Result:" + $rootScope.overallResult);
+                            }
+                            console.log(graphData);
+                            console.log($scope.data);
+                            $scope.data = graphData;
+                            $scope.labels = labelsArray;
+                        } else if (totalTimeInBed > sevenhours) {
+                            $rootScope.overallScore += 10;
+                            $rootScope.overallSum += 1;
+                            $rootScope.overallResult = Math.round($rootScope.overallScore / $rootScope.overallSum);
+                            console.log("Result:" + $rootScope.overallResult);
+                        }
+                    }
+                
+
+
+            }).error(function(data) {
             //what to do on error
         });
     }, true);
