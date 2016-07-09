@@ -44,10 +44,11 @@
                                 </script>
 
 
-                                <div ng-show="!selected && todaysmoodimg"><img src="assets/img/{{todaysmoodimg}}" class="img-mood-display"></div>
+                                <div ng-show="!selected && !nomood "><img src="assets/img/{{todaysmoodimg}}" class="img-mood-display"></div>
                                 <div ng-show="selected"><img src="assets/img/{{selected.icon}}" class="img-mood-display"></div>
                             </fieldset>
-                            <button type="button" class="btn btn-primary-outline btn-lg btn-block" ng-click="open('lg')">Select mood for this day</button>
+                            <button type="button" ng-show="!nomood" class="btn btn-primary-outline btn-lg btn-block" ng-click="open('lg')">Update mood for this day</button>
+                            <button type="button" ng-show="nomood" class="btn btn-primary-outline btn-lg btn-block" ng-click="open('lg')">Insert mood for this day</button>
                         </div>
 
 

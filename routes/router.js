@@ -98,14 +98,7 @@
             thisdate = req.params.date;
 
             dbFunctions.getMood(userid, thisdate).then(function(moodDay) {
-                if (moodDay != false) {
                     res.json(moodDay);
-                }
-                else{
-                  res.json({
-                    message : "Mood for this day not found"
-                  });
-                }
             });
 
 

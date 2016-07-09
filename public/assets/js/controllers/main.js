@@ -133,8 +133,9 @@ function ModalInstanceCtrl($scope, $uibModalInstance, items, $cookies, $location
     };
 }
 
-twitterCtrl.$inject = ['$scope', '$rootScope', '$http', '$location', '$cookies', '$filter'];
-function twitterCtrl($scope, $rootScope, $http, $location, $cookies, $filter, Score) {
+twitterCtrl.$inject = ['$scope', '$http', '$location', '$cookies', '$filter'];
+
+function twitterCtrl($scope, $http, $location, $cookies, $filter) {
     $scope.$watch(function() {
         return $cookies.selDate;
     }, function(newVal, oldVal) {
@@ -157,14 +158,7 @@ function twitterCtrl($scope, $rootScope, $http, $location, $cookies, $filter, Sc
             $http.get('/api/sentimentalanalysis/' + id + "/" + parsedDate).success(function(data) {
                 $scope.positive = data.positive;
                 $scope.negative = data.negative;
-                console.debug($rootScope.overallScore);
-
-                $rootScope.overallScore += (data.positive/(data.positive+data.negative)) * 10;
-                console.log("Result:"+$rootScope.overallResult);
-                $rootScope.overallSum +=1;
-                $rootScope.overallResult = Math.ceil($rootScope.overallScore / $rootScope.overallSum);
-                console.log("Result:"+$rootScope.overallResult);
-            }).error(function (data) {
+            }).error(function(data) {
                 console.log("erro ao ir buscar moods");
             });
         }
@@ -310,16 +304,12 @@ function DatePickerCtrl($scope, $cookies, $http, $location, $filter, $uibModal) 
     });
 
 
-
+    $cookies.selDate = moment()._d;
     //Watch for date changes
     $scope.$watch('date', function(newDate) {
         var selectedDate = newDate._d;
 
         $cookies.selDate = selectedDate;
-
-
-
-
 
     }, false);
 
@@ -361,15 +351,30 @@ function DatePickerCtrl($scope, $cookies, $http, $location, $filter, $uibModal) 
         parsedDate = $filter('date')(new Date(unparsedDate), 'yyyy-MM-dd');
 
         $http.get('/api/getMood/' + $location.search().id + "/" + parsedDate).success(function(data) {
+          console.log("mood for "+parsedDate+" is:");
+          console.log(data);
             if (!data.message) {
+                $scope.nomood = null;
                 $scope.todaysmood = data.score;
-                console.log("MOOD DE HOJE : " + $scope.todaysmood)
+                console.log("MOOD DE HOJE : " + $scope.todaysmood);
                 $scope.todaysmoodimg = $scope.items[$scope.todaysmood / 2.5].icon;
                 console.log("mod img = " + $scope.todaysmoodimg);
+            } else {
+                $scope.nomood = 1;
             }
-        }).error(function(data) {});
+        }).error(function(data) {
+            $scope.nomood = 1;
+        });
 
     }, true);
+
+
+
+
+
+
+
+
 
     $scope.animationsEnabled = true;
 
@@ -498,9 +503,9 @@ function sparklineChartCtrl($scope) {
     }];
 }
 
-activityCtrl.$inject = ['$scope', '$rootScope', '$cookies', '$window', '$http', '$filter', '$location'];
+activityCtrl.$inject = ['$scope', '$cookies', '$window', '$http', '$filter', '$location'];
 
-function activityCtrl($scope, $rootScope, $cookies, $window, $http, $filter, $location) {
+function activityCtrl($scope, $cookies, $window, $http, $filter, $location) {
 
     var id = null;
     if ($location.search().id == undefined) {
@@ -526,113 +531,90 @@ function activityCtrl($scope, $rootScope, $cookies, $window, $http, $filter, $lo
         parsedDate = $filter('date')(new Date(unparsedDate), 'yyyy-MM-dd');
         $http.get('/api/fitbit/activity/' + parsedDate + "/" + id).success(function(data) {
             console.log(data);
-            if(data.message == "Error retrieving activity."){
-                $rootScope.overallScore += 1;
-                $rootScope.overallSum += 1;
-                $rootScope.overallResult = Math.ceil($rootScope.overallScore / $rootScope.overallSum);
-            }
-            data = JSON.parse(data);
-            $scope.activities = data.activities;
-            $scope.goals = data.goals;
-            $scope.summary = data.summary;
+            if (!data.message) {
+                data = JSON.parse(data);
+                $scope.activities = data.activities;
+                $scope.goals = data.goals;
+                $scope.summary = data.summary;
 
-            $scope.stepsVSGoals = ($scope.summary.steps / $scope.goals.steps);
-            console.log("stepsVSGoals: " + $scope.stepsVSGoals);
-            $scope.activitiesTotal;
+                $scope.stepsVSGoals = ($scope.summary.steps / $scope.goals.steps);
+                console.log("stepsVSGoals: " + $scope.stepsVSGoals);
+                $scope.activitiesTotal;
 
-            $scope.caloriesVSGoals = ($scope.summary.caloriesOut / $scope.goals.caloriesOut);
+                $scope.caloriesVSGoals = ($scope.summary.caloriesOut / $scope.goals.caloriesOut);
 
+                if ($scope.caloriesVSGoals >= 1) {
+                    $scope.calgreaterthanone = true;
+                } else {
+                    $scope.calgreaterthanone = false;
+                }
 
-            if ($scope.caloriesVSGoals >= 1) {
-                $scope.calgreaterthanone = true;
-                $rootScope.overallScore += 10;
-                $rootScope.overallSum += 1;
-                $rootScope.overallResult = Math.ceil($rootScope.overallScore / $rootScope.overallSum);
-                console.log("Result:"+$rootScope.overallResult);
-            } else {
-                $scope.calgreaterthanone = false;
-                $rootScope.overallScore += $scope.caloriesVSGoals * 10;
-                $rootScope.overallSum += 1;
-                $rootScope.overallResult = Math.ceil($rootScope.overallScore / $rootScope.overallSum);
-                console.log("Result:"+$rootScope.overallResult);
-            }
+                if ($scope.stepsoriesVSGoals >= 1) {
+                    $scope.stepsgreaterthanone = true;
+                } else {
+                    $scope.calgreaterthanone = false;
 
-            if ($scope.stepsVSGoals >= 1) {
-                $scope.stepsgreaterthanone = true;
-                $rootScope.overallScore += 10;
-                $rootScope.overallSum += 1;
-                $rootScope.overallResult = Math.ceil($rootScope.overallScore / $rootScope.overallSum);
-                console.log("Result:"+$rootScope.overallResult);
-            } else {
-                $scope.calgreaterthanone = false;
-                $rootScope.overallScore += $scope.stepsVSGoals * 10;
-                $rootScope.overallSum += 1;
-                $rootScope.overallResult = Math.ceil($rootScope.overallScore / $rootScope.overallSum);
-                console.log("Result:"+$rootScope.overallResult);
-
-            }
-            console.log("caloriesVSGoals: " + $scope.caloriesVSGoals);
+                }
+                console.log("caloriesVSGoals: " + $scope.caloriesVSGoals);
 
 
 
-            angular.forEach($scope.summary.distances, function(summaryAct) {
-                if (summaryAct.activity == 'total') {
-                    $scope.totalDistance = summaryAct.distance;
-                    $scope.distanceVSGoals = ($scope.totalDistance / $scope.goals.distance);
-                    if ($scope.stepsVSGoals >= 1) {
-                        $scope.distgreaterthanone = true;
-                    } else {
-                        $scope.distgreaterthanone = false;
+                angular.forEach($scope.summary.distances, function(summaryAct) {
+                    if (summaryAct.activity == 'total') {
+                        $scope.totalDistance = summaryAct.distance;
+                        $scope.distanceVSGoals = ($scope.totalDistance / $scope.goals.distance);
+                        if ($scope.stepsVSGoals >= 1) {
+                            $scope.distgreaterthanone = true;
+                        } else {
+                            $scope.distgreaterthanone = false;
+                        }
                     }
-                }
 
-            });
-
-
-            //$scope.caloriesVSGoals=
+                });
 
 
-            $scope.gender = [{
-                title: 'Male',
-                icon: 'icon-user',
-                value: 43
-            }, {
-                title: 'Female',
-                icon: 'icon-user-female',
-                value: 37
-            }, ];
+                //$scope.caloriesVSGoals=
 
-            $scope.source = [{
-                    title: 'Steps',
-                    icon: 'icon-like',
-                    value: $scope.summary.steps,
-                    percentOut: $scope.stepsVSGoals,
-                    percent: $scope.stepsVSGoals * 100,
-                    greterthan: $scope.stepsgreaterthanone
+
+                $scope.gender = [{
+                    title: 'Male',
+                    icon: 'icon-user',
+                    value: 43
                 }, {
-                    title: 'Distance',
-                    icon: 'icon-like',
-                    value: $scope.totalDistance,
-                    percentOut: $scope.distanceVSGoals,
-                    percent: $scope.distanceVSGoals * 100,
-                    greterthan: $scope.distgreaterthanone
-                }, {
-                    title: 'Calories',
-                    icon: 'icon-like',
-                    value: $scope.summary.caloriesOut,
-                    percentOut: $scope.caloriesVSGoals,
-                    percent: $scope.caloriesVSGoals * 100,
-                    greterthan: $scope.calgreaterthanone
-                }
+                    title: 'Female',
+                    icon: 'icon-user-female',
+                    value: 37
+                }, ];
 
-            ];
+                $scope.source = [{
+                        title: 'Steps',
+                        icon: 'icon-like',
+                        value: $scope.summary.steps,
+                        percentOut: $scope.stepsVSGoals,
+                        percent: $scope.stepsVSGoals * 100,
+                        greterthan: $scope.stepsgreaterthanone
+                    }, {
+                        title: 'Distance',
+                        icon: 'icon-like',
+                        value: $scope.totalDistance,
+                        percentOut: $scope.distanceVSGoals,
+                        percent: $scope.distanceVSGoals * 100,
+                        greterthan: $scope.distgreaterthanone
+                    }, {
+                        title: 'Calories',
+                        icon: 'icon-like',
+                        value: $scope.summary.caloriesOut,
+                        percentOut: $scope.caloriesVSGoals,
+                        percent: $scope.caloriesVSGoals * 100,
+                        greterthan: $scope.calgreaterthanone
+                    }
 
+                ];
+            } else {
 
-
-
-
+            }
         }).error(function(data) {
-            console.log("error if no activities");
+            //what to do on error
         });
 
 
@@ -689,7 +671,6 @@ function situmanCtrl($scope, $cookies, $window, $http, $filter, $location) {
         });
 
         $http.get('/api/moodsituation/' + id).success(function(data) {
-            console.debug(data);
             var jsond = JSON.parse(data);
             for (var j in jsond) {
                 $scope.moods[sizee] = [];
@@ -1089,10 +1070,9 @@ function gaugeJSDemoCtrl($scope, $timeout) {
     }
 }
 
-cardChartCtrl1.$inject = ['$scope', '$rootScope'];
+cardChartCtrl1.$inject = ['$scope'];
 
-function cardChartCtrl1($scope, $rootScope) {
-
+function cardChartCtrl1($scope) {
 
     $scope.labels = ['April 22', 'April 23', 'April 24', 'April 25', 'April 26', 'Yesterday', 'Today'];
     $scope.data = [
@@ -1147,9 +1127,9 @@ function cardChartCtrl2($scope) {
     }];
 }
 
-sleepCtrl.$inject = ['$scope', '$rootScope', '$cookies', '$filter', '$http', '$location'];
+sleepCtrl.$inject = ['$scope', '$cookies', '$filter', '$http', '$location'];
 
-function sleepCtrl($scope, $rootScope, $cookies, $filter, $http, $location) {
+function sleepCtrl($scope, $cookies, $filter, $http, $location) {
 
     var id = null;
     if ($location.search().id == undefined) {
@@ -1162,6 +1142,7 @@ function sleepCtrl($scope, $rootScope, $cookies, $filter, $http, $location) {
     } else {
         id = $location.search().id;
     }
+
     $scope.labels = ['January', 'February', 'March', 'April', 'May', 'June', 'July'];
     $scope.data = [
         [78, 81, 80, 45, 34, 12, 40]
@@ -1195,57 +1176,29 @@ function sleepCtrl($scope, $rootScope, $cookies, $filter, $http, $location) {
         unparsedDate = newVal;
         parsedDate = $filter('date')(new Date(unparsedDate), 'yyyy-MM-dd');
         $http.get('/api/fitbit/sleep/' + parsedDate + "/" + id).success(function(data) {
-            var labelsArray = [];
-            var graphData = [
-                []
-            ];
-            console.debug(data);
-            if(data.message == "Error retrieving sleep log."){
-                $rootScope.overallScore += 1;
-                $rootScope.overallSum += 1;
-                $rootScope.overallResult = Math.ceil($rootScope.overallScore / $rootScope.overallSum);
-            }
-            data = JSON.parse(data);
-            if (data.sleep) {
-                angular.forEach(data.sleep[0].minuteData, function(datevalue) {
-                    graphData[0].push(parseInt(datevalue.value));
-                });
-            }
-            var totalTimeInBed = data.summary.totalTimeInBed;
-            var i = 1;
-            while (i <= totalTimeInBed) {
-                labelsArray.push(i.toString());
-                i++;
-            }
-            console.log(graphData);
-            console.log($scope.data);
-            $scope.data = graphData;
-            $scope.labels = labelsArray;
-
-            var sevenhours = 7 * 60;
-            var twohours = 2 * 60;
-            if(totalTimeInBed < sevenhours){
-                if(totalTimeInBed > twohours){
-                    $rootScope.overallScore += totalTimeInBed/60 - 2;
-                    $rootScope.overallSum += 1;
-                    $rootScope.overallResult = Math.ceil($rootScope.overallScore / $rootScope.overallSum);
-                    console.log("Result:"+$rootScope.overallResult);
-
+            if (!data.message) {
+                var labelsArray = [];
+                var graphData = [
+                    []
+                ];
+                console.log(JSON.parse(data));
+                data = JSON.parse(data);
+                if (data.sleep) {
+                    angular.forEach(data.sleep[0].minuteData, function(datevalue) {
+                        graphData[0].push(parseInt(datevalue.value));
+                    });
                 }
-                else {
-                    $rootScope.overallScore += 1;
-                    $rootScope.overallSum += 1;
-                    $rootScope.overallResult = Math.ceil($rootScope.overallScore / $rootScope.overallSum);
-                    console.log("Result:"+$rootScope.overallResult);
+                var totalTimeInBed = data.summary.totalTimeInBed;
+                var i = 1;
+                while (i <= totalTimeInBed) {
+                    labelsArray.push(i.toString());
+                    i++;
                 }
+                console.log(graphData);
+                console.log($scope.data);
+                $scope.data = graphData;
+                $scope.labels = labelsArray;
             }
-            else if(totalTimeInBed > sevenhours){
-                $rootScope.overallScore += 10;
-                $rootScope.overallSum += 1;
-                $rootScope.overallResult = Math.ceil($rootScope.overallScore / $rootScope.overallSum);
-                console.log("Result:"+$rootScope.overallResult);
-            }
-
         }).error(function(data) {
             //what to do on error
         });

@@ -68,7 +68,9 @@
                     console.log("MOOOOD " + moodDay.score);
                     resolve(moodDay);
                 } else {
-                    return false;
+                  resolve({
+                    message : "Mood for this day not found."
+                  });
                 }
             });
         });
