@@ -162,7 +162,7 @@ function twitterCtrl($scope, $rootScope, $http, $location, $cookies, $filter, Sc
                 $rootScope.overallScore += (data.positive/(data.positive+data.negative)) * 10;
                 console.log("Result:"+$rootScope.overallResult);
                 $rootScope.overallSum +=1;
-                $rootScope.overallResult = Math.ceil($rootScope.overallScore / $rootScope.overallSum);
+                $rootScope.overallResult = Math.round($rootScope.overallScore / $rootScope.overallSum);
                 console.log("Result:"+$rootScope.overallResult);
             }).error(function (data) {
                 console.log("erro ao ir buscar moods");
@@ -253,7 +253,7 @@ function moodDemoCtrl($scope) {
         scaleShowVerticalLines: false,
         scaleOverride: true,
         scaleSteps: 5,
-        scaleStepWidth: Math.ceil(250 / 5),
+        scaleStepWidth: Math.round(250 / 5),
         //bezierCurve : false,
         scaleStartValue: 0,
         pointDot: false,
@@ -366,7 +366,7 @@ function DatePickerCtrl($scope, $rootScope, $cookies, $http, $location, $filter,
 
                 $rootScope.overallScore += data.score;
                 $rootScope.overallSum += 1;
-                $rootScope.overallResult = Math.ceil($rootScope.overallScore / $rootScope.overallSum);
+                $rootScope.overallResult = Math.round($rootScope.overallScore / $rootScope.overallSum);
 
                 console.log("MOOD DE HOJE : " + $scope.todaysmood)
                 $scope.todaysmoodimg = $scope.items[$scope.todaysmood / 2.5].icon;
@@ -534,7 +534,7 @@ function activityCtrl($scope, $rootScope, $cookies, $window, $http, $filter, $lo
             if(data.message == "Error retrieving activity."){
                 $rootScope.overallScore += 1;
                 $rootScope.overallSum += 1;
-                $rootScope.overallResult = Math.ceil($rootScope.overallScore / $rootScope.overallSum);
+                $rootScope.overallResult = Math.round($rootScope.overallScore / $rootScope.overallSum);
             }
             data = JSON.parse(data);
             $scope.activities = data.activities;
@@ -552,13 +552,13 @@ function activityCtrl($scope, $rootScope, $cookies, $window, $http, $filter, $lo
                 $scope.calgreaterthanone = true;
                 $rootScope.overallScore += 10;
                 $rootScope.overallSum += 1;
-                $rootScope.overallResult = Math.ceil($rootScope.overallScore / $rootScope.overallSum);
+                $rootScope.overallResult = Math.round($rootScope.overallScore / $rootScope.overallSum);
                 console.log("Result:"+$rootScope.overallResult);
             } else {
                 $scope.calgreaterthanone = false;
                 $rootScope.overallScore += $scope.caloriesVSGoals * 10;
                 $rootScope.overallSum += 1;
-                $rootScope.overallResult = Math.ceil($rootScope.overallScore / $rootScope.overallSum);
+                $rootScope.overallResult = Math.round($rootScope.overallScore / $rootScope.overallSum);
                 console.log("Result:"+$rootScope.overallResult);
             }
 
@@ -566,13 +566,13 @@ function activityCtrl($scope, $rootScope, $cookies, $window, $http, $filter, $lo
                 $scope.stepsgreaterthanone = true;
                 $rootScope.overallScore += 10;
                 $rootScope.overallSum += 1;
-                $rootScope.overallResult = Math.ceil($rootScope.overallScore / $rootScope.overallSum);
+                $rootScope.overallResult = Math.round($rootScope.overallScore / $rootScope.overallSum);
                 console.log("Result:"+$rootScope.overallResult);
             } else {
                 $scope.calgreaterthanone = false;
                 $rootScope.overallScore += $scope.stepsVSGoals * 10;
                 $rootScope.overallSum += 1;
-                $rootScope.overallResult = Math.ceil($rootScope.overallScore / $rootScope.overallSum);
+                $rootScope.overallResult = Math.round($rootScope.overallScore / $rootScope.overallSum);
                 console.log("Result:"+$rootScope.overallResult);
 
             }
@@ -699,7 +699,7 @@ function situmanCtrl($scope, $cookies, $window, $http, $filter, $location) {
             for (var j in jsond) {
                 $scope.moods[sizee] = [];
                 $scope.moods[sizee].situation = jsond[j].situation;
-                $scope.moods[sizee].score = jsond[j].score / jsond[j].moods;
+                $scope.moods[sizee].score = Math.round(jsond[j].score / jsond[j].moods);
                 sizee += 1;
             }
         }).error(function(data) {
@@ -1208,7 +1208,7 @@ function sleepCtrl($scope, $rootScope, $cookies, $filter, $http, $location) {
             if(data.message == "Error retrieving sleep log."){
                 $rootScope.overallScore += 1;
                 $rootScope.overallSum += 1;
-                $rootScope.overallResult = Math.ceil($rootScope.overallScore / $rootScope.overallSum);
+                $rootScope.overallResult = Math.round($rootScope.overallScore / $rootScope.overallSum);
             }
             data = JSON.parse(data);
             if (data.sleep) {
@@ -1233,21 +1233,21 @@ function sleepCtrl($scope, $rootScope, $cookies, $filter, $http, $location) {
                 if(totalTimeInBed > twohours){
                     $rootScope.overallScore += totalTimeInBed/60 - 2;
                     $rootScope.overallSum += 1;
-                    $rootScope.overallResult = Math.ceil($rootScope.overallScore / $rootScope.overallSum);
+                    $rootScope.overallResult = Math.round($rootScope.overallScore / $rootScope.overallSum);
                     console.log("Result:"+$rootScope.overallResult);
 
                 }
                 else {
                     $rootScope.overallScore += 1;
                     $rootScope.overallSum += 1;
-                    $rootScope.overallResult = Math.ceil($rootScope.overallScore / $rootScope.overallSum);
+                    $rootScope.overallResult = Math.round($rootScope.overallScore / $rootScope.overallSum);
                     console.log("Result:"+$rootScope.overallResult);
                 }
             }
             else if(totalTimeInBed > sevenhours){
                 $rootScope.overallScore += 10;
                 $rootScope.overallSum += 1;
-                $rootScope.overallResult = Math.ceil($rootScope.overallScore / $rootScope.overallSum);
+                $rootScope.overallResult = Math.round($rootScope.overallScore / $rootScope.overallSum);
                 console.log("Result:"+$rootScope.overallResult);
             }
 
