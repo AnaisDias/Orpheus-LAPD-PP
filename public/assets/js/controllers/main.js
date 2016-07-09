@@ -260,9 +260,9 @@ function moodDemoCtrl($scope) {
     }
 }
 
-DatePickerCtrl.$inject = ['$scope', '$cookies', '$http', '$location', '$filter', '$uibModal'];
+DatePickerCtrl.$inject = ['$scope','$rootScope', '$cookies', '$http', '$location', '$filter', '$uibModal'];
 
-function DatePickerCtrl($scope, $cookies, $http, $location, $filter, $uibModal) {
+function DatePickerCtrl($scope, $rootScope, $cookies, $http, $location, $filter, $uibModal) {
 
     var id = null;
     $cookies.selDate = moment()._d;
@@ -363,6 +363,11 @@ function DatePickerCtrl($scope, $cookies, $http, $location, $filter, $uibModal) 
         $http.get('/api/getMood/' + $location.search().id + "/" + parsedDate).success(function(data) {
             if (!data.message) {
                 $scope.todaysmood = data.score;
+
+                $rootScope.overallScore += data.score;
+                $rootScope.overallSum += 1;
+                $rootScope.overallResult = Math.ceil($rootScope.overallScore / $rootScope.overallSum);
+
                 console.log("MOOD DE HOJE : " + $scope.todaysmood)
                 $scope.todaysmoodimg = $scope.items[$scope.todaysmood / 2.5].icon;
                 console.log("mod img = " + $scope.todaysmoodimg);
