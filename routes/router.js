@@ -153,18 +153,17 @@
             thisdate = req.params.date;
 
             dbFunctions.getMood(userid, thisdate).then(function(moodDay) {
-                if (moodDay != false) {
                     res.json(moodDay);
-                }
-                else{
-                  res.json({
-                    message : "Mood for this day not found"
-                  });
-                }
             });
+        });
 
+        app.get('/api/getLastMoods/:id', function(req, res) {
 
+            userid = req.params.id;
 
+            dbFunctions.lastMoods(userid).then(function(moodDays) {
+                    res.json(moodDays);
+            });
         });
 
         app.get('/api/fitbit/activity/:date/:id', function(req, res) {

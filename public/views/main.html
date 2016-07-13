@@ -44,10 +44,11 @@
                                 </script>
 
 
-                                <div ng-show="!selected && todaysmoodimg"><img src="assets/img/{{todaysmoodimg}}" class="img-mood-display"></div>
+                                <div ng-show="!selected && !nomood "><img src="assets/img/{{todaysmoodimg}}" class="img-mood-display"></div>
                                 <div ng-show="selected"><img src="assets/img/{{selected.icon}}" class="img-mood-display"></div>
                             </fieldset>
-                            <button type="button" class="btn btn-primary-outline btn-lg btn-block" ng-click="open('lg')">Select mood for this day</button>
+                            <button type="button" ng-show="!nomood" class="btn btn-primary-outline btn-lg btn-block" ng-click="open('lg')">Update mood for this day</button>
+                            <button type="button" ng-show="nomood" class="btn btn-primary-outline btn-lg btn-block" ng-click="open('lg')">Insert mood for this day</button>
                         </div>
 
 
@@ -361,24 +362,10 @@
                         <div class="row">
                             <div class="col-sm-6">
                                 <h4 class="card-title m-b-0">Patient mood progress</h4>
-                                <div class="small text-muted">April 2016</div>
                             </div>
                             <div class="col-sm-6">
                                 <div class="btn-toolbar pull-right" role="toolbar" aria-label="Toolbar with button groups">
-                                    <div class="btn-group" data-toggle="buttons" aria-label="First group">
-                                        <label class="btn btn-sm btn-secondary-outline">
-                                            <input type="radio" name="options" id="option1"> Day
-                                        </label>
-                                        <label class="btn btn-sm btn-secondary-outline active">
-                                            <input type="radio" name="options" id="option2" checked> Month
-                                        </label>
-                                        <label class="btn btn-sm btn-secondary-outline">
-                                            <input type="radio" name="options" id="option3"> Year
-                                        </label>
-                                    </div>
-                                    <div class="btn-group" role="group" aria-label="Second group">
-                                        <button type="button" class="btn btn-sm btn-primary"><i class="icon-cloud-download"></i></button>
-                                    </div>
+
                                 </div>
                             </div>
                         </div>
