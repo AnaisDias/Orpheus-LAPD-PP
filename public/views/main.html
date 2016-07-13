@@ -249,9 +249,26 @@
                                                         <td>{{ situation.name }}</td>
                                                         <td>{{ situation.count }}</td>
                                                         <td>
-                                                            <button type="button" class="btn btn-primary">Good</button>
-                                                            <button type="button" class="btn btn-warning">Neutral</button>
-                                                            <button type="button" class="btn btn-danger">Bad</button>
+                                                            <div>
+                                                            <form style="display: inline" action="/insertsituationmood">
+                                                                <input type="hidden" name="userid" value="{{ userid }}"/>
+                                                                <input type="hidden" name="mood" value="good"/>
+                                                                <input type="hidden" name="situation" value="{{ situation.name }}"/>
+                                                            <button type="submit" class="btn btn-primary">Good</button>
+                                                        </form>
+                                                        <form style="display: inline" action="/insertsituationmood">
+                                                            <input type="hidden" name="userid" value="{{ userid }}"/>
+                                                            <input type="hidden" name="situation" value="{{ situation.name }}"/>
+                                                                <input type="hidden" name="mood" value="neutral"/>
+                                                            <button type="submit" class="btn btn-warning">Neutral</button>
+                                                        </form>
+                                                        <form style="display: inline" action="/insertsituationmood">
+                                                            <input type="hidden" name="userid" value="{{ userid }}"/>
+                                                            <input type="hidden" name="situation" value="{{ situation.name }}"/>
+                                                                <input type="hidden" name="mood" value="bad"/>
+                                                            <button type="submit" class="btn btn-danger">Bad</button>
+                                                        </form>
+                                                        </div>
                                                         </td>
                                                     </tr>
 

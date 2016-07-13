@@ -92,6 +92,61 @@
 
         });
 
+        app.post('/api/insertsituationmood', function(req, res) {
+            var mood = 5;
+            if(req.body.mood == "good"){
+                mood=10;
+            }
+            else if(req.body.mood == "neutral"){
+                mood=5;
+            }
+            else if(req.body.mood == "bad"){
+                mood=1;
+            }
+            var userid = req.body.userid;
+            var situation = req.body.situation;
+            var moods = 1; 
+
+            models.MoodSituation.find({
+                                        where: {
+                                            UserId: userid,
+                                            situation: situation
+                                        }
+                                    }).then(function(moodsit) {
+                                        if (moodsit != null) {
+                                            console.log("encontrou um mood situation para este dia e user já.");
+                                            moodsit.increment('counter');
+                                            var oldscore = moodsit.dataValues.moodpoints;
+                                            var newscore = oldscore + mood;
+                                            models.MoodSituation.update({
+                                                moodpoints: newscore
+                                            }, {
+                                                where: {
+                                                    situation: situation,
+                                                    UserId: userid
+                                                }
+                                            });
+                                            res.json({
+                    message : "situation mood updated",
+                    redirecturl: '/#/user?id=' + userid
+                  });
+                                        } else {
+                                            models.MoodSituation.create({
+
+                                                situation: situation,
+                                                UserId: userid,
+                                                moodpoints: mood,
+                                                counter: moods
+                                            });
+                                            res.json({
+                    message : "New situation mood created",
+                    redirecturl: '/#/user?id=' + userid
+                  });
+                                        }
+                                    });
+
+        });
+
         app.get('/api/getMood/:id/:date', function(req, res) {
 
             userid = req.params.id;
@@ -204,7 +259,6 @@
                         }
                     }
 
-                    //var ts = ['I hate my life', "I want to die", "The new album by Kasabian is great"];
                     var counterPos = 0;
                     var counterNeg = 0;
 
@@ -216,6 +270,7 @@
                             .header("Accept", "application/json")
                             .send("text=" + tweet)
                             .end(function(result) {
+                                console.log("Tweet result: " + result.body.type);
                                 if (result.body.type == "positive") {
                                     counterPos++;
                                 } else if (result.body.type == "negative") {

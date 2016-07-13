@@ -157,7 +157,8 @@ function twitterCtrl($scope, $rootScope, $http, $location, $cookies, $filter, Sc
             $http.get('/api/sentimentalanalysis/' + id + "/" + parsedDate).success(function(data) {
                 $scope.positive = data.positive;
                 $scope.negative = data.negative;
-                console.debug($rootScope.overallScore);
+                console.debug($scope.positive);
+                console.debug($scope.negative);
 
                 $rootScope.overallScore += (data.positive/(data.positive+data.negative)) * 10;
                 console.log("Result:"+$rootScope.overallResult);
@@ -674,6 +675,7 @@ function situmanCtrl($scope, $cookies, $window, $http, $filter, $location) {
         unparsedDate = newVal;
         var size = 0;
         var sizee = 0;
+        $scope.userid = id;
         $scope.situations = [];
         $scope.moods = [];
         parsedDate = $filter('date')(new Date(unparsedDate), 'dd-MM-yyyy');
@@ -689,6 +691,7 @@ function situmanCtrl($scope, $cookies, $window, $http, $filter, $location) {
 
             //$scope.situations = jsonD.situations;
             // console.log("situations:" + $scope.situations[0].name);
+
         }).error(function(data) {
             console.log("error on situmanCtrl");
         });

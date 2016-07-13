@@ -55,6 +55,7 @@
         });
     }
 
+
     exports.getMood = function(userid, thisdate) {
         return new Promise(function(resolve, reject) {
 
