@@ -553,20 +553,41 @@
 
             var json_data;
             if (req.isAuthenticated()) {
-                models.User.find({
-                    where: {
-                        auth_id: req.user.profile.id
-                    }
-                }).then(function(user) {
-                    json_data = {
-                        'id': user.id,
-                        'type': user.type
-                    }
-                    if (id == null || id != user.id) {
-                        id = user.id
-                    }
-                    res.send(json_data);
-                });
+                if(req.user.id != undefined){
+                    models.User.find({
+                        where: {
+                            id: req.user.id
+                        }
+                    }).then(function(user){
+                        console.log("User id: " + user.id);
+                        json_data = {
+                            'id': user.id,
+                            'type': user.type
+                        }
+                        if (id == null || id != user.id) {
+                            id = user.id
+                        }
+                        res.send(json_data);
+                    });
+                }
+                else {
+                    models.User.find({
+                        where: {
+                            auth_id: req.user.profile.id
+                        }
+                    }).then(function (user) {
+                        console.log("User id: " + user.id);
+                        console.log("User type: " + user.type);
+                        json_data = {
+                            'id': user.id,
+                            'type': user.type
+                        }
+                        if (id == null || id != user.id) {
+                            id = user.id
+                        }
+                        res.send(json_data);
+                    });
+                }
 
 
             } else {

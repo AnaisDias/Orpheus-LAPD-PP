@@ -34,7 +34,7 @@ function userAccessCtrl($scope, $http, $location, $window) {
         if ($location.search().id != undefined && data != 'undefined') {
             if (data.type != 1) {
                 if ($location.search().id != data.id) {
-                    $window.location.href = '/#/user';
+                    $window.location.href = '/#/user?id=' + data.id;
                     $window.location.reload();
                 }
             }
@@ -80,23 +80,24 @@ function ModalInstanceCtrl($scope, $uibModalInstance, items, $cookies, $location
     $scope.selected = {
         item: $scope.items[0]
     };
-    var id = null;
-
-    if ($location.search().id == undefined) {
-        $http.get('api/checkLogin').success(function(data) {
-            id = data.id;
-        }).error(function(data) {
-            console.log("erro ao ir buscar id");
-        });
-    } else {
-        id = $location.search().id;
-    }
-
     $scope.ok = function() {
 
         $scope.$watch(function() {
             return $cookies.selDate;
         }, function(newVal, oldVal) {
+
+            var id = null;
+            if ($location.search().id == undefined) {
+                $http.get('api/checkLogin').success(function(data) {
+                    console.log("DATA IS: \n\n\n\n" + data);
+                    id = data.id;
+                }).error(function(data) {
+                    console.log("erro ao ir buscar id");
+                });
+            } else {
+                id = $location.search().id;
+            }
+
             if (typeof(newVal) == 'undefined') {
                 newVal = moment()._d;
             }
@@ -108,7 +109,7 @@ function ModalInstanceCtrl($scope, $uibModalInstance, items, $cookies, $location
                 method: 'POST',
                 url: '/api/insertMood',
                 data: {
-                    'userid': $location.search().id,
+                    'userid': id,
                     'mood': $scope.selected.item.score,
                     'date': parsedDate
                 }
@@ -127,7 +128,6 @@ function ModalInstanceCtrl($scope, $uibModalInstance, items, $cookies, $location
         }, true);
 
     }
-    var id = null;
     $scope.cancel = function() {
         $uibModalInstance.dismiss('cancel');
     };
@@ -221,9 +221,20 @@ function moodDemoCtrl($scope, $http, $location) {
     var data1tmp = [];
     $scope.labels = [];
 
-    console.log("AI NSSA SENHORA QUERO DORMIR.");
+    var id = null;
+    if ($location.search().id == undefined) {
+        $http.get('api/checkLogin').success(function(data) {
+            console.log("O id é:" + data.id);
+            id = data.id;
+        }).error(function(data) {
+            console.log("erro ao ir buscar id");
+        });
+    } else {
+        id = $location.search().id;
+    }
 
-    $http.get('/api/getLastMoods/' + $location.search().id).success(function(data) {
+
+    $http.get('/api/getLastMoods/' + id).success(function(data) {
         if (!data.message) {
             data1tmp = data;
             var found = false;
@@ -375,6 +386,19 @@ function DatePickerCtrl($scope, $rootScope, $cookies, $http, $location, $filter,
     $scope.$watch(function() {
         return $cookies.selDate;
     }, function(newVal, oldVal) {
+
+        var id = null;
+        if ($location.search().id == undefined) {
+            $http.get('api/checkLogin').success(function(data) {
+                console.log("O id é:" + data.id);
+                id = data.id;
+            }).error(function(data) {
+                console.log("erro ao ir buscar id");
+            });
+        } else {
+            id = $location.search().id;
+        }
+
         if (typeof(newVal) == 'undefined') {
             newVal = moment()._d;
         }
@@ -382,7 +406,7 @@ function DatePickerCtrl($scope, $rootScope, $cookies, $http, $location, $filter,
         unparsedDate = newVal;
         parsedDate = $filter('date')(new Date(unparsedDate), 'yyyy-MM-dd');
 
-        $http.get('/api/getMood/' + $location.search().id + "/" + parsedDate).success(function(data) {
+        $http.get('/api/getMood/' + id + "/" + parsedDate).success(function(data) {
             console.log("mood for " + parsedDate + " is:");
             console.log(data);
             if (!data.message) {
@@ -542,22 +566,24 @@ activityCtrl.$inject = ['$scope', '$cookies', '$window', '$http', '$filter', '$l
 
 function activityCtrl($scope, $cookies, $window, $http, $filter, $location, $rootScope) {
 
-    var id = null;
-    if ($location.search().id == undefined) {
-        $http.get('api/checkLogin').success(function(data) {
-            console.log("O id é:" + data.id);
-            id = data.id;
-        }).error(function(data) {
-            console.log("erro ao ir buscar id");
-        });
-    } else {
-        id = $location.search().id;
-    }
 
 
     $scope.$watch(function() {
         return $cookies.selDate;
     }, function(newVal, oldVal) {
+
+        var id = null;
+        if ($location.search().id == undefined) {
+            $http.get('api/checkLogin').success(function(data) {
+                console.log("O id é:" + data.id);
+                id = data.id;
+            }).error(function(data) {
+                console.log("erro ao ir buscar id");
+            });
+        } else {
+            id = $location.search().id;
+        }
+
         if (typeof(newVal) == 'undefined') {
             newVal = moment()._d;
         }
@@ -683,17 +709,7 @@ situmanCtrl.$inject = ['$scope', '$cookies', '$window', '$http', '$filter', '$lo
 function situmanCtrl($scope, $cookies, $window, $http, $filter, $location) {
     $scope.cenas = {};
     $scope.myform= {};
-    var id = null;
-    if ($location.search().id == undefined) {
-        $http.get('api/checkLogin').success(function(data) {
-            console.log("O id é:" + data.id);
-            id = data.id;
-        }).error(function(data) {
-            console.log("erro ao ir buscar id");
-        });
-    } else {
-        id = $location.search().id;
-    }
+
 
     $scope.insertSitMood = function(userid, mood, situation) {
         console.log(userid + mood + situation);
@@ -715,6 +731,18 @@ function situmanCtrl($scope, $cookies, $window, $http, $filter, $location) {
     $scope.$watch(function() {
         return $cookies.selDate;
     }, function(newVal, oldVal) {
+        var id = null;
+        if ($location.search().id == undefined) {
+            $http.get('api/checkLogin').success(function(data) {
+                console.log("O id é:" + data.id);
+                id = data.id;
+            }).error(function(data) {
+                console.log("erro ao ir buscar id");
+            });
+        } else {
+            id = $location.search().id;
+        }
+
         if (typeof(newVal) == 'undefined') {
             newVal = moment()._d;
         }
@@ -727,6 +755,8 @@ function situmanCtrl($scope, $cookies, $window, $http, $filter, $location) {
         $scope.situations = [];
         $scope.moods = [];
         parsedDate = $filter('date')(new Date(unparsedDate), 'dd-MM-yyyy');
+        console.log("debuging");
+        console.log('/api/situationData/' + parsedDate + "/" + id);
         $http.get('/api/situationData/' + parsedDate + "/" + id).success(function(data) {
             console.debug(data);
             //jsonD = JSON.parse(JSONdata);
@@ -743,7 +773,7 @@ function situmanCtrl($scope, $cookies, $window, $http, $filter, $location) {
         }).error(function(data) {
             console.log("error on situmanCtrl");
         });
-
+        console.log('/api/moodsituation/' + id);
         $http.get('/api/moodsituation/' + id).success(function(data) {
             var jsond = JSON.parse(data);
             for (var j in jsond) {
@@ -760,16 +790,7 @@ function situmanCtrl($scope, $cookies, $window, $http, $filter, $location) {
 
     }, true);
 
-
-
-
-
 }
-
-
-
-
-
 
 
 clientsTableCtrl.$inject = ['$scope', '$timeout'];
@@ -1208,17 +1229,7 @@ sleepCtrl.$inject = ['$scope', '$cookies', '$filter', '$http', '$location', '$ro
 
 function sleepCtrl($scope, $cookies, $filter, $http, $location, $rootScope) {
 
-    var id = null;
-    if ($location.search().id == undefined) {
-        $http.get('api/checkLogin').success(function(data) {
-            console.log("O id é:" + data.id);
-            id = data.id;
-        }).error(function(data) {
-            console.log("erro ao ir buscar id");
-        });
-    } else {
-        id = $location.search().id;
-    }
+
 
     $scope.labels = ['January', 'February', 'March', 'April', 'May', 'June', 'July'];
     $scope.data = [
@@ -1246,6 +1257,17 @@ function sleepCtrl($scope, $cookies, $filter, $http, $location, $rootScope) {
     $scope.$watch(function() {
         return $cookies.selDate;
     }, function(newVal, oldVal) {
+        var id = null;
+        if ($location.search().id == undefined) {
+            $http.get('api/checkLogin').success(function(data) {
+                console.log("O id é:" + data.id);
+                id = data.id;
+            }).error(function(data) {
+                console.log("erro ao ir buscar id");
+            });
+        } else {
+            id = $location.search().id;
+        }
         if (typeof(newVal) == 'undefined') {
             newVal = moment()._d;
         }
