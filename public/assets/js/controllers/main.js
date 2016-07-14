@@ -681,7 +681,8 @@ function activityCtrl($scope, $cookies, $window, $http, $filter, $location, $roo
 situmanCtrl.$inject = ['$scope', '$cookies', '$window', '$http', '$filter', '$location'];
 
 function situmanCtrl($scope, $cookies, $window, $http, $filter, $location) {
-
+    $scope.cenas = {};
+    $scope.myform= {};
     var id = null;
     if ($location.search().id == undefined) {
         $http.get('api/checkLogin').success(function(data) {
@@ -692,6 +693,23 @@ function situmanCtrl($scope, $cookies, $window, $http, $filter, $location) {
         });
     } else {
         id = $location.search().id;
+    }
+
+    $scope.insertSitMood = function(userid, mood, situation) {
+        console.log(userid + mood + situation);
+        var data = {
+                userid: userid,
+                situation: situation,
+                mood: mood
+            };
+        console.debug(data);
+      $http.post('/api/insertsituationmood', data).
+        success(function(data) {
+            console.log("posted successfully");
+        }).error(function(data) {
+            console.error("error in posting");
+        });
+
     }
 
     $scope.$watch(function() {
@@ -739,7 +757,10 @@ function situmanCtrl($scope, $cookies, $window, $http, $filter, $location) {
         });
 
 
+
     }, true);
+
+
 
 
 

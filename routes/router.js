@@ -86,13 +86,14 @@
             thisdate = req.body.date;
 
             dbFunctions.insertMood(userid, mood, thisdate).then(function(moodDay) {
-                updateMoodSituation(req.body.userid);
+                updateMoodSituation(req.body.userid, thisdate);
                 res.json(moodDay);
             });
 
         });
 
         app.post('/api/insertsituationmood', function(req, res) {
+            console.log("HEEEERE, MOOD=" + req.body.mood + " USERID " + req.body.userid + " SITUATION " + req.body.situation);
             var mood = 5;
             if(req.body.mood == "good"){
                 mood=10;
@@ -126,10 +127,8 @@
                                                     UserId: userid
                                                 }
                                             });
-                                            res.json({
-                    message : "situation mood updated",
-                    redirecturl: '/#/user?id=' + userid
-                  });
+                                           
+                
                                         } else {
                                             models.MoodSituation.create({
 
@@ -138,12 +137,16 @@
                                                 moodpoints: mood,
                                                 counter: moods
                                             });
-                                            res.json({
-                    message : "New situation mood created",
-                    redirecturl: '/#/user?id=' + userid
-                  });
+                                           
                                         }
-                                    });
+                                        res.json(moodsit);
+                                    }).catch(function(err) {
+                console.log("ERROR situation mood: " + err);
+                var data = {
+                    success: false
+                };
+                res.json(data);
+            });
 
         });
 
@@ -750,6 +753,115 @@
             });
         }
 
+
+        var updateMoodSituation = function(id, date) {
+            var size = 0;
+            var situ = [];
+            var dates = [];
+
+            models.SituationData.findAll({
+                where: {
+                    UserId: id,
+                    date: date
+                }
+            }).then(function(sits) {
+                sits.forEach(function(r) {
+                    console.log("Results: " + util.inspect(r.dataValues, false, null));
+                    var date = r.dataValues.date;
+                    var moodscore = 0;
+                    var situations = r.dataValues.situations;
+                    var found = false;
+
+                    if (dates.indexOf(date) == -1) {
+                        dates.push(date);
+                        models.MoodDay.find({
+                            attributes: ['score'],
+                            where: {
+                                date: date
+                            }
+                        }).then(function(moods) {
+                            if (moods != null) {
+                                moodscore = moods.score;
+                                console.log('Moodscore: ' + moodscore);
+                                for (var s in situations) {
+                                    console.log("SITUATIONS: " + util.inspect(situations, false, null));
+
+                                    if (situations[s].name != undefined) {
+
+                                        found = false;
+                                        for (var names in situ) {
+                                            if (situations[s].name == situ[names].name) {
+                                                situ[names].moodscore += moodscore;
+                                                situ[names].moods += 1;
+                                                found = true;
+                                                break;
+                                            }
+                                        }
+
+                                        if (!found) {
+                                            situ[size] = [];
+                                            situ[size].name = situations[s].name;
+                                            situ[size].moodscore = moodscore;
+                                            situ[size].moods = 1;
+                                            size += 1;
+                                        }
+                                        console.log("SITU: " + util.inspect(situ, false, null));
+                                    }
+                                }
+                                //save results to db
+                                for (var i in situ) {
+                                    var name = situ[i].name;
+                                    var score = situ[i].moodscore;
+                                    var moods = situ[i].moods;
+                                    console.log("Situation: " + name + " Score: " + score);
+
+                                    models.MoodSituation.find({
+                                        where: {
+                                            UserId: id,
+                                            situation: name
+                                        }
+                                    }).then(function(moodsit) {
+                                        if (moodsit != null) {
+                                            console.log("encontrou um mood situation para este dia e user já.");
+                                            moodsit.increment('counter');
+                                            var oldscore = moodsit.dataValues.moodpoints;
+                                            var newscore = oldscore + score;
+                                            models.MoodSituation.update({
+                                                moodpoints: newscore
+                                            }, {
+                                                where: {
+                                                    situation: name,
+                                                    UserId: id
+                                                }
+                                            });
+                                        } else {
+                                            models.MoodSituation.create({
+
+                                                situation: name,
+                                                UserId: id,
+                                                moodpoints: score,
+                                                counter: moods
+                                            });
+
+
+                                        }
+                                    });
+                                }
+                            }
+
+                        }).catch(function(err) {
+                            console.log("ERROR getting moods: " + err);
+
+                        });
+
+                    }
+                });
+
+            }).catch(function(err) {
+                console.log("ERROR getting situations: " + err);
+            });
+        }
+
         app.get('/api/moodsituation/:id', function(req, res) {
 
             var id = req.params.id;
@@ -820,11 +932,13 @@
         // will print stacktrace
         if (app.get('env') === 'development') {
             app.use(function(err, req, res, next) {
+                console.log(err);
                 res.status(err.status || 500);
-                res.render('error', {
-                    message: err.message,
-                    error: err
-                });
+    res.send({
+        message: err.message,
+        error: err
+    });
+   return;
             });
         }
 
@@ -832,10 +946,11 @@
         // no stacktraces leaked to user
         app.use(function(err, req, res, next) {
             res.status(err.status || 500);
-            res.render('error', {
-                message: err.message,
-                error: {}
-            });
+    res.send({
+        message: err.message,
+        error: err
+    });
+   return;
         });
 
 
