@@ -250,9 +250,23 @@
                                                         <td>{{ situation.name }}</td>
                                                         <td>{{ situation.count }}</td>
                                                         <td>
-                                                            <button type="button" class="btn btn-primary">Good</button>
-                                                            <button type="button" class="btn btn-warning">Neutral</button>
-                                                            <button type="button" class="btn btn-danger">Bad</button>
+                                                            <div>
+                                                            <form style="display: inline">
+                                                                <input type="hidden" name="userid" value="{{ userid }}"/>
+                                                                <input type="hidden" name="situation" value="{{ situation.name }}"/>
+                                                            <button type="submit" class="btn btn-primary"  ng-click="insertSitMood(userid,'good',situation.name)">Good</button>
+                                                        </form>
+                                                        <form style="display: inline">
+                                                            <input type="hidden" name="userid" value="{{ userid }}"/>
+                                                            <input type="hidden" name="situation" value="{{ situation.name }}"/>
+                                                            <button type="submit" class="btn btn-warning" ng-click="insertSitMood(userid,'neutral',situation.name)">Neutral</button>
+                                                        </form>
+                                                        <form style="display: inline">
+                                                            <input type="hidden" name="userid" value="{{ userid }}"/>
+                                                            <input type="hidden" name="situation" value="{{ situation.name }}"/>
+                                                            <button type="submit" class="btn btn-danger" ng-click="insertSitMood(userid,'bad',situation.name)">Bad</button>
+                                                        </form>
+                                                        </div>
                                                         </td>
                                                     </tr>
 
@@ -296,7 +310,7 @@
                                                 </thead>
                                                 <tbody>
 
-                                                    <tr ng-repeat="mood in moods">
+                                                    <tr ng-repeat="mood in moods | orderBy : '-score'">
                                                         <td>{{ mood.situation }}</td>
                                                         <td>{{ mood.score }}</td>
                                                         <!-- <td>

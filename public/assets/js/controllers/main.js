@@ -158,7 +158,8 @@ function twitterCtrl($scope, $http, $location, $cookies, $filter, $rootScope) {
             $http.get('/api/sentimentalanalysis/' + id + "/" + parsedDate).success(function(data) {
                 $scope.positive = data.positive;
                 $scope.negative = data.negative;
-                console.debug($rootScope.overallScore);
+                console.debug($scope.positive);
+                console.debug($scope.negative);
 
                 $rootScope.overallScore += (data.positive / (data.positive + data.negative)) * 10;
                 console.log("Result:" + $rootScope.overallResult);
@@ -680,7 +681,8 @@ function activityCtrl($scope, $cookies, $window, $http, $filter, $location, $roo
 situmanCtrl.$inject = ['$scope', '$cookies', '$window', '$http', '$filter', '$location'];
 
 function situmanCtrl($scope, $cookies, $window, $http, $filter, $location) {
-
+    $scope.cenas = {};
+    $scope.myform= {};
     var id = null;
     if ($location.search().id == undefined) {
         $http.get('api/checkLogin').success(function(data) {
@@ -691,6 +693,23 @@ function situmanCtrl($scope, $cookies, $window, $http, $filter, $location) {
         });
     } else {
         id = $location.search().id;
+    }
+
+    $scope.insertSitMood = function(userid, mood, situation) {
+        console.log(userid + mood + situation);
+        var data = {
+                userid: userid,
+                situation: situation,
+                mood: mood
+            };
+        console.debug(data);
+      $http.post('/api/insertsituationmood', data).
+        success(function(data) {
+            console.log("posted successfully");
+        }).error(function(data) {
+            console.error("error in posting");
+        });
+
     }
 
     $scope.$watch(function() {
@@ -704,6 +723,7 @@ function situmanCtrl($scope, $cookies, $window, $http, $filter, $location) {
         unparsedDate = newVal;
         var size = 0;
         var sizee = 0;
+        $scope.userid = id;
         $scope.situations = [];
         $scope.moods = [];
         parsedDate = $filter('date')(new Date(unparsedDate), 'dd-MM-yyyy');
@@ -719,6 +739,7 @@ function situmanCtrl($scope, $cookies, $window, $http, $filter, $location) {
 
             //$scope.situations = jsonD.situations;
             // console.log("situations:" + $scope.situations[0].name);
+
         }).error(function(data) {
             console.log("error on situmanCtrl");
         });
@@ -736,7 +757,10 @@ function situmanCtrl($scope, $cookies, $window, $http, $filter, $location) {
         });
 
 
+
     }, true);
+
+
 
 
 

@@ -86,8 +86,66 @@
             thisdate = req.body.date;
 
             dbFunctions.insertMood(userid, mood, thisdate).then(function(moodDay) {
-                updateMoodSituation(req.body.userid);
+                updateMoodSituation(req.body.userid, thisdate);
                 res.json(moodDay);
+            });
+
+        });
+
+        app.post('/api/insertsituationmood', function(req, res) {
+            console.log("HEEEERE, MOOD=" + req.body.mood + " USERID " + req.body.userid + " SITUATION " + req.body.situation);
+            var mood = 5;
+            if(req.body.mood == "good"){
+                mood=10;
+            }
+            else if(req.body.mood == "neutral"){
+                mood=5;
+            }
+            else if(req.body.mood == "bad"){
+                mood=1;
+            }
+            var userid = req.body.userid;
+            var situation = req.body.situation;
+            var moods = 1; 
+
+            models.MoodSituation.find({
+                                        where: {
+                                            UserId: userid,
+                                            situation: situation
+                                        }
+                                    }).then(function(moodsit) {
+                                        if (moodsit != null) {
+                                            console.log("encontrou um mood situation para este dia e user já.");
+                                            moodsit.increment('counter');
+                                            var oldscore = moodsit.dataValues.moodpoints;
+                                            var newscore = oldscore + mood;
+                                            models.MoodSituation.update({
+                                                moodpoints: newscore
+                                            }, {
+                                                where: {
+                                                    situation: situation,
+                                                    UserId: userid
+                                                }
+                                            });
+                                           
+                
+                                        } else {
+                                            models.MoodSituation.create({
+
+                                                situation: situation,
+                                                UserId: userid,
+                                                moodpoints: mood,
+                                                counter: moods
+                                            });
+                                           
+                                        }
+                                        res.json(moodsit);
+                                    }).catch(function(err) {
+                console.log("ERROR situation mood: " + err);
+                var data = {
+                    success: false
+                };
+                res.json(data);
             });
 
         });
@@ -203,7 +261,6 @@
                         }
                     }
 
-                    //var ts = ['I hate my life', "I want to die", "The new album by Kasabian is great"];
                     var counterPos = 0;
                     var counterNeg = 0;
 
@@ -215,6 +272,7 @@
                             .header("Accept", "application/json")
                             .send("text=" + tweet)
                             .end(function(result) {
+                                console.log("Tweet result: " + result.body.type);
                                 if (result.body.type == "positive") {
                                     counterPos++;
                                 } else if (result.body.type == "negative") {
@@ -695,6 +753,115 @@
             });
         }
 
+
+        var updateMoodSituation = function(id, date) {
+            var size = 0;
+            var situ = [];
+            var dates = [];
+
+            models.SituationData.findAll({
+                where: {
+                    UserId: id,
+                    date: date
+                }
+            }).then(function(sits) {
+                sits.forEach(function(r) {
+                    console.log("Results: " + util.inspect(r.dataValues, false, null));
+                    var date = r.dataValues.date;
+                    var moodscore = 0;
+                    var situations = r.dataValues.situations;
+                    var found = false;
+
+                    if (dates.indexOf(date) == -1) {
+                        dates.push(date);
+                        models.MoodDay.find({
+                            attributes: ['score'],
+                            where: {
+                                date: date
+                            }
+                        }).then(function(moods) {
+                            if (moods != null) {
+                                moodscore = moods.score;
+                                console.log('Moodscore: ' + moodscore);
+                                for (var s in situations) {
+                                    console.log("SITUATIONS: " + util.inspect(situations, false, null));
+
+                                    if (situations[s].name != undefined) {
+
+                                        found = false;
+                                        for (var names in situ) {
+                                            if (situations[s].name == situ[names].name) {
+                                                situ[names].moodscore += moodscore;
+                                                situ[names].moods += 1;
+                                                found = true;
+                                                break;
+                                            }
+                                        }
+
+                                        if (!found) {
+                                            situ[size] = [];
+                                            situ[size].name = situations[s].name;
+                                            situ[size].moodscore = moodscore;
+                                            situ[size].moods = 1;
+                                            size += 1;
+                                        }
+                                        console.log("SITU: " + util.inspect(situ, false, null));
+                                    }
+                                }
+                                //save results to db
+                                for (var i in situ) {
+                                    var name = situ[i].name;
+                                    var score = situ[i].moodscore;
+                                    var moods = situ[i].moods;
+                                    console.log("Situation: " + name + " Score: " + score);
+
+                                    models.MoodSituation.find({
+                                        where: {
+                                            UserId: id,
+                                            situation: name
+                                        }
+                                    }).then(function(moodsit) {
+                                        if (moodsit != null) {
+                                            console.log("encontrou um mood situation para este dia e user já.");
+                                            moodsit.increment('counter');
+                                            var oldscore = moodsit.dataValues.moodpoints;
+                                            var newscore = oldscore + score;
+                                            models.MoodSituation.update({
+                                                moodpoints: newscore
+                                            }, {
+                                                where: {
+                                                    situation: name,
+                                                    UserId: id
+                                                }
+                                            });
+                                        } else {
+                                            models.MoodSituation.create({
+
+                                                situation: name,
+                                                UserId: id,
+                                                moodpoints: score,
+                                                counter: moods
+                                            });
+
+
+                                        }
+                                    });
+                                }
+                            }
+
+                        }).catch(function(err) {
+                            console.log("ERROR getting moods: " + err);
+
+                        });
+
+                    }
+                });
+
+            }).catch(function(err) {
+                console.log("ERROR getting situations: " + err);
+            });
+        }
+
         app.get('/api/moodsituation/:id', function(req, res) {
 
             var id = req.params.id;
@@ -765,11 +932,13 @@
         // will print stacktrace
         if (app.get('env') === 'development') {
             app.use(function(err, req, res, next) {
+                console.log(err);
                 res.status(err.status || 500);
-                res.render('error', {
-                    message: err.message,
-                    error: err
-                });
+    res.send({
+        message: err.message,
+        error: err
+    });
+   return;
             });
         }
 
@@ -777,10 +946,11 @@
         // no stacktraces leaked to user
         app.use(function(err, req, res, next) {
             res.status(err.status || 500);
-            res.render('error', {
-                message: err.message,
-                error: {}
-            });
+    res.send({
+        message: err.message,
+        error: err
+    });
+   return;
         });
 
 
